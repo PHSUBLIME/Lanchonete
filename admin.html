@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Painel do Lojista | PHSUBLIME FOOD</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brand: {
+              black: '#171717',
+              dark: '#212121',
+              card: '#2A2A2A',
+              yellow: '#FFB800',
+              yellowHover: '#E0A200',
+              red: '#E53935'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#0F0F0F] text-gray-100 antialiased min-h-screen font-sans flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-black">
+
+  <!-- ========================================================
+       TELA DE LOGIN (DEMONSTRAÇÃO DE SEGURANÇA)
+  ======================================================== -->
+  <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 bg-brand-yellow rounded-2xl flex items-center justify-center mx-auto text-brand-black text-2xl font-black mb-3 shadow-lg">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h2 class="text-2xl font-black tracking-tight text-white">Painel do Lojista</h2>
+        <p class="text-xs text-gray-400 mt-1">Acesso exclusivo para gestão do restaurante</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">E-mail ou Usuário</label>
+          <input type="text" id="loginUser" value="gerente@phsublimefood.com" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+        </div>
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Senha de Acesso</label>
+          <input type="password" id="loginPass" value="123456" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+        </div>
+
+        <button type="submit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2">
+          <span>ENTRAR NO PAINEL</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-6 border-t border-neutral-800 text-center">
+        <span class="text-[11px] text-gray-500">Tecnologia desenvolvida por <strong class="text-gray-400">PHSUBLIME</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       ESTRUTURA PRINCIPAL DO PAINEL (APÓS LOGIN)
+  ======================================================== -->
+  <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
+
+    <!-- SIDEBAR / MENU LATERAL (DESKTOP) -->
+    <aside class="w-full lg:w-64 bg-brand-dark border-b lg:border-b-0 lg:border-r border-neutral-800 flex flex-col justify-between shrink-0">
+      <div>
+        <!-- Topo Sidebar -->
+        <div class="p-5 border-b border-neutral-800 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-brand-yellow text-brand-black rounded-xl flex items-center justify-center font-black text-lg">
+              <i class="fa-solid fa-burger"></i>
+            </div>
+            <div>
+              <h1 class="font-extrabold text-sm text-white leading-none">PHSUBLIME FOOD</h1>
+              <span class="text-[10px] text-brand-yellow font-bold uppercase tracking-wider">Gestão Comercial</span>
+            </div>
+          </div>
+          <a href="index.html" target="_blank" title="Abrir Cardápio Público" class="text-gray-400 hover:text-white p-2 rounded-lg bg-neutral-800 text-xs">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <!-- Botão Abrir/Fechar Loja Manualmente -->
+        <div class="p-4 border-b border-neutral-800">
+          <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span id="storeStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="storeStatusText" class="text-xs font-bold text-white">LOJA ABERTA</span>
+            </div>
+            <button onclick="toggleStoreOpen()" id="btnToggleStore" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold rounded-lg transition">
+              Pausar
+            </button>
+          </div>
+        </div>
+
+        <!-- Links de Navegação -->
+        <nav class="p-3 space-y-1 text-xs font-bold">
+          <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition">
+            <i class="fa-solid fa-bell text-sm"></i>
+            <span class="flex-1 text-left">Pedidos Ao Vivo</span>
+            <span id="badgeLiveOrders" class="bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded-full">3</span>
+          </button>
+
+          <button onclick="navigateTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition">
+            <i class="fa-solid fa-chart-pie text-sm"></i>
+            <span class="flex-1 text-left">Visão Geral / Vendas</span>
+          </button>
+
+          <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition">
+            <i class="fa-solid fa-utensils text-sm"></i>
+            <span class="flex-1 text-left">Gerenciar Cardápio</span>
+          </button>
+
+          <button onclick="navigateTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="flex-1 text-left">Configurações da Loja</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Rodapé Sidebar -->
+      <div class="p-4 border-t border-neutral-800">
+        <div class="bg-neutral-900/80 p-3 rounded-xl border border-neutral-800 mb-3">
+          <p class="text-[10px] font-bold text-gray-400 uppercase">Suporte Técnico</p>
+          <p class="text-xs font-extrabold text-white mt-0.5">PHSUBLIME</p>
+          <a href="https://wa.me/5521986147221" target="_blank" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1 mt-1">
+            <i class="fa-brands fa-whatsapp"></i> (21) 98614-7221
+          </a>
+        </div>
+        <button onclick="handleLogout()" class="w-full text-xs font-bold text-rose-400 hover:text-rose-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Encerrar Sessão</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA DE CONTEÚDO DINÂMICO -->
+    <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+
+      <!-- ========================================================
+           ABA 1: GESTÃO DE PEDIDOS AO VIVO (KANBAN / COZINHA)
+      ======================================================== -->
+      <section id="tab-orders" class="tab-content">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
+            <p class="text-xs text-gray-400">Controle o preparo e despacho dos pedidos em tempo real</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- Botão para simular novo pedido chegando -->
+            <button onclick="simulateIncomingOrder()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg">
+              <i class="fa-solid fa-plus"></i>
+              <span>Simular Novo Pedido</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de Pedidos em Cards -->
+        <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <!-- Inserido dinamicamente via JS -->
+        </div>
+      </section>
+
+      <!-- ========================================================
+           ABA 2: DASHBOARD / MÉTRICAS
+      ======================================================== -->
+      <section id="tab-dashboard" class="tab-content hidden">
+        <div class="mb-6">
+          <h2 class="text-2xl font-black text-white">Desempenho Comercial</h2>
+          <p class="text-xs text-gray-400">Métricas consolidadas das vendas do seu restaurante</p>
+        </div>
+
+        <!-- 4 Cards de Métricas -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Hoje</span>
+            <h3 class="text-2xl font-black text-white mt-1">R$ 1.284,50</h3>
+            <span class="text-[11px] text-emerald-400 font-bold">+24% que ontem</span>
+          </div>
+          <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Total de Pedidos</span>
+            <h3 class="text-2xl font-black text-white mt-1">18 pedidos</h3>
+            <span class="text-[11px] text-emerald-400 font-bold">100% entregues</span>
+          </div>
+          <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Ticket Médio</span>
+            <h3 class="text-2xl font-black text-white mt-1">R$ 71,35</h3>
+            <span class="text-[11px] text-gray-400 font-medium">Por cliente</span>
+          </div>
+          <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Economia sem iFood</span>
+            <h3 class="text-2xl font-black text-brand-yellow mt-1">R$ 346,80</h3>
+            <span class="text-[11px] text-brand-yellow font-bold">Livre de comissões!</span>
+          </div>
+        </div>
+
+        <!-- Top Produtos Mais Vendidos -->
+        <div class="bg-brand-dark p-6 rounded-2xl border border-neutral-800">
+          <h3 class="text-sm font-extrabold text-white mb-4 uppercase tracking-wider">Produtos Mais Populares</h3>
+          <div class="space-y-3 text-xs">
+            <div class="flex items-center justify-between p-3 bg-neutral-900 rounded-xl">
+              <span class="font-bold text-white">🍔 1º PHS Burger</span>
+              <span class="text-gray-400">42 vendidos hoje</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-neutral-900 rounded-xl">
+              <span class="font-bold text-white">🥓 2º Burger Bacon</span>
+              <span class="text-gray-400">28 vendidos hoje</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-neutral-900 rounded-xl">
+              <span class="font-bold text-white">🍟 3º Batata Frita Especial</span>
+              <span class="text-gray-400">25 vendidas hoje</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           ABA 3: GERENCIAR CARDÁPIO / PRODUTOS
+      ======================================================== -->
+      <section id="tab-products" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-white">Cardápio do Restaurante</h2>
+            <p class="text-xs text-gray-400">Pause produtos esgotados ou altere valores instantaneamente</p>
+          </div>
+          <button onclick="openNewProductModal()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Novo Item
+          </button>
+        </div>
+
+        <div id="adminProductTable" class="space-y-2">
+          <!-- Renderizado via JS -->
+        </div>
+      </section>
+
+      <!-- ========================================================
+           ABA 4: CONFIGURAÇÕES DA LOJA
+      ======================================================== -->
+      <section id="tab-settings" class="tab-content hidden max-w-2xl">
+        <div class="mb-6">
+          <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
+          <p class="text-xs text-gray-400">Essas informações atualizam as regras de pedido e entrega</p>
+        </div>
+
+        <form onsubmit="saveStoreSettings(event)" class="space-y-4 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante</label>
+            <input type="text" id="cfgName" value="PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos</label>
+              <input type="text" id="cfgWhatsapp" value="21986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Taxa Padrão de Entrega (R$)</label>
+              <input type="number" step="0.50" id="cfgDelivery" value="5.00" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Endereço Físico Completo</label>
+            <input type="text" id="cfgAddress" value="Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition text-xs">
+              Salvar Alterações
+            </button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================
+       MODAL DE NOVO PRODUTO
+  ======================================================== -->
+  <div id="newProductModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs">
+      <h3 class="text-base font-black text-white mb-4">Adicionar Novo Produto</h3>
+      <form onsubmit="handleCreateProduct(event)" class="space-y-3">
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Nome do Item</label>
+          <input type="text" id="newProdName" placeholder="Ex: Smash Salad Duplo" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+        </div>
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Descrição</label>
+          <input type="text" id="newProdDesc" placeholder="Ex: Pão brioche, 2x smash 90g, queijo e salada..." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Preço (R$)</label>
+            <input type="number" step="0.10" id="newProdPrice" placeholder="28.90" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Categoria</label>
+            <select id="newProdCat" class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white">
+              <option value="burgers">Hambúrgueres</option>
+              <option value="pizzas">Pizzas</option>
+              <option value="porcoes">Porções</option>
+              <option value="bebidas">Bebidas</option>
+              <option value="sobremesas">Sobremesas</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 pt-4">
+          <button type="button" onclick="closeNewProductModal()" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Cancelar</button>
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-brand-yellow text-brand-black font-extrabold">Adicionar ao Cardápio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DO PAINEL DO LOJISTA -->
+  <script>
+    // Estado inicial de pedidos e produtos demonstrativos
+    let storeState = {
+      isOpen: true,
+      orders: [
+        {
+          id: "2084",
+          client: "Carlos Eduardo",
+          phone: "21 99874-5512",
+          items: "2x PHS Burger, 1x Coca-Cola Lata",
+          total: 65.80,
+          payment: "Pix",
+          type: "Delivery",
+          address: "Rua Conde de Bonfim, 300 - Tijuca",
+          status: "Novo",
+          time: "Agora mesmo"
+        },
+        {
+          id: "2083",
+          client: "Mariana Souza",
+          phone: "21 98451-2290",
+          items: "1x Burger Bacon, 1x Batata Frita Especial",
+          total: 59.80,
+          payment: "Cartão de Crédito",
+          type: "Delivery",
+          address: "Av. Atlântica, 1400 - Copacabana",
+          status: "Em preparo",
+          time: "Há 12 min"
+        },
+        {
+          id: "2082",
+          client: "Rodrigo Antunes",
+          phone: "21 97711-4455",
+          items: "1x Cheddar Especial, 1x Pudim Tradicional",
+          total: 42.90,
+          payment: "Dinheiro (Troco p/ 50)",
+          type: "Retirada",
+          address: "Balcão do Restaurante",
+          status: "Pronto",
+          time: "Há 25 min"
+        }
+      ],
+      products: [
+        { id: 1, name: "PHS Burger", price: 29.90, category: "Hambúrgueres", available: true },
+        { id: 2, name: "Burger Bacon", price: 34.90, category: "Hambúrgueres", available: true },
+        { id: 3, name: "Cheddar Especial", price: 32.90, category: "Hambúrgueres", available: true },
+        { id: 4, name: "Batata Frita Especial", price: 24.90, category: "Porções", available: true },
+        { id: 5, name: "Refrigerante Lata", price: 6.00, category: "Bebidas", available: true },
+        { id: 6, name: "Pudim Tradicional", price: 10.00, category: "Sobremesas", available: true }
+      ]
+    };
+
+    // Autenticação demonstrativa
+    function handleLogin(e) {
+      e.preventDefault();
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("mainDashboard").classList.remove("hidden");
+      renderOrders();
+      renderProductsList();
+    }
+
+    function handleLogout() {
+      document.getElementById("mainDashboard").classList.add("hidden");
+      document.getElementById("loginScreen").classList.remove("hidden");
+    }
+
+    // Navegação de abas
+    function navigateTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+
+      document.querySelectorAll(".nav-item").forEach(btn => {
+        btn.className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition";
+      });
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition";
+      }
+    }
+
+    // Controle de Loja Aberta/Fechada
+    function toggleStoreOpen() {
+      storeState.isOpen = !storeState.isOpen;
+      const dot = document.getElementById("storeStatusDot");
+      const text = document.getElementById("storeStatusText");
+      const btn = document.getElementById("btnToggleStore");
+
+      if (storeState.isOpen) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+        text.innerText = "LOJA ABERTA";
+        btn.innerText = "Pausar";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+        text.innerText = "LOJA PAUSADA";
+        btn.innerText = "Abrir";
+      }
+    }
+
+    // Renderização dos Pedidos
+    function renderOrders() {
+      const container = document.getElementById("ordersContainer");
+      const badge = document.getElementById("badgeLiveOrders");
+      const activeOrdersCount = storeState.orders.filter(o => o.status !== "Finalizado").length;
+      badge.innerText = activeOrdersCount;
+
+      container.innerHTML = storeState.orders.map((ord, idx) => {
+        return `
+          <div class="bg-brand-dark rounded-2xl border border-neutral-800 p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-black text-brand-yellow">#${ord.id}</span>
+                <span class="text-[10px] text-gray-400">${ord.time}</span>
+              </div>
+              <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
+              <p class="text-xs text-gray-400 mb-3">${ord.phone}</p>
+
+              <div class="p-3 bg-neutral-900 rounded-xl text-xs mb-3 space-y-1">
+                <p class="font-semibold text-gray-300">${ord.items}</p>
+                <p class="text-[11px] text-gray-500"><i class="fa-solid fa-location-dot text-brand-red mr-1"></i> ${ord.address}</p>
+                <p class="text-[11px] text-gray-400 font-bold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs text-gray-400">Total:</span>
+                <span class="text-base font-black text-brand-yellow">R$ ${ord.total.toFixed(2).replace('.', ',')}</span>
+              </div>
+
+              <!-- Seletor de Status de Cozinha -->
+              <select onchange="changeOrderStatus(${idx}, this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none">
+                <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
+                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Em preparo</option>
+                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto para Entrega</option>
+                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu com Motoboy</option>
+                <option value="Finalizado" ${ord.status === 'Finalizado' ? 'selected' : ''}>✅ Concluído / Entregue</option>
+              </select>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function changeOrderStatus(idx, newStatus) {
+      storeState.orders[idx].status = newStatus;
+      renderOrders();
+    }
+
+    // Simular novo pedido chegando com sinal sonoro
+    function simulateIncomingOrder() {
+      // Beep sonoro sintético via Web Audio API
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {}
+
+      const newId = Math.floor(2000 + Math.random() * 900);
+      storeState.orders.unshift({
+        id: newId.toString(),
+        client: "Cliente Teste",
+        phone: "21 98888-0000",
+        items: "1x PHS Burger, 1x Batata Frita Especial",
+        total: 54.80,
+        payment: "Pix",
+        type: "Delivery",
+        address: "Rua do Cliente Demo, 50 - Centro",
+        status: "Novo",
+        time: "Agora mesmo"
+      });
+
+      renderOrders();
+      alert(`🔔 NOVO PEDIDO RECEBIDO! Pedido #${newId} adicionado à fila.`);
+    }
+
+    // Gestão de Produtos do Cardápio
+    function renderProductsList() {
+      const container = document.getElementById("adminProductTable");
+      container.innerHTML = storeState.products.map((prod, idx) => `
+        <div class="p-4 bg-brand-dark rounded-xl border border-neutral-800 flex items-center justify-between text-xs">
+          <div>
+            <span class="font-extrabold text-white text-sm block">${prod.name}</span>
+            <span class="text-gray-400">R$ ${prod.price.toFixed(2).replace('.', ',')} • ${prod.category}</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button onclick="toggleProdAvailability(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${prod.available ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}">
+              ${prod.available ? 'Disponível' : 'Pausado'}
+            </button>
+            <button onclick="removeProduct(${idx})" class="text-neutral-500 hover:text-rose-400 p-1.5">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleProdAvailability(idx) {
+      storeState.products[idx].available = !storeState.products[idx].available;
+      renderProductsList();
+    }
+
+    function removeProduct(idx) {
+      if (confirm("Deseja realmente remover este produto do cardápio?")) {
+        storeState.products.splice(idx, 1);
+        renderProductsList();
+      }
+    }
+
+    function openNewProductModal() {
+      document.getElementById("newProductModal").classList.remove("hidden");
+    }
+
+    function closeNewProductModal() {
+      document.getElementById("newProductModal").classList.add("hidden");
+    }
+
+    function handleCreateProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById("newProdName").value;
+      const desc = document.getElementById("newProdDesc").value;
+      const price = parseFloat(document.getElementById("newProdPrice").value);
+      const cat = document.getElementById("newProdCat").value;
+
+      storeState.products.unshift({
+        id: Date.now(),
+        name: name,
+        price: price,
+        category: cat,
+        available: true
+      });
+
+      closeNewProductModal();
+      renderProductsList();
+      alert("Produto adicionado ao cardápio com sucesso!");
+    }
+
+    function saveStoreSettings(e) {
+      e.preventDefault();
+      alert("Configurações do restaurante salvas com sucesso!");
+    }
+  </script>
+</body>
+</html>
