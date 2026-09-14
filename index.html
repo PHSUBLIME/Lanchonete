@@ -55,27 +55,19 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12">
 
-  <!-- BARRA SUPERIOR DE HORÁRIO -->
+  <!-- BARRA SUPERIOR DE HORÁRIO (SEM BOTÃO DO LOJISTA) -->
   <div class="bg-brand-black text-white text-xs py-2 px-4 border-b border-neutral-800">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all">
-          <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
-          <span id="storeStatusText">ABERTO AGORA</span>
-        </span>
-        <span class="hidden sm:inline text-neutral-400">|</span>
-        <span class="hidden sm:inline text-neutral-300" id="storeScheduleText">Atendimento e Entregas Disponíveis</span>
-      </div>
-      <div>
-        <a href="admin.html" target="_blank" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs px-2.5 py-1 rounded-md border border-neutral-700 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-lock"></i>
-          <span class="font-semibold">Área do Lojista</span>
-        </a>
-      </div>
+    <div class="max-w-6xl mx-auto flex justify-center sm:justify-start items-center space-x-2">
+      <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all">
+        <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
+        <span id="storeStatusText">ABERTO AGORA</span>
+      </span>
+      <span class="text-neutral-500">|</span>
+      <span class="text-neutral-300" id="storeScheduleText">Atendimento e Entregas Disponíveis</span>
     </div>
   </div>
 
-  <!-- HEADER DA LOJA -->
+  <!-- HEADER -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
     <div class="max-w-6xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToSection('inicio')">
@@ -161,7 +153,7 @@
       </div>
     </section>
 
-    <!-- BARRA DE CATEGORIAS -->
+    <!-- BARRA HORIZONTAL DE CATEGORIAS DINÂMICAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
       <div class="max-w-6xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -191,7 +183,7 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- FOOTER INSTITUCIONAL -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-6xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -698,6 +690,7 @@
       modalQty: 1
     };
 
+    // ESCUTA EM TEMPO REAL
     try {
       const cloudClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
       cloudClient.on('connect', () => {
