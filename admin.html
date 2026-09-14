@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CONEXÃO EM TEMPO REAL VIA NUVEM (WEBSOCKETS) -->
+  <!-- CONEXÃO EM TEMPO REAL VIA NUVEM -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
   <script>
@@ -123,7 +123,7 @@
         </div>
 
         <nav class="p-3 space-y-1 text-xs font-bold">
-          <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition">
+          <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition">
             <i class="fa-solid fa-bell text-sm"></i>
             <span class="flex-1 text-left">Fila de Pedidos</span>
             <span id="badgeLiveOrders" class="bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
@@ -134,7 +134,7 @@
             <span class="flex-1 text-left">Visão Geral / Vendas</span>
           </button>
 
-          <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition">
+          <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition">
             <i class="fa-solid fa-utensils text-sm"></i>
             <span class="flex-1 text-left">Gerenciar Cardápio</span>
           </button>
@@ -165,21 +165,20 @@
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
       <!-- ABA 1: FILA DE PEDIDOS -->
-      <section id="tab-orders" class="tab-content">
+      <section id="tab-orders" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
             <p class="text-xs text-gray-400">Pedidos feitos pelo celular chegam aqui na hora</p>
           </div>
           <div>
-            <span id="cloudStatusBadge" class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
+            <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               Nuvem Conectada em Tempo Real
             </span>
           </div>
         </div>
 
-        <!-- FILTROS -->
         <div class="flex items-center space-x-2 mb-6 border-b border-neutral-800 pb-3">
           <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition">
             Todos (<span id="countFilterTodos">0</span>)
@@ -226,19 +225,19 @@
         </div>
       </section>
 
-      <!-- ABA 3: CARDÁPIO -->
-      <section id="tab-products" class="tab-content hidden">
+      <!-- ABA 3: CARDÁPIO (COM EDIÇÃO E FOTOS) -->
+      <section id="tab-products" class="tab-content">
         <div class="flex justify-between items-center mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Cardápio do Restaurante</h2>
-            <p class="text-xs text-gray-400">Pause produtos esgotados ou altere valores instantaneamente</p>
+            <p class="text-xs text-gray-400">Edite preços, fotos, descrições ou pause produtos esgotados</p>
           </div>
-          <button onclick="openNewProductModal()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+          <button onclick="openProductModal()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
             <i class="fa-solid fa-plus"></i> Novo Item
           </button>
         </div>
 
-        <div id="adminProductTable" class="space-y-2"></div>
+        <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
       <!-- ABA 4: CONFIGURAÇÕES -->
@@ -279,27 +278,68 @@
     </main>
   </div>
 
-  <!-- MODAL DE NOVO PRODUTO -->
-  <div id="newProductModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs">
-      <h3 class="text-base font-black text-white mb-4">Adicionar Novo Produto</h3>
-      <form onsubmit="handleCreateProduct(event)" class="space-y-3">
-        <div>
-          <label class="block font-bold text-gray-300 mb-1">Nome do Item</label>
-          <input type="text" id="newProdName" placeholder="Ex: Smash Especial" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
-        </div>
-        <div>
-          <label class="block font-bold text-gray-300 mb-1">Descrição</label>
-          <input type="text" id="newProdDesc" placeholder="Ex: Pão, smash 90g, cheddar e bacon..." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
-        </div>
-        <div class="grid grid-cols-2 gap-2">
+  <!-- ========================================================
+       MODAL DE CADASTRO E EDIÇÃO DE PRODUTO (COM UPLOAD DE FOTO)
+  ======================================================== -->
+  <div id="productEditModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 sm:p-7 rounded-3xl max-w-lg w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[92vh]">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="productModalTitle" class="text-base font-black text-white">Cadastrar / Editar Produto</h3>
+        <button onclick="closeProductModal()" class="text-gray-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveProduct(event)" class="space-y-4">
+        <input type="hidden" id="prodEditId" value="" />
+
+        <!-- ÁREA DA FOTO DO PRODUTO -->
+        <div class="p-4 bg-neutral-900/90 rounded-2xl border border-neutral-800">
+          <label class="block font-bold text-gray-300 mb-2">Foto do Produto</label>
+          
+          <div class="flex items-center space-x-4 mb-3">
+            <!-- Preview da Imagem -->
+            <div class="w-20 h-20 rounded-xl bg-neutral-800 border border-neutral-700 overflow-hidden shrink-0 flex items-center justify-center">
+              <img id="imagePreview" src="" class="w-full h-full object-cover hidden" />
+              <i id="imagePlaceholder" class="fa-solid fa-image text-2xl text-neutral-600"></i>
+            </div>
+
+            <!-- Botão de Upload do Celular / Computador -->
+            <div class="flex-1">
+              <label class="cursor-pointer inline-flex items-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold px-3.5 py-2.5 rounded-xl border border-neutral-700 transition text-xs mb-1">
+                <i class="fa-solid fa-camera"></i>
+                <span>Escolher Foto do Aparelho</span>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)" class="hidden" />
+              </label>
+              <p class="text-[10px] text-gray-400">Tire uma foto ou escolha da galeria do celular</p>
+            </div>
+          </div>
+
+          <!-- Ou link da imagem -->
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Preço (R$)</label>
-            <input type="number" step="0.10" id="newProdPrice" placeholder="28.90" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+            <label class="block text-[11px] font-semibold text-gray-400 mb-1">Ou cole o link direto da imagem (URL):</label>
+            <input type="url" id="prodImageUrl" oninput="updatePreviewFromUrl(this.value)" placeholder="https://exemplo.com/foto-do-lanche.jpg" class="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Nome do Produto *</label>
+          <input type="text" id="prodName" placeholder="Ex: Smash Salad Duplo" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Descrição do Produto *</label>
+          <textarea id="prodDesc" rows="2" placeholder="Ex: Pão brioche, 2x carnes smash 90g, queijo prato, salada fresca e maionese artesanal." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Preço (R$) *</label>
+            <input type="number" step="0.10" id="prodPrice" placeholder="29.90" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
           </div>
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Categoria</label>
-            <select id="newProdCat" class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white">
+            <label class="block font-bold text-gray-300 mb-1">Categoria *</label>
+            <select id="prodCategory" class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white">
               <option value="Hambúrgueres">Hambúrgueres</option>
               <option value="Pizzas">Pizzas</option>
               <option value="Porções">Porções</option>
@@ -308,9 +348,10 @@
             </select>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 pt-4">
-          <button type="button" onclick="closeNewProductModal()" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Cancelar</button>
-          <button type="submit" class="px-4 py-2.5 rounded-xl bg-brand-yellow text-brand-black font-extrabold">Adicionar ao Cardápio</button>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t border-neutral-800">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold hover:bg-neutral-700">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold shadow-md">Salvar Produto</button>
         </div>
       </form>
     </div>
@@ -319,59 +360,81 @@
   <!-- ÁREA DE IMPRESSÃO TÉRMICA OCULTA -->
   <div id="printableReceipt" class="hidden"></div>
 
-  <!-- JAVASCRIPT DO PAINEL DO LOJISTA -->
+  <!-- JAVASCRIPT DO PAINEL -->
   <script>
     let activeFilter = 'todos';
+    let currentBase64Image = '';
 
     let storeState = {
       isOpen: true,
       orders: [],
       products: [
-        { id: 1, name: "PHS Burger", price: 29.90, category: "Hambúrgueres", available: true },
-        { id: 2, name: "Burger Bacon", price: 34.90, category: "Hambúrgueres", available: true },
-        { id: 3, name: "Cheddar Especial", price: 32.90, category: "Hambúrgueres", available: true },
-        { id: 4, name: "Batata Frita Especial", price: 24.90, category: "Porções", available: true },
-        { id: 5, name: "Refrigerante Lata", price: 6.00, category: "Bebidas", available: true },
-        { id: 6, name: "Pudim Tradicional", price: 10.00, category: "Sobremesas", available: true }
+        { 
+          id: 1, 
+          name: "PHS Burger", 
+          desc: "Hambúrguer artesanal, queijo, alface, tomate e molho especial.", 
+          price: 29.90, 
+          category: "Hambúrgueres", 
+          image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        },
+        { 
+          id: 2, 
+          name: "Burger Bacon", 
+          desc: "Hambúrguer artesanal, queijo derretido, tiras de bacon crocante e barbecue.", 
+          price: 34.90, 
+          category: "Hambúrgueres", 
+          image: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        },
+        { 
+          id: 3, 
+          name: "Cheddar Especial", 
+          desc: "Hambúrguer artesanal, cheddar cremoso legítimo e cebola caramelizada.", 
+          price: 32.90, 
+          category: "Hambúrgueres", 
+          image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        },
+        { 
+          id: 4, 
+          name: "Batata Frita Especial", 
+          desc: "Batata frita ultra crocante com cheddar e bacon picado.", 
+          price: 24.90, 
+          category: "Porções", 
+          image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        },
+        { 
+          id: 5, 
+          name: "Refrigerante Lata", 
+          desc: "Lata 350ml gelada.", 
+          price: 6.00, 
+          category: "Bebidas", 
+          image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        },
+        { 
+          id: 6, 
+          name: "Pudim Tradicional", 
+          desc: "Pudim de leite condensado super cremoso com calda de caramelo.", 
+          price: 10.00, 
+          category: "Sobremesas", 
+          image: "https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?auto=format&fit=crop&w=800&q=80", 
+          available: true 
+        }
       ]
     };
 
     function loadInitialOrders() {
-      const saved = localStorage.getItem('phsublime_orders');
-      if (saved) {
-        storeState.orders = JSON.parse(saved);
-      } else {
-        storeState.orders = [
-          {
-            id: "2084",
-            client: "Carlos Eduardo",
-            phone: "21 99874-5512",
-            items: "2x PHS Burger, 1x Coca-Cola Lata",
-            total: 65.80,
-            payment: "Pix",
-            type: "Delivery",
-            address: "Rua Conde de Bonfim, 300 - Tijuca",
-            notes: "Sem cebola no lanche",
-            status: "Novo",
-            time: "19:20",
-            deliveredAt: null
-          },
-          {
-            id: "2083",
-            client: "Mariana Souza",
-            phone: "21 98451-2290",
-            items: "1x Burger Bacon, 1x Batata Frita Especial",
-            total: 59.80,
-            payment: "Cartão de Crédito",
-            type: "Delivery",
-            address: "Av. Atlântica, 1400 - Copacabana",
-            notes: "Campainha quebrada",
-            status: "Em preparo",
-            time: "19:05",
-            deliveredAt: null
-          }
-        ];
-        saveOrdersToStorage();
+      const savedOrders = localStorage.getItem('phsublime_orders');
+      if (savedOrders) {
+        storeState.orders = JSON.parse(savedOrders);
+      }
+
+      const savedProducts = localStorage.getItem('phsublime_custom_products');
+      if (savedProducts) {
+        storeState.products = JSON.parse(savedProducts);
       }
     }
 
@@ -379,7 +442,228 @@
       localStorage.setItem('phsublime_orders', JSON.stringify(storeState.orders));
     }
 
-    // 1. ESCUTA DA NUVEM EM TEMPO REAL (CELULAR -> COMPUTADOR)
+    function saveProductsToStorage() {
+      localStorage.setItem('phsublime_custom_products', JSON.stringify(storeState.products));
+    }
+
+    // ========================================================
+    // GESTÃO E EDIÇÃO DE PRODUTOS (COM FOTOS)
+    // ========================================================
+    function renderProductsList() {
+      const container = document.getElementById("adminProductTable");
+      
+      container.innerHTML = storeState.products.map((prod, idx) => `
+        <div class="p-4 bg-brand-dark rounded-2xl border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-neutral-700 transition">
+          <div class="flex items-center space-x-3.5">
+            <img src="${prod.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-14 h-14 rounded-xl object-cover bg-neutral-800 border border-neutral-700 shrink-0" />
+            <div>
+              <span class="font-extrabold text-white text-sm block">${prod.name}</span>
+              <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">${prod.desc || ''}</p>
+              <span class="text-brand-yellow font-black text-xs mt-1 block">R$ ${prod.price.toFixed(2).replace('.', ',')} <span class="text-gray-500 font-normal">• ${prod.category}</span></span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-800">
+            <!-- Botão Disponível / Pausado -->
+            <button onclick="toggleProdAvailability(${idx})" class="px-3 py-2 rounded-xl text-xs font-bold transition ${prod.available ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}">
+              ${prod.available ? 'Disponível' : 'Pausado'}
+            </button>
+
+            <!-- Botão de Editar -->
+            <button onclick="openProductModal(${prod.id})" title="Editar este produto" class="bg-neutral-800 hover:bg-neutral-700 text-gray-200 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-pen text-brand-yellow"></i>
+              <span>Editar</span>
+            </button>
+
+            <!-- Botão de Excluir -->
+            <button onclick="removeProduct(${idx})" title="Excluir" class="text-neutral-500 hover:text-rose-400 p-2 transition">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleProdAvailability(idx) {
+      storeState.products[idx].available = !storeState.products[idx].available;
+      saveProductsToStorage();
+      renderProductsList();
+    }
+
+    function removeProduct(idx) {
+      if (confirm(`Deseja realmente excluir "${storeState.products[idx].name}" do cardápio?`)) {
+        storeState.products.splice(idx, 1);
+        saveProductsToStorage();
+        renderProductsList();
+      }
+    }
+
+    // ABRIR MODAL (SEJA PARA NOVO OU PARA EDITAR)
+    function openProductModal(productId = null) {
+      const modal = document.getElementById("productEditModal");
+      const title = document.getElementById("productModalTitle");
+      const idField = document.getElementById("prodEditId");
+      const nameField = document.getElementById("prodName");
+      const descField = document.getElementById("prodDesc");
+      const priceField = document.getElementById("prodPrice");
+      const catField = document.getElementById("prodCategory");
+      const urlField = document.getElementById("prodImageUrl");
+      
+      currentBase64Image = '';
+
+      if (productId) {
+        // Modo Edição
+        const prod = storeState.products.find(p => p.id === productId);
+        if (!prod) return;
+
+        title.innerText = "Editar Produto";
+        idField.value = prod.id;
+        nameField.value = prod.name;
+        descField.value = prod.desc || '';
+        priceField.value = prod.price;
+        catField.value = prod.category;
+        urlField.value = prod.image && prod.image.startsWith('http') ? prod.image : '';
+
+        showImagePreview(prod.image);
+      } else {
+        // Modo Novo Item
+        title.innerText = "Cadastrar Novo Produto";
+        idField.value = "";
+        nameField.value = "";
+        descField.value = "";
+        priceField.value = "";
+        catField.value = "Hambúrgueres";
+        urlField.value = "";
+
+        hideImagePreview();
+      }
+
+      modal.classList.remove("hidden");
+    }
+
+    function closeProductModal() {
+      document.getElementById("productEditModal").classList.add("hidden");
+    }
+
+    // TRATAMENTO DO UPLOAD DE FOTO (COMPRESSÃO AUTOMÁTICA)
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        // Redimensiona a imagem usando Canvas para ficar leve no 4G
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const maxDim = 600; // 600px é perfeito para celular e muito leve
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height *= maxDim / width;
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width *= maxDim / height;
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Gera imagem JPEG comprimida (qualidade 0.75)
+          currentBase64Image = canvas.toDataURL("image/jpeg", 0.75);
+          showImagePreview(currentBase64Image);
+          document.getElementById("prodImageUrl").value = "";
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updatePreviewFromUrl(url) {
+      if (url && url.trim().length > 5) {
+        currentBase64Image = '';
+        showImagePreview(url.trim());
+      } else {
+        hideImagePreview();
+      }
+    }
+
+    function showImagePreview(src) {
+      if (!src) {
+        hideImagePreview();
+        return;
+      }
+      const preview = document.getElementById("imagePreview");
+      const placeholder = document.getElementById("imagePlaceholder");
+      preview.src = src;
+      preview.classList.remove("hidden");
+      placeholder.classList.add("hidden");
+    }
+
+    function hideImagePreview() {
+      const preview = document.getElementById("imagePreview");
+      const placeholder = document.getElementById("imagePlaceholder");
+      preview.src = "";
+      preview.classList.add("hidden");
+      placeholder.classList.remove("hidden");
+    }
+
+    // SALVAR PRODUTO (NOVO OU EDITADO)
+    function handleSaveProduct(e) {
+      e.preventDefault();
+
+      const editId = document.getElementById("prodEditId").value;
+      const name = document.getElementById("prodName").value.trim();
+      const desc = document.getElementById("prodDesc").value.trim();
+      const price = parseFloat(document.getElementById("prodPrice").value);
+      const category = document.getElementById("prodCategory").value;
+      const urlImage = document.getElementById("prodImageUrl").value.trim();
+
+      // Define a foto final: se enviou arquivo base64, usa ela; se colou url, usa url; senão mantém padrão
+      let finalImage = currentBase64Image || urlImage || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80';
+
+      if (editId) {
+        // Editando item existente
+        const prod = storeState.products.find(p => p.id == editId);
+        if (prod) {
+          prod.name = name;
+          prod.desc = desc;
+          prod.price = price;
+          prod.category = category;
+          if (finalImage) prod.image = finalImage;
+        }
+      } else {
+        // Criando novo item
+        const newProduct = {
+          id: Date.now(),
+          name: name,
+          desc: desc,
+          price: price,
+          category: category,
+          image: finalImage,
+          available: true
+        };
+        storeState.products.unshift(newProduct);
+      }
+
+      saveProductsToStorage();
+      renderProductsList();
+      closeProductModal();
+      alert("Produto salvo com sucesso no cardápio!");
+    }
+
+    // ========================================================
+    // SINCRONIZAÇÃO EM TEMPO REAL E PEDIDOS
+    // ========================================================
     try {
       const cloudClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
       cloudClient.on('connect', () => {
@@ -393,11 +677,8 @@
           }
         } catch (e) {}
       });
-    } catch (e) {
-      console.log("Erro na nuvem:", e);
-    }
+    } catch (e) {}
 
-    // 2. ESCUTA LOCAL (MESMO APARELHO)
     try {
       const syncChannel = new BroadcastChannel('phsublime_orders_channel');
       syncChannel.onmessage = function(e) {
@@ -416,7 +697,6 @@
     });
 
     function handleIncomingOrder(newOrder) {
-      // Evita duplicatas caso venha pela nuvem e pelo storage simultaneamente
       const exists = storeState.orders.some(o => o.id === newOrder.id);
       if (!exists) {
         storeState.orders.unshift(newOrder);
@@ -553,7 +833,6 @@
           <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
             <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
             <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
-            <p class="text-xs text-gray-400 mt-1">Os pedidos feitos no cardápio aparecerão aqui.</p>
           </div>
         `;
         return;
@@ -596,7 +875,7 @@
 
             <div>
               <div class="flex justify-between items-center mb-3">
-                <span class="text-xs text-gray-400">Total do Pedido:</span>
+                <span class="text-xs text-gray-400">Total:</span>
                 <span class="text-base font-black text-brand-yellow">R$ ${ord.total.toFixed(2).replace('.', ',')}</span>
               </div>
 
@@ -616,7 +895,7 @@
 
                 ${
                   isEntregue 
-                    ? `<button onclick="reabrirPedido(${ord.originalIndex})" class="w-full bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    ? `<button onclick="reabrirPedido(${ord.originalIndex})" title="Reabrir" class="w-full bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                          <i class="fa-solid fa-check-double"></i>
                          <span>Baixado</span>
                        </button>`
@@ -698,66 +977,6 @@
         text.innerText = "LOJA PAUSADA";
         btn.innerText = "Abrir";
       }
-    }
-
-    function renderProductsList() {
-      const container = document.getElementById("adminProductTable");
-      container.innerHTML = storeState.products.map((prod, idx) => `
-        <div class="p-4 bg-brand-dark rounded-xl border border-neutral-800 flex items-center justify-between text-xs">
-          <div>
-            <span class="font-extrabold text-white text-sm block">${prod.name}</span>
-            <span class="text-gray-400">R$ ${prod.price.toFixed(2).replace('.', ',')} • ${prod.category}</span>
-          </div>
-          <div class="flex items-center space-x-3">
-            <button onclick="toggleProdAvailability(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${prod.available ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}">
-              ${prod.available ? 'Disponível' : 'Pausado'}
-            </button>
-            <button onclick="removeProduct(${idx})" class="text-neutral-500 hover:text-rose-400 p-1.5">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function toggleProdAvailability(idx) {
-      storeState.products[idx].available = !storeState.products[idx].available;
-      renderProductsList();
-    }
-
-    function removeProduct(idx) {
-      if (confirm("Deseja realmente remover este produto do cardápio?")) {
-        storeState.products.splice(idx, 1);
-        renderProductsList();
-      }
-    }
-
-    function openNewProductModal() {
-      document.getElementById("newProductModal").classList.remove("hidden");
-    }
-
-    function closeNewProductModal() {
-      document.getElementById("newProductModal").classList.add("hidden");
-    }
-
-    function handleCreateProduct(e) {
-      e.preventDefault();
-      const name = document.getElementById("newProdName").value;
-      const desc = document.getElementById("newProdDesc").value;
-      const price = parseFloat(document.getElementById("newProdPrice").value);
-      const cat = document.getElementById("newProdCat").value;
-
-      storeState.products.unshift({
-        id: Date.now(),
-        name: name,
-        price: price,
-        category: cat,
-        available: true
-      });
-
-      closeNewProductModal();
-      renderProductsList();
-      alert("Produto adicionado com sucesso!");
     }
 
     function saveStoreSettings(e) {
