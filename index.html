@@ -55,7 +55,7 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12">
 
-  <!-- BARRA DE STATUS SINCRONIZADA -->
+  <!-- BARRA SUPERIOR DE HORÁRIO -->
   <div class="bg-brand-black text-white text-xs py-2 px-4 border-b border-neutral-800">
     <div class="max-w-6xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-2">
@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER DA LOJA -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
     <div class="max-w-6xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToSection('inicio')">
@@ -83,8 +83,8 @@
           <i class="fa-solid fa-burger"></i>
         </div>
         <div>
-          <h1 id="brandNameHeader" class="text-lg sm:text-xl font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
-          <p id="brandSloganHeader" class="text-xs text-gray-500 hidden sm:block">Sabor que combina com você!</p>
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
+          <p class="text-xs text-gray-500 hidden sm:block">Sabor que combina com você!</p>
         </div>
       </div>
 
@@ -122,7 +122,7 @@
               <span>FAZER PEDIDO</span>
               <i class="fa-solid fa-arrow-down"></i>
             </button>
-            <a id="btnHeroWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="bg-neutral-800/80 hover:bg-neutral-700 text-white font-semibold px-5 py-3 rounded-xl transition text-sm flex items-center space-x-2 border border-neutral-700">
+            <a href="https://wa.me/5521986147221" target="_blank" class="bg-neutral-800/80 hover:bg-neutral-700 text-white font-semibold px-5 py-3 rounded-xl transition text-sm flex items-center space-x-2 border border-neutral-700">
               <i class="fa-brands fa-whatsapp text-emerald-400 text-lg"></i>
               <span>Falar no WhatsApp</span>
             </a>
@@ -161,7 +161,7 @@
       </div>
     </section>
 
-    <!-- BARRA HORIZONTAL DE CATEGORIAS DINÂMICAS -->
+    <!-- BARRA DE CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
       <div class="max-w-6xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -202,7 +202,7 @@
             </span>
             <span class="font-extrabold text-base tracking-wide">PHSUBLIME FOOD</span>
           </div>
-          <p class="text-xs text-neutral-400 mb-3">Deliciosos pratos artesanais preparados com qualidade para transformar o seu dia.</p>
+          <p class="text-xs text-neutral-400 mb-3">Deliciosos pratos preparados com carinho para deixar seu dia ainda melhor.</p>
           <p class="text-xs text-neutral-300 flex items-center gap-2 mb-1">
             <i class="fa-solid fa-location-dot text-brand-yellow"></i>
             <span>Rua das Delícias, 100 - Rio de Janeiro - RJ</span>
@@ -563,7 +563,6 @@
 
   <!-- SCRIPT DO CLIENTE -->
   <script>
-    // FORMATAÇÃO DO WHATSAPP COM DDI 55 DO BRASIL
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
       if (clean.length === 10 || clean.length === 11) {
@@ -576,7 +575,7 @@
       store: {
         name: "PHSUBLIME FOOD",
         slogan: "Sabor que combina com você!",
-        whatsapp: "5521986147221", // COM DDI 55 DO BRASIL
+        whatsapp: "5521986147221",
         deliveryFee: 5.00
       },
       categories: [
@@ -645,7 +644,6 @@
       ]
     };
 
-    // CARREGA PRODUTOS E CATEGORIAS DINÂMICAS DO ADMIN
     function syncProductsFromStorage() {
       const saved = localStorage.getItem('phsublime_custom_products');
       if (saved) {
@@ -700,7 +698,6 @@
       modalQty: 1
     };
 
-    // ESCUTA EM TEMPO REAL
     try {
       const cloudClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
       cloudClient.on('connect', () => {
