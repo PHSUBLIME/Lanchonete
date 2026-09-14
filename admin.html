@@ -123,7 +123,7 @@
         <nav class="p-3 space-y-1 text-xs font-bold">
           <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition">
             <i class="fa-solid fa-bell text-sm"></i>
-            <span class="flex-1 text-left">Pedidos Ao Vivo</span>
+            <span class="flex-1 text-left">Fila de Pedidos</span>
             <span id="badgeLiveOrders" class="bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
           </button>
 
@@ -167,16 +167,30 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Pedidos feitos no cardápio chegam aqui imediatamente</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos ativos e histórico de baixas</p>
           </div>
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              Sincronização Ativa com a Loja
+              Sincronização com o Cardápio Ativa
             </span>
           </div>
         </div>
 
+        <!-- ABAS DE FILTRO RÁPIDO -->
+        <div class="flex items-center space-x-2 mb-6 border-b border-neutral-800 pb-3">
+          <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition">
+            Todos (<span id="countFilterTodos">0</span>)
+          </button>
+          <button onclick="setOrderFilter('abertos')" id="filterBtn-abertos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition">
+            🔥 Em Aberto (<span id="countFilterAbertos">0</span>)
+          </button>
+          <button onclick="setOrderFilter('entregues')" id="filterBtn-entregues" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition">
+            ✅ Entregues / Baixados (<span id="countFilterEntregues">0</span>)
+          </button>
+        </div>
+
+        <!-- CONTAINER DOS CARDS DE PEDIDO -->
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
@@ -306,6 +320,8 @@
 
   <!-- SCRIPT DO PAINEL DO LOJISTA -->
   <script>
+    let activeFilter = 'todos'; // 'todos', 'abertos', 'entregues'
+
     let storeState = {
       isOpen: true,
       orders: [],
@@ -336,7 +352,8 @@
             address: "Rua Conde de Bonfim, 300 - Tijuca",
             notes: "Sem cebola no lanche",
             status: "Novo",
-            time: "19:20"
+            time: "19:20",
+            deliveredAt: null
           },
           {
             id: "2083",
@@ -347,9 +364,10 @@
             payment: "Cartão de Crédito",
             type: "Delivery",
             address: "Av. Atlântica, 1400 - Copacabana",
-            notes: "Campainha quebrada, ligar ao chegar",
+            notes: "Campainha quebrada",
             status: "Em preparo",
-            time: "19:05"
+            time: "19:05",
+            deliveredAt: null
           }
         ];
         saveOrdersToStorage();
@@ -370,7 +388,7 @@
         }
       };
     } catch(err) {
-      console.log("BroadcastChannel não suportado, usando fallback Storage");
+      console.log("Fallback para storage");
     }
 
     window.addEventListener('storage', function(e) {
@@ -389,7 +407,6 @@
       alert(`🔔 NOVO PEDIDO RECEBIDO DA LOJA!\n\nPedido #${newOrder.id}\nCliente: ${newOrder.client}\nTotal: R$ ${newOrder.total.toFixed(2).replace('.', ',')}`);
     }
 
-    // SINAL SONORO
     function playOrderChime() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -405,15 +422,35 @@
       } catch (e) {}
     }
 
-    // 1. DAR BAIXA NO PEDIDO
+    // CONTROLE DE FILTROS DA FILA
+    function setOrderFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition";
+      });
+      document.getElementById(`filterBtn-${filter}`).className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition";
+      renderOrders();
+    }
+
+    // 1. DAR BAIXA NO PEDIDO (NÃO SOME, FICA MARCADO COMO ENTREGUE)
     function darBaixaPedido(index) {
       const order = storeState.orders[index];
-      if (confirm(`Deseja realmente DAR BAIXA e finalizar o Pedido #${order.id} de ${order.client}?`)) {
-        order.status = "Finalizado";
-        saveOrdersToStorage();
-        renderOrders();
-        updateDashboardMetrics();
-      }
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      order.status = "Entregue";
+      order.deliveredAt = nowTime;
+      saveOrdersToStorage();
+      renderOrders();
+      updateDashboardMetrics();
+    }
+
+    // REABRIR PEDIDO (CASO DÊ BAIXA SEM QUERER)
+    function reabrirPedido(index) {
+      const order = storeState.orders[index];
+      order.status = "Em preparo";
+      order.deliveredAt = null;
+      saveOrdersToStorage();
+      renderOrders();
+      updateDashboardMetrics();
     }
 
     // 2. IMPRIMIR COMPROVANTE (TÉRMICO OU COMUM)
@@ -431,6 +468,7 @@
 
         <div style="margin-bottom: 8px; font-size: 11px;">
           <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
+          <p style="margin: 2px 0;"><strong>STATUS:</strong> ${ord.status.toUpperCase()}</p>
           <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
           <p style="margin: 2px 0;"><strong>TIPO:</strong> ${ord.type.toUpperCase()}</p>
           <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
@@ -452,11 +490,11 @@
 
         <div style="border-top: 1px dashed #000; padding-top: 6px; font-size: 12px;">
           <p style="margin: 2px 0; display:flex; justify-content:space-between;">
-            <span>FORMA DE PAGAMENTO:</span>
+            <span>PAGAMENTO:</span>
             <strong>${ord.payment}</strong>
           </p>
           <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: bold; display:flex; justify-content:space-between;">
-            <span>VALOR TOTAL:</span>
+            <span>TOTAL:</span>
             <span>R$ ${ord.total.toFixed(2).replace('.', ',')}</span>
           </p>
         </div>
@@ -472,75 +510,121 @@
       receiptArea.classList.add("hidden");
     }
 
+    // RENDERIZAÇÃO DA FILA DE PEDIDOS COM STATUS DE BAIXA
     function renderOrders() {
       const container = document.getElementById("ordersContainer");
       const badge = document.getElementById("badgeLiveOrders");
 
-      const activeOrders = storeState.orders
-        .map((ord, originalIndex) => ({ ...ord, originalIndex }))
-        .filter(o => o.status !== "Finalizado");
+      const totalCount = storeState.orders.length;
+      const abertosCount = storeState.orders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado").length;
+      const entreguesCount = totalCount - abertosCount;
 
-      badge.innerText = activeOrders.length;
+      document.getElementById("countFilterTodos").innerText = totalCount;
+      document.getElementById("countFilterAbertos").innerText = abertosCount;
+      document.getElementById("countFilterEntregues").innerText = entreguesCount;
+      badge.innerText = abertosCount;
 
-      if (activeOrders.length === 0) {
+      let list = storeState.orders.map((ord, originalIndex) => ({ ...ord, originalIndex }));
+
+      if (activeFilter === 'abertos') {
+        list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado");
+      } else if (activeFilter === 'entregues') {
+        list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
+      }
+
+      if (list.length === 0) {
         container.innerHTML = `
           <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
-            <i class="fa-solid fa-check-double text-4xl text-emerald-500 mb-3"></i>
-            <h3 class="text-base font-extrabold text-white">Todos os pedidos foram atendidos!</h3>
-            <p class="text-xs text-gray-400 mt-1">Aguardando novos pedidos vindos da loja online...</p>
+            <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
+            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
+            <p class="text-xs text-gray-400 mt-1">Os pedidos feitos no cardápio aparecerão aqui.</p>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = activeOrders.map(ord => `
-        <div class="bg-brand-dark rounded-2xl border border-neutral-800 p-5 shadow-sm flex flex-col justify-between hover:border-neutral-700 transition">
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-xs font-black text-brand-yellow">#${ord.id}</span>
-              <span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>
-            </div>
-            <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
-            <p class="text-xs text-gray-400 mb-3">${ord.phone}</p>
+      container.innerHTML = list.map(ord => {
+        const isEntregue = ord.status === "Entregue" || ord.status === "Finalizado";
 
-            <div class="p-3 bg-neutral-900 rounded-xl text-xs mb-3 space-y-1.5">
-              <p class="font-bold text-gray-200">${ord.items}</p>
-              ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
-              <p class="text-[11px] text-gray-400"><i class="fa-solid fa-location-dot text-brand-red mr-1"></i> ${ord.address}</p>
-              <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
+        return `
+          <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${
+            isEntregue 
+              ? 'bg-[#1C241E] border-emerald-900/60 opacity-95' 
+              : 'bg-brand-dark border-neutral-800 hover:border-neutral-700'
+          }">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-black text-brand-yellow">#${ord.id}</span>
+                  ${
+                    isEntregue 
+                      ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
+                           <i class="fa-solid fa-check-double"></i> Entregue ${ord.deliveredAt ? `(${ord.deliveredAt})` : ''}
+                         </span>`
+                      : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
+                  }
+                </div>
+                <span class="text-[11px] font-bold text-gray-400">${ord.type}</span>
+              </div>
+
+              <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
+              <p class="text-xs text-gray-400 mb-3">${ord.phone}</p>
+
+              <div class="p-3 bg-neutral-900/90 rounded-xl text-xs mb-3 space-y-1.5 border border-neutral-800">
+                <p class="font-bold text-gray-200">${ord.items}</p>
+                ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
+                <p class="text-[11px] text-gray-400"><i class="fa-solid fa-location-dot text-brand-red mr-1"></i> ${ord.address}</p>
+                <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs text-gray-400">Total do Pedido:</span>
+                <span class="text-base font-black text-brand-yellow">R$ ${ord.total.toFixed(2).replace('.', ',')}</span>
+              </div>
+
+              <!-- Seletor de Status de Cozinha -->
+              <select onchange="changeOrderStatus(${ord.originalIndex}, this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
+                <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
+                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Em preparo</option>
+                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto para Entrega</option>
+                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu com Motoboy</option>
+                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Entregue / Finalizado</option>
+              </select>
+
+              <!-- AÇÕES: IMPRIMIR E DAR BAIXA / STATUS -->
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="printReceipt(${ord.originalIndex})" class="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-print"></i>
+                  <span>Imprimir</span>
+                </button>
+
+                ${
+                  isEntregue 
+                    ? `<button onclick="reabrirPedido(${ord.originalIndex})" title="Clique para reabrir caso necessário" class="w-full bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                         <i class="fa-solid fa-check-double"></i>
+                         <span>Baixado</span>
+                       </button>`
+                    : `<button onclick="darBaixaPedido(${ord.originalIndex})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+                         <i class="fa-solid fa-check"></i>
+                         <span>Dar Baixa</span>
+                       </button>`
+                }
+              </div>
             </div>
           </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-xs text-gray-400">Total:</span>
-              <span class="text-base font-black text-brand-yellow">R$ ${ord.total.toFixed(2).replace('.', ',')}</span>
-            </div>
-
-            <select onchange="changeOrderStatus(${ord.originalIndex}, this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
-              <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
-              <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Em preparo</option>
-              <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto para Entrega</option>
-              <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu com Motoboy</option>
-            </select>
-
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button onclick="printReceipt(${ord.originalIndex})" class="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                <i class="fa-solid fa-print"></i>
-                <span>Imprimir</span>
-              </button>
-              <button onclick="darBaixaPedido(${ord.originalIndex})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
-                <i class="fa-solid fa-check"></i>
-                <span>Dar Baixa</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
     function changeOrderStatus(idx, newStatus) {
       storeState.orders[idx].status = newStatus;
+      if (newStatus === "Entregue") {
+        storeState.orders[idx].deliveredAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } else {
+        storeState.orders[idx].deliveredAt = null;
+      }
       saveOrdersToStorage();
       renderOrders();
     }
