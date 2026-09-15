@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CONEXÃO SUPABASE (BANCO DE DADOS EM NUVEM) -->
+  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -100,7 +100,7 @@
     </div>
   </div>
 
-  <!-- ESTRUTURA PRINCIPAL DO PAINEL -->
+  <!-- ESTRUTURA PRINCIPAL -->
   <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
 
     <!-- MENU LATERAL -->
@@ -145,12 +145,12 @@
             <span class="flex-1 text-left">Visão Geral / Vendas</span>
           </button>
 
-          <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
+          <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
             <i class="fa-solid fa-utensils text-sm"></i>
             <span class="flex-1 text-left">Gerenciar Cardápio</span>
           </button>
 
-          <button onclick="navigateTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
+          <button onclick="navigateTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
             <i class="fa-solid fa-gear text-sm"></i>
             <span class="flex-1 text-left">Configurações da Loja</span>
           </button>
@@ -240,7 +240,7 @@
       </section>
 
       <!-- ABA 3: CARDÁPIO -->
-      <section id="tab-products" class="tab-content">
+      <section id="tab-products" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Cardápio do Restaurante</h2>
@@ -261,36 +261,115 @@
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA 4: CONFIGURAÇÕES DA LOJA (ATUALIZAÇÃO DINÂMICA NA NUVEM) -->
-      <section id="tab-settings" class="tab-content hidden max-w-2xl">
+      <!-- ABA 4: CONFIGURAÇÕES DA LOJA (COM 4 FAIXAS DE KM E PREÇO) -->
+      <section id="tab-settings" class="tab-content max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
-          <p class="text-xs text-gray-400">Altere informações gerais do seu cardápio em tempo real</p>
+          <p class="text-xs text-gray-400">Altere informações gerais e a tabela de frete por KM do seu restaurante</p>
         </div>
 
-        <form onsubmit="saveStoreSettings(event)" class="space-y-4 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante</label>
-            <input type="text" id="cfgName" placeholder="Ex: PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
+          <!-- DADOS GERAIS -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-store"></i> Identidade & Contato
+            </h3>
+
             <div>
-              <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos (com DDI 55)</label>
-              <input type="text" id="cfgWhatsapp" placeholder="Ex: 5521986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+              <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante *</label>
+              <input type="text" id="cfgName" placeholder="Ex: PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
             </div>
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Taxa Padrão de Entrega (R$)</label>
-              <input type="number" step="0.50" id="cfgDelivery" placeholder="5.00" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos (com DDI 55) *</label>
+                <input type="text" id="cfgWhatsapp" placeholder="Ex: 5521986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+              </div>
+              <div>
+                <label class="block font-bold text-gray-300 mb-1">Endereço Completo da Loja *</label>
+                <input type="text" id="cfgAddress" placeholder="Ex: Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+              </div>
             </div>
           </div>
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Endereço Físico Completo</label>
-            <input type="text" id="cfgAddress" placeholder="Ex: Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+
+          <!-- TABELA DE 4 FAIXAS DE KM -->
+          <div class="pt-4 border-t border-neutral-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
+                </h3>
+                <p class="text-[11px] text-gray-400">Configure até 4 faixas de distância e o valor do frete para cada uma</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- FAIXA 1 -->
+              <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 1 (Mais próxima)</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
+                    <input type="number" step="0.5" id="cfgKm1" value="3" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <input type="number" step="0.50" id="cfgPrice1" value="5.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- FAIXA 2 -->
+              <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 2</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
+                    <input type="number" step="0.5" id="cfgKm2" value="6" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <input type="number" step="0.50" id="cfgPrice2" value="8.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- FAIXA 3 -->
+              <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 3</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
+                    <input type="number" step="0.5" id="cfgKm3" value="10" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <input type="number" step="0.50" id="cfgPrice3" value="12.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- FAIXA 4 -->
+              <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 4 (Mais distante)</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
+                    <input type="number" step="0.5" id="cfgKm4" value="15" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <input type="number" step="0.50" id="cfgPrice4" value="15.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="pt-2">
-            <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition text-xs cursor-pointer shadow-lg">
-              Salvar Alterações
+            <button type="submit" class="w-full sm:w-auto bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-8 py-3.5 rounded-xl transition text-xs cursor-pointer shadow-lg flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Salvar Alterações</span>
             </button>
           </div>
         </form>
@@ -474,16 +553,33 @@
       if (data) {
         window.isStoreOpen = data.is_open;
         updateStoreButtonUI();
-        const nameInput = document.getElementById('cfgName');
-        if (nameInput) nameInput.value = data.store_name || '';
-        const waInput = document.getElementById('cfgWhatsapp');
-        if (waInput) waInput.value = data.whatsapp || '';
-        const feeInput = document.getElementById('cfgDelivery');
-        if (feeInput) feeInput.value = data.delivery_fee !== undefined ? data.delivery_fee : 5.00;
-        const addrInput = document.getElementById('cfgAddress');
-        if (addrInput) addrInput.value = data.address || '';
-        const brandHeader = document.getElementById('adminBrandName');
-        if (brandHeader) brandHeader.innerText = data.store_name || 'PHSUBLIME FOOD';
+
+        if (document.getElementById('cfgName')) document.getElementById('cfgName').value = data.store_name || '';
+        if (document.getElementById('cfgWhatsapp')) document.getElementById('cfgWhatsapp').value = data.whatsapp || '';
+        if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
+        if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
+
+        // CARREGA AS 4 FAIXAS DE KM
+        const tiers = Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4
+          ? data.delivery_tiers
+          : [
+              { km: 3, price: 5.00 },
+              { km: 6, price: 8.00 },
+              { km: 10, price: 12.00 },
+              { km: 15, price: 15.00 }
+            ];
+
+        document.getElementById('cfgKm1').value = tiers[0].km;
+        document.getElementById('cfgPrice1').value = Number(tiers[0].price).toFixed(2);
+
+        document.getElementById('cfgKm2').value = tiers[1].km;
+        document.getElementById('cfgPrice2').value = Number(tiers[1].price).toFixed(2);
+
+        document.getElementById('cfgKm3').value = tiers[2].km;
+        document.getElementById('cfgPrice3').value = Number(tiers[2].price).toFixed(2);
+
+        document.getElementById('cfgKm4').value = tiers[3].km;
+        document.getElementById('cfgPrice4').value = Number(tiers[3].price).toFixed(2);
       }
     }
 
@@ -1045,21 +1141,29 @@
       }
     }
 
-    // SALVAR CONFIGURAÇÕES DA LOJA COM UPSERT
+    // SALVAR CONFIGURAÇÕES COM AS 4 FAIXAS DE KM
     async function saveStoreSettings(e) {
       e.preventDefault();
 
       const newName = document.getElementById('cfgName').value.trim();
       const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
-      const newDelivery = parseFloat(document.getElementById('cfgDelivery').value) || 0;
       const newAddress = document.getElementById('cfgAddress').value.trim();
+
+      // MONTA O ARRAY DAS 4 FAIXAS DE KM
+      const tiers = [
+        { km: parseFloat(document.getElementById('cfgKm1').value) || 3, price: parseFloat(document.getElementById('cfgPrice1').value) || 5.00 },
+        { km: parseFloat(document.getElementById('cfgKm2').value) || 6, price: parseFloat(document.getElementById('cfgPrice2').value) || 8.00 },
+        { km: parseFloat(document.getElementById('cfgKm3').value) || 10, price: parseFloat(document.getElementById('cfgPrice3').value) || 12.00 },
+        { km: parseFloat(document.getElementById('cfgKm4').value) || 15, price: parseFloat(document.getElementById('cfgPrice4').value) || 15.00 }
+      ];
 
       const { error } = await db.from('store_settings').upsert({
         id: 1,
         store_name: newName,
         whatsapp: newWhatsapp,
-        delivery_fee: newDelivery,
         address: newAddress,
+        delivery_tiers: tiers,
+        delivery_fee: tiers[0].price,
         is_open: window.isStoreOpen
       });
 
@@ -1069,7 +1173,7 @@
       } else {
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
-        showToast("Configurações Salvas!", "Os dados foram atualizados na nuvem e na loja.");
+        showToast("Configurações Salvas!", "A tabela de frete por KM e dados da loja foram salvos na nuvem.");
       }
     }
   </script>
