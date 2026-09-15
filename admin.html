@@ -112,7 +112,7 @@
               <i class="fa-solid fa-burger"></i>
             </div>
             <div>
-              <h1 class="font-extrabold text-sm text-white leading-none">PHSUBLIME FOOD</h1>
+              <h1 id="adminBrandName" class="font-extrabold text-sm text-white leading-none">PHSUBLIME FOOD</h1>
               <span class="text-[10px] text-brand-yellow font-bold uppercase tracking-wider">Gestão Comercial</span>
             </div>
           </div>
@@ -261,35 +261,35 @@
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA 4: CONFIGURAÇÕES -->
+      <!-- ABA 4: CONFIGURAÇÕES DA LOJA (ATUALIZAÇÃO DINÂMICA NA NUVEM) -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
-          <p class="text-xs text-gray-400">Altere informações gerais do seu cardápio</p>
+          <p class="text-xs text-gray-400">Altere informações gerais do seu cardápio em tempo real</p>
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-4 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
           <div>
             <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante</label>
-            <input type="text" id="cfgName" value="PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+            <input type="text" id="cfgName" placeholder="Ex: PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos (com DDI 55)</label>
-              <input type="text" id="cfgWhatsapp" value="5521986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+              <input type="text" id="cfgWhatsapp" placeholder="Ex: 5521986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
             </div>
             <div>
               <label class="block font-bold text-gray-300 mb-1">Taxa Padrão de Entrega (R$)</label>
-              <input type="number" step="0.50" id="cfgDelivery" value="5.00" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+              <input type="number" step="0.50" id="cfgDelivery" placeholder="5.00" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
             </div>
           </div>
           <div>
             <label class="block font-bold text-gray-300 mb-1">Endereço Físico Completo</label>
-            <input type="text" id="cfgAddress" value="Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
+            <input type="text" id="cfgAddress" placeholder="Ex: Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white" required />
           </div>
 
           <div class="pt-2">
-            <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition text-xs cursor-pointer">
+            <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition text-xs cursor-pointer shadow-lg">
               Salvar Alterações
             </button>
           </div>
@@ -397,9 +397,8 @@
   <!-- ÁREA DE IMPRESSÃO TÉRMICA -->
   <div id="printableReceipt" class="hidden"></div>
 
-  <!-- SCRIPT CONECTADO AO SUPABASE -->
+  <!-- JAVASCRIPT DO PAINEL -->
   <script>
-    // CONFIGURAÇÃO CENTRAL SUPABASE
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -436,7 +435,6 @@
       }, 2800);
     }
 
-    // CARREGAR DADOS DO SUPABASE
     async function loadAllData() {
       await Promise.all([
         fetchCategories(),
@@ -472,18 +470,23 @@
     }
 
     async function fetchSettings() {
-      const { data } = await db.from('store_settings').select('*').eq('id', 1).single();
+      const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       if (data) {
         window.isStoreOpen = data.is_open;
         updateStoreButtonUI();
-        document.getElementById('cfgName').value = data.store_name || '';
-        document.getElementById('cfgWhatsapp').value = data.whatsapp || '';
-        document.getElementById('cfgDelivery').value = data.delivery_fee || 5.00;
-        document.getElementById('cfgAddress').value = data.address || '';
+        const nameInput = document.getElementById('cfgName');
+        if (nameInput) nameInput.value = data.store_name || '';
+        const waInput = document.getElementById('cfgWhatsapp');
+        if (waInput) waInput.value = data.whatsapp || '';
+        const feeInput = document.getElementById('cfgDelivery');
+        if (feeInput) feeInput.value = data.delivery_fee !== undefined ? data.delivery_fee : 5.00;
+        const addrInput = document.getElementById('cfgAddress');
+        if (addrInput) addrInput.value = data.address || '';
+        const brandHeader = document.getElementById('adminBrandName');
+        if (brandHeader) brandHeader.innerText = data.store_name || 'PHSUBLIME FOOD';
       }
     }
 
-    // ESCUTA EM TEMPO REAL SUPABASE
     function setupRealtimeListeners() {
       db.channel('admin_live')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
@@ -499,7 +502,7 @@
         .subscribe();
     }
 
-    // GERENCIAMENTO DE CATEGORIAS
+    // CATEGORIAS
     function openCategoryManagerModal() {
       renderCategoriesList();
       document.getElementById("categoryManagerModal").classList.remove("hidden");
@@ -903,9 +906,9 @@
 
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; margin: 0; font-weight: bold;">PHSUBLIME FOOD</h2>
-          <p style="margin: 2px 0; font-size: 11px;">Rua das Delícias, 100 - RJ</p>
-          <p style="margin: 2px 0; font-size: 11px;">WhatsApp: (21) 98614-7221</p>
+          <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
+          <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
+          <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
           <p style="margin: 4px 0 0 0; font-weight: bold; font-size: 14px;">COMPROVANTE DE PEDIDO</p>
         </div>
 
@@ -1027,19 +1030,47 @@
     async function toggleStoreOpen() {
       window.isStoreOpen = !window.isStoreOpen;
       updateStoreButtonUI();
-      await db.from('store_settings').update({ is_open: window.isStoreOpen }).eq('id', 1);
-      showToast(window.isStoreOpen ? "Loja Aberta!" : "Loja Pausada", "Atualizado na nuvem para todos os clientes.");
+
+      const { error } = await db.from('store_settings').upsert({
+        id: 1,
+        is_open: window.isStoreOpen
+      });
+
+      if (error) {
+        window.isStoreOpen = !window.isStoreOpen;
+        updateStoreButtonUI();
+        showToast("Erro ao alterar status", error.message, true);
+      } else {
+        showToast(window.isStoreOpen ? "Loja Aberta!" : "Loja Pausada", "Atualizado no Supabase para todos os clientes.");
+      }
     }
 
+    // SALVAR CONFIGURAÇÕES DA LOJA COM UPSERT
     async function saveStoreSettings(e) {
       e.preventDefault();
-      await db.from('store_settings').update({
-        store_name: document.getElementById('cfgName').value,
-        whatsapp: document.getElementById('cfgWhatsapp').value,
-        delivery_fee: parseFloat(document.getElementById('cfgDelivery').value),
-        address: document.getElementById('cfgAddress').value
-      }).eq('id', 1);
-      showToast("Configurações Salvas!", "As configurações da loja foram atualizadas na nuvem.");
+
+      const newName = document.getElementById('cfgName').value.trim();
+      const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
+      const newDelivery = parseFloat(document.getElementById('cfgDelivery').value) || 0;
+      const newAddress = document.getElementById('cfgAddress').value.trim();
+
+      const { error } = await db.from('store_settings').upsert({
+        id: 1,
+        store_name: newName,
+        whatsapp: newWhatsapp,
+        delivery_fee: newDelivery,
+        address: newAddress,
+        is_open: window.isStoreOpen
+      });
+
+      if (error) {
+        console.error("Erro ao salvar configurações:", error);
+        showToast("Erro ao Salvar", error.message, true);
+      } else {
+        const brandHeader = document.getElementById('adminBrandName');
+        if (brandHeader) brandHeader.innerText = newName;
+        showToast("Configurações Salvas!", "Os dados foram atualizados na nuvem e na loja.");
+      }
     }
   </script>
 </body>
