@@ -189,12 +189,12 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS COM ARQUIVO DE TURNOS FECHADOS -->
+      <!-- ABA 1: FILA DE PEDIDOS COM ARQUIVO DE TURNOS FECHADOS ORGANIZADOS -->
       <section id="tab-orders" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual aberto ou consulte pedidos de turnos arquivados</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual ou consulte arquivos de turnos fechados</p>
           </div>
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
@@ -204,7 +204,7 @@
           </div>
         </div>
 
-        <!-- BARRA DE FILTROS: TURNO ATUAL + BOTÃO DE ARQUIVO -->
+        <!-- BARRA DE FILTROS -->
         <div class="flex flex-wrap items-center gap-2 mb-6 border-b border-neutral-800 pb-3">
           <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
             Todos do Turno (<span id="countFilterTodos">0</span>)
@@ -222,11 +222,29 @@
             ❌ Cancelados (<span id="countFilterCancelados">0</span>)
           </button>
 
-          <!-- NOVO BOTÃO: SEPARA E GUARDA OS PEDIDOS DE TURNOS JÁ FECHADOS -->
+          <!-- BOTÃO DE TURNOS FECHADOS -->
           <button onclick="setOrderFilter('arquivados')" id="filterBtn-arquivados" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-gray-400 hover:text-amber-400 hover:border-amber-400 transition cursor-pointer ml-auto">
             <i class="fa-solid fa-box-archive mr-1.5 text-brand-yellow"></i>
             Turnos Fechados (<span id="countFilterArquivados">0</span>)
           </button>
+        </div>
+
+        <!-- SELETOR DINÂMICO DE TURNOS ARQUIVADOS (VISÍVEL APENAS EM 'TURNOS FECHADOS') -->
+        <div id="closedShiftSelectorArea" class="hidden mb-6 p-4 bg-neutral-900/90 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-brand-yellow flex items-center justify-center font-black text-sm">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+              <span class="font-black text-white text-xs block">Consultar Pedidos de Turnos Anteriores</span>
+              <p class="text-[11px] text-gray-400">Selecione um fechamento abaixo para ver os pedidos daquele dia sem misturar</p>
+            </div>
+          </div>
+          <div class="w-full sm:w-auto">
+            <select id="selectClosedShiftArchive" onchange="handleClosedShiftSelect(this.value)" class="w-full sm:w-auto p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-black focus:outline-none focus:border-brand-yellow cursor-pointer shadow-sm text-xs">
+              <!-- Gerado dinamicamente -->
+            </select>
+          </div>
         </div>
 
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
@@ -807,6 +825,7 @@
     window.isStoreOpen = true;
     window.currentSettleOrderId = null;
     window.closureIdToDelete = null;
+    window.selectedArchiveClosureId = 'todos';
 
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
@@ -874,6 +893,7 @@
       if (data) {
         window.dailyClosures = data;
         populateMonthSelector();
+        populateClosedShiftDropdown();
         renderClosuresTable();
         renderOrders();
         updateDashboardMetrics();
@@ -1041,7 +1061,6 @@
         ? new Date(lastClosure.closed_at).getTime() 
         : 0;
 
-      // FILTRA APENAS PEDIDOS REALIZADOS APÓS O ÚLTIMO FECHAMENTO!
       const currentShiftOrders = window.storeOrders.filter(o => {
         if (!o.created_at) return lastClosedTime === 0;
         return new Date(o.created_at).getTime() > lastClosedTime;
@@ -1117,7 +1136,7 @@
     }
 
     // ========================================================
-    // FECHAMENTO DE CAIXA / TURNO
+    // FECHAMENTO DE CAIXA COM DATA OPERACIONAL INTELIGENTE
     // ========================================================
     function openCloseShiftModal() {
       const m = calculateShiftMetrics();
@@ -1127,7 +1146,6 @@
       }
 
       const todayStr = new Date().toLocaleDateString('pt-BR');
-
       document.getElementById('closeShiftDateText').innerText = `Turno atual • ${todayStr}`;
       document.getElementById('closeShiftGross').innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById('closeShiftOrders').innerText = `${m.validCount} pedidos válidos`;
@@ -1150,6 +1168,16 @@
       const now = new Date();
       const todayStr = now.toLocaleDateString('pt-BR');
       const nowTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // DATA OPERACIONAL: Se fechou entre 00h e 06h da manhã, o turno pertence à noite anterior!
+      let opDate = new Date(now);
+      if (now.getHours() < 6) {
+        opDate.setDate(opDate.getDate() - 1);
+      }
+      const opDateStr = opDate.toLocaleDateString('pt-BR');
+      const closureTitle = now.getHours() < 6
+        ? `Turno de ${opDateStr} (Encerrado em ${todayStr} às ${nowTime})`
+        : `Turno de ${todayStr} às ${nowTime}`;
       
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1159,7 +1187,7 @@
 
       const closureData = {
         id: closureId,
-        date: `${todayStr} às ${nowTime}`,
+        date: closureTitle,
         gross_revenue: m.grossRevenue,
         total_orders: m.validCount,
         cancelled_orders: m.cancelledCount,
@@ -1195,7 +1223,7 @@
     // MODAL CUSTOMIZADO DE EXCLUSÃO
     function openDeleteConfirmModal(closureId, closureDate) {
       window.closureIdToDelete = closureId;
-      document.getElementById('deleteConfirmModalText').innerText = `Deseja realmente excluir o fechamento de ${closureDate}? O valor acumulado do mês será recalculado na mesma hora.`;
+      document.getElementById('deleteConfirmModalText').innerText = `Deseja realmente excluir o fechamento de "${closureDate}"? O acumulado do mês será recalculado na mesma hora.`;
       
       const btnConfirm = document.getElementById('btnExecuteDeleteClosure');
       btnConfirm.onclick = executeDeleteClosureAction;
@@ -1438,7 +1466,63 @@
     }
 
     // ========================================================
-    // RENDERIZAR PEDIDOS (TURNO ATUAL VS ARQUIVO DE FECHADOS)
+    // SEPARADOR DE PEDIDOS POR TURNO FECHADO (SELETOR DE ARQUIVO)
+    // ========================================================
+    function populateClosedShiftDropdown() {
+      const select = document.getElementById('selectClosedShiftArchive');
+      if (!select) return;
+
+      if (!window.dailyClosures || window.dailyClosures.length === 0) {
+        select.innerHTML = `<option value="nenhum">Nenhum turno fechado</option>`;
+        return;
+      }
+
+      let html = `<option value="todos">📦 Ver Todos os Turnos Fechados (${window.dailyClosures.length})</option>`;
+      html += window.dailyClosures.map(c => `
+        <option value="${c.id}">📅 ${c.date} • ${c.total_orders} pedidos • R$ ${Number(c.gross_revenue).toFixed(2).replace('.', ',')}</option>
+      `).join("");
+
+      select.innerHTML = html;
+      if (window.selectedArchiveClosureId) {
+        select.value = window.selectedArchiveClosureId;
+      }
+    }
+
+    function handleClosedShiftSelect(val) {
+      window.selectedArchiveClosureId = val;
+      renderOrders();
+    }
+
+    // Retorna os pedidos pertencentes a um turno fechado específico
+    function getOrdersForSpecificClosure(closureId) {
+      if (!closureId || closureId === 'todos') {
+        const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 ? window.dailyClosures[0] : null;
+        const lastClosedTime = lastClosure && lastClosure.closed_at ? new Date(lastClosure.closed_at).getTime() : 0;
+        return window.storeOrders.filter(o => {
+          if (!o.created_at) return false;
+          return new Date(o.created_at).getTime() <= lastClosedTime && (o.status === "Entregue" || o.status === "Finalizado" || o.status === "Cancelado");
+        });
+      }
+
+      const closuresDesc = [...window.dailyClosures].sort((a, b) => new Date(b.closed_at) - new Date(a.closed_at));
+      const idx = closuresDesc.findIndex(c => c.id === closureId);
+      if (idx === -1) return [];
+
+      const targetClosure = closuresDesc[idx];
+      const targetCloseTime = new Date(targetClosure.closed_at).getTime();
+      const prevCloseTime = (idx + 1 < closuresDesc.length) 
+        ? new Date(closuresDesc[idx + 1].closed_at).getTime() 
+        : 0;
+
+      return window.storeOrders.filter(o => {
+        if (!o.created_at) return false;
+        const orderTime = new Date(o.created_at).getTime();
+        return orderTime > prevCloseTime && orderTime <= targetCloseTime;
+      });
+    }
+
+    // ========================================================
+    // RENDERIZAR PEDIDOS (TURNO ATUAL VS TURNOS ARQUIVADOS)
     // ========================================================
     function setOrderFilter(filter) {
       window.activeFilter = filter;
@@ -1461,9 +1545,9 @@
     function renderOrders() {
       const container = document.getElementById("ordersContainer");
       const badge = document.getElementById("badgeLiveOrders");
+      const selectorArea = document.getElementById("closedShiftSelectorArea");
       if (!container) return;
 
-      // Pega data/hora do último fechamento de caixa
       const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 
         ? window.dailyClosures[0] 
         : null;
@@ -1472,18 +1556,15 @@
         ? new Date(lastClosure.closed_at).getTime() 
         : 0;
 
-      // Função para saber se o pedido é de turno já fechado
       const isOrderFromClosedShift = (o) => {
         if (lastClosedTime === 0) return false;
         if (!o.created_at) return false;
         return new Date(o.created_at).getTime() <= lastClosedTime && (o.status === "Entregue" || o.status === "Finalizado" || o.status === "Cancelado");
       };
 
-      // Separa os pedidos ativos do turno atual vs pedidos arquivados em fechamentos
       const shiftOrders = window.storeOrders.filter(o => !isOrderFromClosedShift(o));
       const archivedOrders = window.storeOrders.filter(o => isOrderFromClosedShift(o));
 
-      // Contadores do Turno Atual
       const totalCount = shiftOrders.length;
       const abertosCount = shiftOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
       const mesasCount = shiftOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
@@ -1499,14 +1580,16 @@
       if (document.getElementById("countFilterArquivados")) document.getElementById("countFilterArquivados").innerText = arquivadosCount;
       badge.innerText = abertosCount;
 
-      // Determina qual lista exibir com base no filtro
       let list = [];
       let isViewingArchive = false;
 
       if (window.activeFilter === 'arquivados') {
-        list = archivedOrders;
         isViewingArchive = true;
+        if (selectorArea) selectorArea.classList.remove('hidden');
+        populateClosedShiftDropdown();
+        list = getOrdersForSpecificClosure(window.selectedArchiveClosureId);
       } else {
+        if (selectorArea) selectorArea.classList.add('hidden');
         list = [...shiftOrders];
         if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
         else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
@@ -1519,10 +1602,10 @@
           <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
             <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
             <h3 class="text-base font-extrabold text-white">
-              ${isViewingArchive ? 'Nenhum pedido em turnos arquivados' : 'Fila limpa • Aguardando novos pedidos para este turno'}
+              ${isViewingArchive ? 'Nenhum pedido encontrado para este fechamento' : 'Fila limpa • Aguardando novos pedidos para este turno'}
             </h3>
             <p class="text-xs text-gray-500 mt-1">
-              ${isViewingArchive ? 'Os pedidos aparecem aqui após fechar o caixa.' : 'Os pedidos do turno anterior foram arquivados com sucesso.'}
+              ${isViewingArchive ? 'Escolha outro turno no seletor acima.' : 'Os pedidos do turno anterior foram arquivados com sucesso.'}
             </p>
           </div>
         `;
