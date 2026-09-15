@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <!-- LOGIN SCREEN -->
+  <!-- TELA DE LOGIN -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -304,14 +304,15 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 5: CONFIGURAÇÕES DA LOJA -->
+      <!-- ABA 5: CONFIGURAÇÕES DA LOJA (COM DIAS E HORÁRIOS EDITÁVEIS) -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
-          <p class="text-xs text-gray-400">Altere informações gerais e a tabela de frete por KM do seu restaurante</p>
+          <p class="text-xs text-gray-400">Altere informações da loja, horários de atendimento e frete por KM</p>
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
+          <!-- 1. IDENTIDADE E CONTATO -->
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Contato
@@ -319,21 +320,68 @@
 
             <div>
               <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante *</label>
-              <input type="text" id="cfgName" placeholder="Ex: PHSUBLIME FOOD" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+              <input type="text" id="cfgName" placeholder="Ex: Café da Vovó" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos (com DDI 55) *</label>
-                <input type="text" id="cfgWhatsapp" placeholder="Ex: 5521986147221" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+                <input type="text" id="cfgWhatsapp" placeholder="Ex: 5521986847171" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
               </div>
               <div>
                 <label class="block font-bold text-gray-300 mb-1">Endereço Completo da Loja *</label>
-                <input type="text" id="cfgAddress" placeholder="Ex: Rua das Delícias, 100 - Rio de Janeiro - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+                <input type="text" id="cfgAddress" placeholder="Ex: Rua Marcílio Dias, 100" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
               </div>
             </div>
           </div>
 
+          <!-- 2. HORÁRIOS DE ATENDIMENTO EDITÁVEIS (DIAS E HORÁRIOS LIVRES) -->
+          <div class="pt-4 border-t border-neutral-800 space-y-3">
+            <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-clock"></i> Horário de Atendimento no Rodapé
+            </h3>
+            <p class="text-[11px] text-gray-400">Personalize os dias da semana e os horários de funcionamento do seu negócio</p>
+
+            <div class="space-y-2.5">
+              <!-- LINHA 1 -->
+              <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 1)</label>
+                  <input type="text" id="cfgDays1" value="Segunda a Quinta:" placeholder="Ex: Segunda a Sexta:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                </div>
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
+                  <input type="text" id="cfgHours1" value="18:00 às 23:00" placeholder="Ex: 08:00 às 18:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                </div>
+              </div>
+
+              <!-- LINHA 2 -->
+              <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 2)</label>
+                  <input type="text" id="cfgDays2" value="Sexta e Sábado:" placeholder="Ex: Sábado:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                </div>
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
+                  <input type="text" id="cfgHours2" value="18:00 às 00:00" placeholder="Ex: 08:00 às 14:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                </div>
+              </div>
+
+              <!-- LINHA 3 -->
+              <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 3)</label>
+                  <input type="text" id="cfgDays3" value="Domingo:" placeholder="Ex: Domingo:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                </div>
+                <div>
+                  <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
+                  <input type="text" id="cfgHours3" value="18:00 às 23:00" placeholder="Ex: Fechado" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. FRETE POR KM -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
@@ -425,7 +473,7 @@
       </div>
 
       <form onsubmit="handleAddCategory(event)" class="flex gap-2 mb-4">
-        <input type="text" id="newCategoryInput" placeholder="Ex: Combos, Pastéis, Sucos..." required class="flex-1 p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+        <input type="text" id="newCategoryInput" placeholder="Ex: Cafés, Bolos, Tortas..." required class="flex-1 p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
         <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black px-4 py-2.5 rounded-xl transition cursor-pointer">
           <i class="fa-solid fa-plus"></i> Adicionar
         </button>
@@ -479,18 +527,18 @@
 
         <div>
           <label class="block font-bold text-gray-300 mb-1">Nome do Produto *</label>
-          <input type="text" id="prodName" placeholder="Ex: Smash Salad Duplo" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+          <input type="text" id="prodName" placeholder="Ex: Café Expresso Duplo" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
         </div>
 
         <div>
           <label class="block font-bold text-gray-300 mb-1">Descrição do Produto *</label>
-          <textarea id="prodDesc" rows="2" placeholder="Ex: Pão brioche, carnes smash, queijo prato e molho especial." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white resize-none"></textarea>
+          <textarea id="prodDesc" rows="2" placeholder="Ex: Grãos especiais moídos na hora." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white resize-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-gray-300 mb-1">Preço (R$) *</label>
-            <input type="number" step="0.10" id="prodPrice" placeholder="29.90" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+            <input type="number" step="0.10" id="prodPrice" placeholder="9.90" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
           </div>
           <div>
             <label class="block font-bold text-gray-300 mb-1">Categoria *</label>
@@ -596,6 +644,19 @@
         if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
         if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
 
+        // CARREGA HORÁRIOS DE ATENDIMENTO
+        if (Array.isArray(data.business_hours) && data.business_hours.length === 3) {
+          document.getElementById('cfgDays1').value = data.business_hours[0].days;
+          document.getElementById('cfgHours1').value = data.business_hours[0].hours;
+
+          document.getElementById('cfgDays2').value = data.business_hours[1].days;
+          document.getElementById('cfgHours2').value = data.business_hours[1].hours;
+
+          document.getElementById('cfgDays3').value = data.business_hours[2].days;
+          document.getElementById('cfgHours3').value = data.business_hours[2].hours;
+        }
+
+        // CARREGA FAIXAS DE KM
         const tiers = Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4
           ? data.delivery_tiers
           : [
@@ -635,9 +696,6 @@
         .subscribe();
     }
 
-    // ========================================================
-    // HELPER: DETECTAR E FORMATAR MESA INTELIGENTE
-    // ========================================================
     function isTableOrder(ord) {
       if (!ord) return false;
       const typeStr = (ord.type || '').toLowerCase();
@@ -650,14 +708,12 @@
              addrStr.includes('mesa') || 
              addrStr.includes('salão') || 
              notesStr.includes('mesa') ||
-             /^\d+$/.test(typeStr.trim()); // se o tipo for apenas um número (ex: "3")
+             /^\d+$/.test(typeStr.trim());
     }
 
     function formatTableNumber(ord) {
       const typeStr = (ord.type || '').trim();
       const addrStr = (ord.address || '').trim();
-      
-      // Procura dígitos no type ou no address
       const combined = `${typeStr} ${addrStr}`;
       const match = combined.match(/\d+/);
       if (match) {
@@ -695,9 +751,6 @@
       `;
     }
 
-    // ========================================================
-    // GERADOR DE PLACAS DE MESA COM QR CODE
-    // ========================================================
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       const container = document.getElementById('tableCardsGrid');
@@ -1029,7 +1082,7 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
-    // PEDIDOS (COM DISTINÇÃO DE MESAS E DELIVERY)
+    // FILA DE PEDIDOS
     function setOrderFilter(filter) {
       window.activeFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1089,7 +1142,6 @@
         return `
           <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
             <div>
-              <!-- TOPO DO CARD: PEDIDO + DESTINO DESTACADO -->
               <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center space-x-2">
                   <span class="text-sm font-black text-brand-yellow">#${ord.id}</span>
@@ -1102,7 +1154,6 @@
                   }
                 </div>
 
-                <!-- SELO GIGANTE E DESTACADO -->
                 <div>
                   ${renderOrderDestinationBadge(ord)}
                 </div>
@@ -1331,12 +1382,20 @@
       }
     }
 
+    // SALVAR CONFIGURAÇÕES (INCLUINDO OS DIAS E HORÁRIOS)
     async function saveStoreSettings(e) {
       e.preventDefault();
 
       const newName = document.getElementById('cfgName').value.trim();
       const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
       const newAddress = document.getElementById('cfgAddress').value.trim();
+
+      // MONTA OS HORÁRIOS DE ATENDIMENTO EDITÁVEIS
+      const businessHours = [
+        { days: document.getElementById('cfgDays1').value.trim(), hours: document.getElementById('cfgHours1').value.trim() },
+        { days: document.getElementById('cfgDays2').value.trim(), hours: document.getElementById('cfgHours2').value.trim() },
+        { days: document.getElementById('cfgDays3').value.trim(), hours: document.getElementById('cfgHours3').value.trim() }
+      ];
 
       const tiers = [
         { km: parseFloat(document.getElementById('cfgKm1').value) || 3, price: parseFloat(document.getElementById('cfgPrice1').value) || 5.00 },
@@ -1350,6 +1409,7 @@
         store_name: newName,
         whatsapp: newWhatsapp,
         address: newAddress,
+        business_hours: businessHours,
         delivery_tiers: tiers,
         delivery_fee: tiers[0].price,
         is_open: window.isStoreOpen
@@ -1362,7 +1422,7 @@
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
         generateTableCards();
-        showToast("Configurações Salvas!", "Os dados da loja foram atualizados.");
+        showToast("Configurações Salvas!", "Nome, horários de atendimento e frete atualizados com sucesso!");
       }
     }
   </script>
