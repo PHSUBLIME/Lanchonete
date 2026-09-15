@@ -65,7 +65,7 @@
 </head>
 <body class="bg-[#0F0F0F] text-gray-100 antialiased min-h-screen font-sans flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-black">
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- NOTIFICAÇÃO FLUTUANTE -->
   <div id="toastNotification" class="fixed top-5 right-5 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-neutral-900 border border-emerald-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl">
     <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
       <i class="fa-solid fa-check"></i>
@@ -201,7 +201,6 @@
           </div>
         </div>
 
-        <!-- BARRA DE FILTROS -->
         <div class="flex flex-wrap items-center gap-2 mb-6 border-b border-neutral-800 pb-3">
           <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
             Todos do Turno (<span id="countFilterTodos">0</span>)
@@ -225,7 +224,6 @@
           </button>
         </div>
 
-        <!-- SELETOR DINÂMICO DE TURNOS ARQUIVADOS -->
         <div id="closedShiftSelectorArea" class="hidden mb-6 p-4 bg-neutral-900/90 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md">
           <div class="flex items-center space-x-2.5">
             <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-brand-yellow flex items-center justify-center font-black text-sm">
@@ -244,7 +242,7 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: MÓDULO FINANCEIRO / CAIXA ZERÁVEL POR TURNO -->
+      <!-- ABA 2: MÓDULO FINANCEIRO / CAIXA -->
       <section id="tab-dashboard" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -266,7 +264,6 @@
           </div>
         </div>
 
-        <!-- 3 CARDS PRINCIPAIS DO TURNO ATUAL -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
             <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Bruto (Turno)</span>
@@ -287,7 +284,6 @@
           </div>
         </div>
 
-        <!-- BATE-CAIXA DO TURNO ATUAL -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-6">
           <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
             <i class="fa-solid fa-money-check-dollar"></i> Entradas por Meio de Pagamento (Turno Atual)
@@ -316,7 +312,6 @@
           </div>
         </div>
 
-        <!-- VENDAS POR CANAL DO TURNO ATUAL -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-8">
           <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
             <i class="fa-solid fa-chart-simple"></i> Vendas por Canal (Turno Atual)
@@ -337,7 +332,6 @@
           </div>
         </div>
 
-        <!-- HISTÓRICO DE DIAS FECHADOS & ACUMULADOR DO MÊS -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
@@ -410,7 +404,6 @@
 
         <!-- BARRA DE BUSCA & FILTROS POR CATEGORIA -->
         <div class="space-y-3 mb-6">
-          <!-- CAMPO DE PESQUISA -->
           <div class="relative w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-xs"></i>
             <input 
@@ -422,11 +415,9 @@
             />
           </div>
 
-          <!-- ABAS DE CATEGORIAS (PILLS) -->
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
-        <!-- TABELA DE PRODUTOS -->
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
@@ -724,31 +715,73 @@
     </div>
   </div>
 
-  <!-- MODAL DE CATEGORIAS -->
+  <!-- MODAL DE GERENCIAR CATEGORIAS COM SELETOR DE DESENHOS (ÍCONES) -->
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
         <div>
           <h3 class="text-base font-black text-white">Gerenciar Categorias</h3>
-          <p class="text-[11px] text-gray-400">Adicione, edite ou exclua categorias</p>
+          <p class="text-[11px] text-gray-400">Adicione, edite nomes e escolha o desenho da categoria</p>
         </div>
         <button onclick="closeCategoryManagerModal()" class="text-gray-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <form onsubmit="handleAddCategory(event)" class="flex gap-2 mb-4">
-        <input type="text" id="newCategoryInput" placeholder="Ex: Cafés, Bolos, Tortas..." required class="flex-1 p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
-        <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black px-4 py-2.5 rounded-xl transition cursor-pointer">
-          <i class="fa-solid fa-plus"></i> Adicionar
-        </button>
+      <!-- FORMULÁRIO DE NOVA CATEGORIA COM SELETOR DE ÍCONE -->
+      <form onsubmit="handleAddCategory(event)" class="space-y-3 mb-5 p-3.5 bg-neutral-900/90 rounded-2xl border border-neutral-800">
+        <div>
+          <label class="block font-bold text-gray-300 text-[11px] mb-1">Nome da Nova Categoria</label>
+          <div class="flex gap-2">
+            <input type="text" id="newCategoryInput" placeholder="Ex: Cafés Especiais, Tortas..." required class="flex-1 p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white text-xs focus:outline-none focus:border-brand-yellow font-medium" />
+            <button type="submit" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black px-4 py-2.5 rounded-xl transition cursor-pointer text-xs flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Criar
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-400 text-[10px] mb-1.5 font-bold uppercase tracking-wider">Escolha o desenho (ícone):</label>
+          <div id="newCategoryIconGrid" class="grid grid-cols-6 gap-1.5"></div>
+          <input type="hidden" id="newCategoryIconInput" value="fa-solid fa-mug-hot" />
+        </div>
       </form>
 
-      <div id="categoriesList" class="space-y-2 divide-y divide-neutral-800"></div>
+      <!-- LISTA DE CATEGORIAS CADASTRADAS -->
+      <label class="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2">Categorias Atuais:</label>
+      <div id="categoriesList" class="space-y-1.5 divide-y divide-neutral-800/60 max-h-60 overflow-y-auto pr-1"></div>
 
       <div class="pt-4 border-t border-neutral-800 flex justify-end">
-        <button onclick="closeCategoryManagerModal()" class="px-5 py-2 rounded-xl bg-neutral-800 text-white font-bold hover:bg-neutral-700 cursor-pointer">Concluir</button>
+        <button onclick="closeCategoryManagerModal()" class="px-5 py-2.5 rounded-xl bg-neutral-800 text-white font-bold hover:bg-neutral-700 cursor-pointer">Concluir</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL MODERNO: EDITAR CATEGORIA (SEM CAIXA CINZA FEIA!) -->
+  <div id="editCategoryModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-base font-black text-white">Editar Categoria</h3>
+        <button onclick="closeEditCategoryModal()" class="text-gray-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <form onsubmit="handleSaveEditedCategory(event)" class="space-y-3">
+        <input type="hidden" id="editCatOldId" />
+        <div>
+          <label class="block font-bold text-gray-300 mb-1">Nome da Categoria</label>
+          <input type="text" id="editCatNameInput" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-xs focus:outline-none focus:border-brand-yellow font-bold" />
+        </div>
+        <div>
+          <label class="block text-gray-400 text-[10px] mb-1.5 font-bold uppercase tracking-wider">Desenho / Ícone:</label>
+          <div id="editCategoryIconGrid" class="grid grid-cols-6 gap-1.5"></div>
+          <input type="hidden" id="editCatIconInput" value="fa-solid fa-tag" />
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeEditCategoryModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Cancelar</button>
+          <button type="submit" class="flex-1 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-2.5 rounded-xl transition cursor-pointer shadow-md">Salvar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -843,6 +876,22 @@
     // ESTADOS PARA PESQUISA E FILTROS DO CARDÁPIO
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
+
+    // LISTA DE DESENHOS / ÍCONES PARA AS CATEGORIAS
+    const PRESET_CATEGORY_ICONS = [
+      { icon: 'fa-solid fa-mug-hot', label: 'Café' },
+      { icon: 'fa-solid fa-cake-candles', label: 'Bolo' },
+      { icon: 'fa-solid fa-bread-slice', label: 'Pão' },
+      { icon: 'fa-solid fa-cookie', label: 'Doce' },
+      { icon: 'fa-solid fa-glass-water', label: 'Bebida' },
+      { icon: 'fa-solid fa-burger', label: 'Burger' },
+      { icon: 'fa-solid fa-bowl-food', label: 'Porção' },
+      { icon: 'fa-solid fa-pizza-slice', label: 'Pizza' },
+      { icon: 'fa-solid fa-ice-cream', label: 'Sorvete' },
+      { icon: 'fa-solid fa-leaf', label: 'Salada' },
+      { icon: 'fa-solid fa-cheese', label: 'Queijo' },
+      { icon: 'fa-solid fa-tag', label: 'Geral' }
+    ];
 
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
@@ -1068,9 +1117,7 @@
       showToast("Pedido Concluído!", `Pedido #${orderId} baixado como ${chosenMethod}.`);
     }
 
-    // ========================================================
-    // CÁLCULOS DO TURNO ATUAL (ZERAM APÓS O FECHAMENTO DO CAIXA)
-    // ========================================================
+    // CÁLCULOS DO TURNO ATUAL
     function calculateShiftMetrics() {
       const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 
         ? window.dailyClosures[0] 
@@ -1154,9 +1201,7 @@
       }
     }
 
-    // ========================================================
-    // FECHAMENTO DE CAIXA COM DATA OPERACIONAL INTELIGENTE
-    // ========================================================
+    // FECHAMENTO DE CAIXA
     function openCloseShiftModal() {
       const m = calculateShiftMetrics();
       if (m.totalShiftOrders === 0) {
@@ -1238,7 +1283,6 @@
       }
     }
 
-    // MODAL CUSTOMIZADO DE EXCLUSÃO
     function openDeleteConfirmModal(closureId, closureDate) {
       window.closureIdToDelete = closureId;
       document.getElementById('deleteConfirmModalText').innerText = `Deseja realmente excluir o fechamento de "${closureDate}"? O acumulado do mês será recalculado na mesma hora.`;
@@ -1270,7 +1314,6 @@
       }
     }
 
-    // IMPRESSÃO DE FECHAMENTO
     function printTodayClosingReceipt() {
       const m = calculateShiftMetrics();
       const todayStr = new Date().toLocaleDateString('pt-BR');
@@ -1365,7 +1408,6 @@
       receiptArea.classList.add("hidden");
     }
 
-    // TABELA DE DIAS FECHADOS & FILTRO DO MÊS
     function populateMonthSelector() {
       const select = document.getElementById('selectMonthFilter');
       if (!select) return;
@@ -1483,9 +1525,6 @@
       receiptArea.classList.add("hidden");
     }
 
-    // ========================================================
-    // SEPARADOR DE PEDIDOS POR TURNO FECHADO
-    // ========================================================
     function populateClosedShiftDropdown() {
       const select = document.getElementById('selectClosedShiftArchive');
       if (!select) return;
@@ -1538,9 +1577,6 @@
       });
     }
 
-    // ========================================================
-    // RENDERIZAR PEDIDOS
-    // ========================================================
     function setOrderFilter(filter) {
       window.activeFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1827,7 +1863,7 @@
     }
 
     // ========================================================
-    // GERENCIAMENTO DO CARDÁPIO: PESQUISA & FILTROS POR CATEGORIA
+    // GERENCIAMENTO DO CARDÁPIO: PESQUISA & FILTROS
     // ========================================================
     function handleAdminProductSearch(query) {
       window.adminProductSearchQuery = (query || '').toLowerCase().trim();
@@ -1884,12 +1920,10 @@
 
       let list = [...window.storeProducts];
 
-      // Filtro por Categoria Selecionada
       if (window.adminSelectedCategory && window.adminSelectedCategory !== 'all') {
         list = list.filter(p => (p.category || '').toLowerCase() === window.adminSelectedCategory.toLowerCase());
       }
 
-      // Filtro por Termo de Pesquisa
       if (window.adminProductSearchQuery) {
         const q = window.adminProductSearchQuery;
         list = list.filter(p => 
@@ -2092,8 +2126,39 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
-    // CATEGORIAS
+    // ========================================================
+    // GERENCIADOR DE CATEGORIAS (COM ESCOLHA DE DESENHO E MODAL DARK)
+    // ========================================================
+    function renderCategoryIconPickers(containerId, inputId, selectedIcon) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.innerHTML = PRESET_CATEGORY_ICONS.map(item => {
+        const isSelected = item.icon === selectedIcon;
+        const activeClass = isSelected 
+          ? 'bg-brand-yellow text-brand-black border-amber-400 font-black scale-105 shadow-md'
+          : 'bg-neutral-950 text-gray-400 border-neutral-800 hover:text-white hover:border-neutral-600';
+
+        return `
+          <button 
+            type="button"
+            title="${item.label}"
+            onclick="selectCategoryIcon('${containerId}', '${inputId}', '${item.icon}')"
+            class="h-9 rounded-xl border flex items-center justify-center transition cursor-pointer text-sm ${activeClass}">
+            <i class="${item.icon}"></i>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function selectCategoryIcon(containerId, inputId, iconValue) {
+      const input = document.getElementById(inputId);
+      if (input) input.value = iconValue;
+      renderCategoryIconPickers(containerId, inputId, iconValue);
+    }
+
     function openCategoryManagerModal() {
+      renderCategoryIconPickers('newCategoryIconGrid', 'newCategoryIconInput', 'fa-solid fa-mug-hot');
       renderCategoriesList();
       document.getElementById("categoryManagerModal").classList.remove("hidden");
     }
@@ -2104,17 +2169,26 @@
 
     function renderCategoriesList() {
       const container = document.getElementById("categoriesList");
+      if (!container) return;
+
+      if (window.storeCategories.length === 0) {
+        container.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma categoria cadastrada.</p>`;
+        return;
+      }
+
       container.innerHTML = window.storeCategories.map(cat => `
         <div class="py-2.5 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <i class="${cat.icon || 'fa-solid fa-tag'} text-brand-yellow"></i>
+          <div class="flex items-center space-x-2.5">
+            <span class="w-7 h-7 rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-center text-brand-yellow text-xs">
+              <i class="${cat.icon || 'fa-solid fa-tag'}"></i>
+            </span>
             <span class="font-bold text-white text-xs">${cat.name}</span>
           </div>
-          <div class="flex items-center space-x-1.5">
-            <button onclick="editCategoryName('${cat.id}')" class="p-1.5 text-gray-400 hover:text-brand-yellow transition cursor-pointer" title="Renomear">
+          <div class="flex items-center space-x-1">
+            <button onclick="openEditCategoryModal('${cat.id}', '${cat.name}', '${cat.icon || 'fa-solid fa-tag'}')" class="p-2 text-gray-400 hover:text-brand-yellow transition cursor-pointer" title="Renomear e Trocar Desenho">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button onclick="deleteCategory('${cat.id}')" class="p-1.5 text-gray-400 hover:text-rose-400 transition cursor-pointer" title="Excluir">
+            <button onclick="deleteCategory('${cat.id}')" class="p-2 text-gray-400 hover:text-rose-400 transition cursor-pointer" title="Excluir">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -2134,30 +2208,55 @@
     async function handleAddCategory(e) {
       e.preventDefault();
       const input = document.getElementById("newCategoryInput");
+      const iconInput = document.getElementById("newCategoryIconInput");
       const name = input.value.trim();
+      const icon = iconInput.value || 'fa-solid fa-mug-hot';
       if (!name) return;
 
-      const { error } = await db.from('categories').insert([{ id: name, name: name, icon: 'fa-solid fa-tag' }]);
+      const { error } = await db.from('categories').insert([{ id: name, name: name, icon: icon }]);
       if (!error) {
         input.value = "";
         await fetchCategories();
         renderCategoriesList();
-        showToast("Categoria Criada!", `${name} foi adicionada ao cardápio.`);
+        renderAdminCategoryPills();
+        showToast("Categoria Criada!", `${name} adicionada com o novo desenho.`);
       } else {
         showToast("Erro ao criar", "Essa categoria já existe.", true);
       }
     }
 
-    async function editCategoryName(id) {
-      const newName = prompt(`Digite o novo nome para "${id}":`, id);
-      if (newName && newName.trim() && newName.trim() !== id) {
-        await db.from('categories').update({ name: newName.trim() }).eq('id', id);
-        await db.from('products').update({ category: newName.trim() }).eq('category', id);
-        await fetchCategories();
-        await fetchProducts();
-        renderCategoriesList();
-        showToast("Categoria Atualizada!", `Renomeada para ${newName.trim()}.`);
+    // MODAL DE EDITAR CATEGORIA (SEM PROMPT / SEM CAIXA CINZA!)
+    function openEditCategoryModal(id, currentName, currentIcon) {
+      document.getElementById('editCatOldId').value = id;
+      document.getElementById('editCatNameInput').value = currentName;
+      document.getElementById('editCatIconInput').value = currentIcon;
+      renderCategoryIconPickers('editCategoryIconGrid', 'editCatIconInput', currentIcon);
+      document.getElementById('editCategoryModal').classList.remove('hidden');
+    }
+
+    function closeEditCategoryModal() {
+      document.getElementById('editCategoryModal').classList.add('hidden');
+    }
+
+    async function handleSaveEditedCategory(e) {
+      e.preventDefault();
+      const oldId = document.getElementById('editCatOldId').value;
+      const newName = document.getElementById('editCatNameInput').value.trim();
+      const newIcon = document.getElementById('editCatIconInput').value;
+
+      if (!newName) return;
+
+      await db.from('categories').update({ name: newName, icon: newIcon }).eq('id', oldId);
+      if (oldId !== newName) {
+        await db.from('products').update({ category: newName }).eq('category', oldId);
       }
+
+      closeEditCategoryModal();
+      await fetchCategories();
+      await fetchProducts();
+      renderCategoriesList();
+      renderAdminCategoryPills();
+      showToast("Categoria Atualizada!", `Atualizada para "${newName}".`);
     }
 
     async function deleteCategory(id) {
@@ -2165,13 +2264,12 @@
         await db.from('categories').delete().eq('id', id);
         await fetchCategories();
         renderCategoriesList();
+        renderAdminCategoryPills();
         showToast("Categoria Removida", `A categoria ${id} foi excluída.`);
       }
     }
 
-    // ========================================================
-    // LOGIN REAL CRIPTOGRAFADO COM SUPABASE AUTH
-    // ========================================================
+    // LOGIN E NAVEGAÇÃO
     window.handleLogin = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
 
