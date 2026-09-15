@@ -312,8 +312,8 @@
           <span id="cartSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
         </div>
         <div class="flex justify-between text-gray-600">
-          <span>Taxa de entrega</span>
-          <span id="cartDeliveryFeeText" class="font-bold text-gray-800">R$ 0,00</span>
+          <span>Frete estimado</span>
+          <span id="cartDeliveryFeeText" class="font-bold text-gray-800">A partir de R$ 0,00</span>
         </div>
         <div class="flex justify-between text-base font-black text-brand-black pt-2 border-t border-gray-200">
           <span>TOTAL</span>
@@ -338,7 +338,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT -->
+  <!-- MODAL DE CHECKOUT (COM O SELETOR DE KM E FRETE) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -391,7 +391,20 @@
             </label>
           </div>
 
+          <!-- CAMPOS DE ENTREGA -->
           <div id="deliveryFieldsArea" class="mt-4 space-y-3">
+            
+            <!-- SELETOR DINÂMICO DE DISTÂNCIA / KM -->
+            <div class="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-1.5">
+              <label class="block font-black text-gray-800 text-[11px]">
+                <i class="fa-solid fa-map-location-dot text-brand-yellow mr-1"></i> Selecione a distância do seu endereço *
+              </label>
+              <select id="custDeliveryTier" onchange="handleDeliveryTierChange(this.value)" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white font-extrabold text-brand-black focus:outline-none focus:border-brand-yellow text-xs shadow-sm cursor-pointer">
+                <!-- Gerado via JavaScript de acordo com o Admin -->
+              </select>
+              <p class="text-[10px] text-gray-500 italic">O valor do frete é calculado automaticamente com base na distância da loja.</p>
+            </div>
+
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
                 <label class="block font-bold text-gray-700 mb-1">Rua / Logradouro *</label>
@@ -478,7 +491,7 @@
 
         <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-1.5">
           <div class="flex justify-between font-bold text-gray-700">
-            <span>Total com entrega:</span>
+            <span>Total com frete:</span>
             <span id="chkFinalTotalText" class="text-brand-red font-black text-base"></span>
           </div>
         </div>
@@ -553,7 +566,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT DO CLIENTE CONECTADO AO SUPABASE -->
+  <!-- SCRIPT DO CLIENTE CONECTADO AO SUPABASE COM 4 FAIXAS DE KM -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -562,7 +575,13 @@
     let storeConfig = {
       name: "PHSUBLIME FOOD",
       whatsapp: "5521986147221",
-      deliveryFee: 5.00,
+      deliveryTiers: [
+        { km: 3, price: 5.00 },
+        { km: 6, price: 8.00 },
+        { km: 10, price: 12.00 },
+        { km: 15, price: 15.00 }
+      ],
+      selectedTierIndex: 0,
       address: "Rua das Delícias, 100 - Rio de Janeiro - RJ"
     };
 
@@ -618,16 +637,20 @@
       }
     }
 
+    // CARREGA DADOS E FAIXAS DE KM DO SUPABASE
     async function fetchSettings() {
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       
       if (data) {
         storeConfig.name = data.store_name || storeConfig.name;
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
-        storeConfig.deliveryFee = Number(data.delivery_fee) !== undefined ? Number(data.delivery_fee) : storeConfig.deliveryFee;
         storeConfig.address = data.address || storeConfig.address;
 
-        // Atualização dinâmica em tempo real dos textos
+        // FAIXAS DE KM CARREGADAS DA NUVEM
+        if (Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4) {
+          storeConfig.deliveryTiers = data.delivery_tiers;
+        }
+
         document.title = `${storeConfig.name} | Cardápio Digital`;
         if (document.getElementById('brandNameHeader')) document.getElementById('brandNameHeader').innerText = storeConfig.name;
         if (document.getElementById('bannerTitle')) document.getElementById('bannerTitle').innerText = storeConfig.name;
@@ -635,9 +658,7 @@
         if (document.getElementById('footerStoreAddress')) document.getElementById('footerStoreAddress').innerText = storeConfig.address;
         if (document.getElementById('footerStoreWhatsapp')) document.getElementById('footerStoreWhatsapp').innerText = storeConfig.whatsapp;
         if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
-        if (document.getElementById('chkDeliveryFeeText')) document.getElementById('chkDeliveryFeeText').innerText = formatMoney(storeConfig.deliveryFee);
 
-        // Links de WhatsApp
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
         if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
@@ -657,8 +678,39 @@
           text.innerText = "FECHADO NO MOMENTO";
         }
 
+        renderDeliveryTierOptions();
+        updateCheckoutTotals();
         if (appState.cart.length > 0) renderCartDrawer();
       }
+    }
+
+    // GERA O SELETOR DE KM NO CHECKOUT
+    function renderDeliveryTierOptions() {
+      const select = document.getElementById('custDeliveryTier');
+      if (!select) return;
+
+      select.innerHTML = storeConfig.deliveryTiers.map((tier, idx) => {
+        let label = '';
+        if (idx === 0) {
+          label = `Até ${tier.km} km ➔ Frete: R$ ${formatMoney(tier.price)}`;
+        } else {
+          const prevKm = storeConfig.deliveryTiers[idx - 1].km;
+          label = `De ${prevKm} a ${tier.km} km ➔ Frete: R$ ${formatMoney(tier.price)}`;
+        }
+        return `<option value="${idx}" ${idx === storeConfig.selectedTierIndex ? 'selected' : ''}>🛵 ${label}</option>`;
+      }).join("");
+
+      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
+      const feeBadge = document.getElementById('chkDeliveryFeeText');
+      if (feeBadge) feeBadge.innerText = formatMoney(currentTier.price);
+    }
+
+    function handleDeliveryTierChange(val) {
+      storeConfig.selectedTierIndex = parseInt(val, 10) || 0;
+      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex];
+      const feeBadge = document.getElementById('chkDeliveryFeeText');
+      if (feeBadge) feeBadge.innerText = formatMoney(currentTier.price);
+      updateCheckoutTotals();
     }
 
     function setupRealtimeListeners() {
@@ -883,11 +935,11 @@
       }).join("");
 
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-      const delivery = storeConfig.deliveryFee;
-      const total = subtotal + delivery;
+      const minDeliveryFee = storeConfig.deliveryTiers[0]?.price || 5.00;
+      const total = subtotal + minDeliveryFee;
 
       document.getElementById("cartSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
-      document.getElementById("cartDeliveryFeeText").innerText = `R$ ${formatMoney(delivery)}`;
+      document.getElementById("cartDeliveryFeeText").innerText = `A partir de R$ ${formatMoney(minDeliveryFee)}`;
       document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(total)}`;
     }
 
@@ -917,6 +969,7 @@
     function startCheckout() {
       if (appState.cart.length === 0) return;
       closeCartDrawer();
+      renderDeliveryTierOptions();
       updateCheckoutTotals();
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
@@ -953,10 +1006,13 @@
       else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
     }
 
+    // ATUALIZA OS TOTAIS COM A FAIXA DE KM ESCOLHIDA
     function updateCheckoutTotals() {
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
-      const delivery = orderType === "delivery" ? storeConfig.deliveryFee : 0;
+      
+      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
+      const delivery = orderType === "delivery" ? Number(currentTier.price) : 0;
       const grandTotal = subtotal + delivery;
 
       document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
@@ -978,6 +1034,7 @@
 
       let deliveryAddressText = "Retirada no Balcão";
       let deliveryFeeApplied = 0;
+      let deliveryKmInfo = "Retirada no Local";
 
       if (orderType === "delivery") {
         const street = document.getElementById("custStreet").value.trim();
@@ -991,8 +1048,10 @@
           return;
         }
 
+        const chosenTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
+        deliveryFeeApplied = Number(chosenTier.price);
+        deliveryKmInfo = `Até ${chosenTier.km} km`;
         deliveryAddressText = `${street}, nº ${number} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
-        deliveryFeeApplied = storeConfig.deliveryFee;
       }
 
       let paymentDetails = paymentMethod;
@@ -1015,6 +1074,7 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
+      // MENSAGEM DO WHATSAPP COM A FAIXA DE KM INFORMADA
       const message = 
 `🍔 *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
@@ -1029,7 +1089,7 @@ ${phone}
 ${itemsListFormatted}
 
 💰 *SUBTOTAL:* R$ ${formatMoney(subtotal)}
-🛵 *ENTREGA:* ${deliveryFeeApplied > 0 ? `R$ ${formatMoney(deliveryFeeApplied)}` : "Grátis (Retirada)"}
+🛵 *ENTREGA:* ${deliveryFeeApplied > 0 ? `R$ ${formatMoney(deliveryFeeApplied)} (${deliveryKmInfo})` : "Grátis (Retirada)"}
 💵 *TOTAL:* R$ ${formatMoney(grandTotal)}
 
 📍 *ENDEREÇO:*
@@ -1043,7 +1103,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // SALVA O PEDIDO DIRETAMENTE NO SUPABASE
+      // REGISTRA O PEDIDO NO SUPABASE
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
@@ -1051,14 +1111,14 @@ Obrigado pelo pedido!`;
         items: appState.cart.map(i => `${i.quantity}x ${i.product.name}`).join(", "),
         total: grandTotal,
         payment: paymentDetails,
-        type: orderType === 'delivery' ? 'Delivery' : 'Retirada',
+        type: orderType === 'delivery' ? `Delivery (${deliveryKmInfo})` : 'Retirada',
         address: deliveryAddressText,
-        notes: orderNotes !== "Nenhuma" ? orderNotes : "",
+        notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "delivery" ? ` [Frete: ${deliveryKmInfo}]` : ""),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: "Novo"
       }]);
 
-      // ABRIR WHATSAPP AUTOMÁTICO
+      // ABRE O WHATSAPP
       const waNumber = getCleanWaNumber(storeConfig.whatsapp);
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
