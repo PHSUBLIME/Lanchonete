@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <!-- ESTRUTURA PRINCIPAL DO PAINEL -->
+  <!-- DASHBOARD PRINCIPAL -->
   <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
 
     <!-- MENU LATERAL -->
@@ -159,7 +159,6 @@
             <span class="flex-1 text-left">Gerenciar Cardápio</span>
           </button>
 
-          <!-- ABA DE PLACAS DE MESA COM QR CODE -->
           <button onclick="navigateTab('tables')" id="nav-tables" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
             <i class="fa-solid fa-qrcode text-sm text-brand-yellow"></i>
             <span class="flex-1 text-left">Placas de Mesa (QR Code)</span>
@@ -195,7 +194,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos de Delivery, Retirada e Mesas do Salão</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos de Mesas do Salão, Delivery e Retiradas</p>
           </div>
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
@@ -279,7 +278,7 @@
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA NOVA: GERADOR DE PLACAS DE MESA COM QR CODE -->
+      <!-- ABA 4: PLACAS DE MESA COM QR CODE -->
       <section id="tab-tables" class="tab-content hidden max-w-4xl">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -302,7 +301,6 @@
           </button>
         </div>
 
-        <!-- CONTAINER DAS PLACAS DE MESA -->
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
@@ -413,7 +411,7 @@
     </main>
   </div>
 
-  <!-- MODAL: GERENCIAR CATEGORIAS -->
+  <!-- MODAL DE CATEGORIAS -->
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
@@ -441,7 +439,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE PRODUTO COM FOTO -->
+  <!-- MODAL DE PRODUTO -->
   <div id="productEditModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 sm:p-7 rounded-3xl max-w-lg w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[92vh]">
       <div class="flex justify-between items-center mb-4">
@@ -511,7 +509,7 @@
   <!-- ÁREA DE IMPRESSÃO TÉRMICA DE COMANDA -->
   <div id="printableReceipt" class="hidden"></div>
 
-  <!-- ÁREA OCULTA PARA IMPRESSÃO DAS PLACAS DE MESA -->
+  <!-- ÁREA DE IMPRESSÃO DAS PLACAS DE MESA -->
   <div id="printAreaTables" class="hidden"></div>
 
   <!-- JAVASCRIPT DO PAINEL -->
@@ -623,10 +621,11 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
           if (payload.eventType === 'INSERT') {
             playOrderChime();
-            const orderTypeDesc = payload.new.type && payload.new.type.includes('Mesa') 
-              ? `🍽️ Pedido na ${payload.new.type}!` 
+            const isMesa = isTableOrder(payload.new);
+            const titleMsg = isMesa 
+              ? `🍽️ Pedido na ${formatTableNumber(payload.new)}!` 
               : `Novo Pedido #${payload.new.id}!`;
-            showToast(orderTypeDesc, `${payload.new.client} enviou um pedido.`);
+            showToast(titleMsg, `${payload.new.client} enviou um pedido.`);
           }
           fetchOrders();
         })
@@ -637,14 +636,72 @@
     }
 
     // ========================================================
+    // HELPER: DETECTAR E FORMATAR MESA INTELIGENTE
+    // ========================================================
+    function isTableOrder(ord) {
+      if (!ord) return false;
+      const typeStr = (ord.type || '').toLowerCase();
+      const addrStr = (ord.address || '').toLowerCase();
+      const notesStr = (ord.notes || '').toLowerCase();
+
+      return typeStr.includes('mesa') || 
+             typeStr.includes('salão') || 
+             typeStr.includes('dine_in') || 
+             addrStr.includes('mesa') || 
+             addrStr.includes('salão') || 
+             notesStr.includes('mesa') ||
+             /^\d+$/.test(typeStr.trim()); // se o tipo for apenas um número (ex: "3")
+    }
+
+    function formatTableNumber(ord) {
+      const typeStr = (ord.type || '').trim();
+      const addrStr = (ord.address || '').trim();
+      
+      // Procura dígitos no type ou no address
+      const combined = `${typeStr} ${addrStr}`;
+      const match = combined.match(/\d+/);
+      if (match) {
+        return `MESA ${match[0].padStart(2, '0')}`;
+      }
+      return 'MESA SALÃO';
+    }
+
+    function renderOrderDestinationBadge(ord) {
+      if (isTableOrder(ord)) {
+        const tableTxt = formatTableNumber(ord);
+        return `
+          <span class="bg-amber-400 text-neutral-950 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md border border-amber-300 uppercase tracking-wide animate-pulse">
+            <i class="fa-solid fa-utensils text-sm"></i>
+            <span>${tableTxt}</span>
+          </span>
+        `;
+      }
+
+      const isPickup = (ord.type || '').toLowerCase().includes('retirada') || (ord.address || '').toLowerCase().includes('balcão');
+      if (isPickup) {
+        return `
+          <span class="bg-emerald-600 text-white font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md uppercase tracking-wide">
+            <i class="fa-solid fa-store"></i>
+            <span>RETIRADA BALCÃO</span>
+          </span>
+        `;
+      }
+
+      return `
+        <span class="bg-blue-600 text-white font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md uppercase tracking-wide">
+          <i class="fa-solid fa-motorcycle"></i>
+          <span>${ord.type || 'DELIVERY'}</span>
+        </span>
+      `;
+    }
+
+    // ========================================================
     // GERADOR DE PLACAS DE MESA COM QR CODE
     // ========================================================
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       const container = document.getElementById('tableCardsGrid');
       const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
-      
-      // Base da URL da sua loja
       const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
 
       let html = '';
@@ -989,7 +1046,7 @@
 
       const totalCount = window.storeOrders.length;
       const abertosCount = window.storeOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
-      const mesasCount = window.storeOrders.filter(o => (o.type && o.type.includes('Mesa')) && o.status !== "Entregue" && o.status !== "Cancelado").length;
+      const mesasCount = window.storeOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
       const entreguesCount = window.storeOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
       const canceladosCount = window.storeOrders.filter(o => o.status === "Cancelado").length;
 
@@ -1002,7 +1059,7 @@
 
       let list = [...window.storeOrders];
       if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
-      else if (window.activeFilter === 'mesas') list = list.filter(o => o.type && o.type.includes('Mesa'));
+      else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
       else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
       else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
 
@@ -1019,10 +1076,10 @@
       container.innerHTML = list.map(ord => {
         const isEntregue = ord.status === "Entregue" || ord.status === "Finalizado";
         const isCancelado = ord.status === "Cancelado";
-        const isMesa = ord.type && ord.type.includes('Mesa');
+        const isMesa = isTableOrder(ord);
 
         let cardBg = isMesa && !isEntregue && !isCancelado
-          ? 'bg-[#221f15] border-brand-yellow/80 shadow-md' 
+          ? 'bg-[#1f1a10] border-2 border-brand-yellow/80 shadow-xl' 
           : isEntregue 
             ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
             : isCancelado 
@@ -1032,9 +1089,10 @@
         return `
           <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
             <div>
-              <div class="flex justify-between items-start mb-2">
+              <!-- TOPO DO CARD: PEDIDO + DESTINO DESTACADO -->
+              <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center space-x-2">
-                  <span class="text-xs font-black text-brand-yellow">#${ord.id}</span>
+                  <span class="text-sm font-black text-brand-yellow">#${ord.id}</span>
                   ${
                     isCancelado
                       ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
@@ -1044,25 +1102,21 @@
                   }
                 </div>
 
-                <!-- BADGE DESTACADO DO TIPO DE PEDIDO -->
-                ${
-                  isMesa 
-                    ? `<span class="bg-brand-yellow text-brand-black px-2.5 py-1 rounded-lg text-xs font-black flex items-center gap-1 shadow-sm">
-                         <i class="fa-solid fa-utensils"></i> ${ord.type.toUpperCase()}
-                       </span>`
-                    : `<span class="text-[11px] font-bold text-gray-400">${ord.type}</span>`
-                }
+                <!-- SELO GIGANTE E DESTACADO -->
+                <div>
+                  ${renderOrderDestinationBadge(ord)}
+                </div>
               </div>
 
               <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
               <p class="text-xs text-gray-400 mb-3">${ord.phone || 'Sem telefone'}</p>
 
               <div class="p-3 bg-neutral-900/90 rounded-xl text-xs mb-3 space-y-1.5 border border-neutral-800">
-                <p class="font-bold text-gray-200">${ord.items}</p>
+                <p class="font-bold text-gray-200 text-sm">${ord.items}</p>
                 ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
                 <p class="text-[11px] text-gray-400">
                   <i class="${isMesa ? 'fa-solid fa-utensils text-brand-yellow' : 'fa-solid fa-location-dot text-brand-red'} mr-1"></i> 
-                  ${ord.address}
+                  ${isMesa ? formatTableNumber(ord) + ' (Consumo no Salão)' : ord.address}
                 </p>
                 <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
               </div>
@@ -1070,8 +1124,8 @@
 
             <div>
               <div class="flex justify-between items-center mb-3">
-                <span class="text-xs text-gray-400">Total:</span>
-                <span class="text-base font-black ${isCancelado ? 'line-through text-gray-500' : 'text-brand-yellow'}">R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
+                <span class="text-xs text-gray-400 font-bold">Total do Pedido:</span>
+                <span class="text-lg font-black ${isCancelado ? 'line-through text-gray-500' : 'text-brand-yellow'}">R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
               </div>
 
               <select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
@@ -1084,27 +1138,27 @@
               </select>
 
               <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
-                <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
+                <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
                   <i class="fa-solid fa-print"></i>
                   <span>Comanda</span>
                 </button>
 
                 ${
                   isCancelado 
-                    ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
+                    ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
                          <i class="fa-solid fa-rotate-left"></i>
                          <span>Reativar</span>
                        </button>`
                     : isEntregue 
-                      ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
+                      ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
                            <i class="fa-solid fa-check-double"></i>
                            <span>Concluído</span>
                          </button>`
-                      : `<button onclick="changeOrderStatus('${ord.id}', 'Entregue')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
+                      : `<button onclick="changeOrderStatus('${ord.id}', 'Entregue')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
                            <i class="fa-solid fa-check"></i>
                            <span>Concluir</span>
                          </button>
-                         <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
+                         <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
                            <i class="fa-solid fa-ban"></i>
                            <span>Cancelar</span>
                          </button>`
@@ -1130,22 +1184,25 @@
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (!ord) return;
       const receiptArea = document.getElementById("printableReceipt");
-      const isMesa = ord.type && ord.type.includes('Mesa');
+      const isMesa = isTableOrder(ord);
 
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
           <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
           <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
           <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
-          <p style="margin: 6px 0 0 0; font-weight: 900; font-size: 15px;">
-            ${isMesa ? `🍽️ ATENDIMENTO SALÃO • ${ord.type.toUpperCase()}` : 'COMPROVANTE DE PEDIDO'}
-          </p>
+          
+          <div style="margin: 8px 0; padding: 6px; background: #000; color: #fff; border-radius: 4px;">
+            <span style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">
+              ${isMesa ? `🍽️ ${formatTableNumber(ord)}` : '🛵 ENTREGA DELIVERY'}
+            </span>
+          </div>
         </div>
 
         <div style="margin-bottom: 8px; font-size: 11px;">
           <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
           <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
-          <p style="margin: 2px 0; font-size: 13px;"><strong>DESTINO:</strong> <span style="font-weight:900;">${ord.type.toUpperCase()}</span></p>
+          <p style="margin: 2px 0; font-size: 13px;"><strong>DESTINO:</strong> <span style="font-weight:900;">${isMesa ? formatTableNumber(ord) : ord.type.toUpperCase()}</span></p>
           <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
           ${ord.phone ? `<p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>` : ''}
           ${!isMesa ? `<p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>` : ''}
