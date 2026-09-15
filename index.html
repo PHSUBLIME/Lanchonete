@@ -153,7 +153,7 @@
       </div>
     </section>
 
-    <!-- BARRA HORIZONTAL DE CATEGORIAS DINÂMICAS -->
+    <!-- BARRA HORIZONTAL DE CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
       <div class="max-w-6xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -290,7 +290,7 @@
     </div>
   </div>
 
-  <!-- DRAWER DO CARRINHO -->
+  <!-- DRAWER DO CARRINHO (TRANSPARENTE: NÃO SOMA FRETE FALSO AQUI!) -->
   <div id="cartBackdrop" onclick="closeCartDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-black text-white">
@@ -308,16 +308,16 @@
     <div id="cartFooterArea" class="p-5 bg-gray-50 border-t border-gray-200">
       <div class="space-y-1.5 text-xs mb-4">
         <div class="flex justify-between text-gray-600">
-          <span>Subtotal</span>
+          <span>Subtotal dos Itens</span>
           <span id="cartSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
         </div>
-        <div class="flex justify-between text-gray-600">
-          <span>Frete</span>
-          <span id="cartDeliveryFeeText" class="font-bold text-gray-800">Calculado no endereço</span>
+        <div class="flex justify-between text-gray-500">
+          <span>Taxa de Entrega</span>
+          <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Calculada no endereço</span>
         </div>
         <div class="flex justify-between text-base font-black text-brand-black pt-2 border-t border-gray-200">
-          <span>TOTAL</span>
-          <span id="cartGrandTotalText" class="text-brand-red">R$ 0,00</span>
+          <span>SUBTOTAL</span>
+          <span id="cartGrandTotalText" class="text-brand-black">R$ 0,00</span>
         </div>
       </div>
 
@@ -338,7 +338,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT -->
+  <!-- MODAL DE CHECKOUT (TOTALMENTE CLARO E TRANSPARENTE) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -379,34 +379,34 @@
               <input type="radio" name="orderType" value="delivery" checked onchange="toggleDeliveryFields()" class="accent-brand-yellow text-brand-yellow" />
               <div>
                 <p class="font-bold text-gray-800">🛵 Entrega Delivery</p>
-                <p class="text-[10px] text-gray-500">Taxa: R$ <span id="chkDeliveryFeeText">5,00</span></p>
+                <p class="text-[10px] text-gray-500">Frete calculado pelo endereço</p>
               </div>
             </label>
             <label class="cursor-pointer border rounded-xl p-3 flex items-center space-x-2.5 transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50/50">
               <input type="radio" name="orderType" value="pickup" onchange="toggleDeliveryFields()" class="accent-brand-yellow text-brand-yellow" />
               <div>
                 <p class="font-bold text-gray-800">🏪 Retirada no Local</p>
-                <p class="text-[10px] text-gray-500">Sem taxa de entrega</p>
+                <p class="text-[10px] text-emerald-600 font-bold">Sem taxa (Grátis)</p>
               </div>
             </label>
           </div>
 
-          <!-- CAMPOS DE ENDEREÇO (AO DIGITAR, O FRETE ATUALIZA SOZINHO E SILENCIOSAMENTE) -->
+          <!-- CAMPOS DE ENDEREÇO -->
           <div id="deliveryFieldsArea" class="mt-4 space-y-3">
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
                 <label class="block font-bold text-gray-700 mb-1">Rua / Logradouro *</label>
-                <input type="text" id="custStreet" onchange="autoCalculateRouteDelivery()" placeholder="Ex: Rua Barata Ribeiro" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custStreet" oninput="scheduleAutoCalculate()" placeholder="Ex: Rua Barata Ribeiro" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Número *</label>
-                <input type="text" id="custNumber" onchange="autoCalculateRouteDelivery()" placeholder="Ex: 500" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custNumber" oninput="scheduleAutoCalculate()" placeholder="Ex: 500" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Bairro *</label>
-                <input type="text" id="custNeighborhood" onchange="autoCalculateRouteDelivery()" placeholder="Ex: Copacabana" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custNeighborhood" oninput="scheduleAutoCalculate()" placeholder="Ex: Copacabana" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Complemento / Apto</label>
@@ -416,6 +416,18 @@
             <div>
               <label class="block font-bold text-gray-700 mb-1">Ponto de Referência</label>
               <input type="text" id="custReference" placeholder="Ex: Próximo à praça" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+            </div>
+
+            <!-- QUADRO DE FRETE CLARO E TRANSPARENTE -->
+            <div id="deliveryFeeNoticeBox" class="p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-xs flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-motorcycle text-brand-yellow text-base"></i>
+                <div>
+                  <p class="font-bold text-gray-800" id="deliveryNoticeTitle">Frete de Entrega</p>
+                  <p class="text-[10px] text-gray-500" id="deliveryNoticeSubtitle">Digite seu endereço para calcular</p>
+                </div>
+              </div>
+              <span class="font-black text-sm text-brand-red" id="chkDeliveryFeeText">R$ 5,00</span>
             </div>
           </div>
 
@@ -477,16 +489,26 @@
           <input type="text" id="orderNotes" placeholder="Ex: Tocar o interfone, campainha estragada..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
-        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-1.5">
-          <div class="flex justify-between font-bold text-gray-700">
-            <span>Total com entrega:</span>
-            <span id="chkFinalTotalText" class="text-brand-red font-black text-base"></span>
+        <!-- RESUMO FINAL COM TOTAL CLARO -->
+        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+          <div class="flex justify-between text-gray-600">
+            <span>Subtotal dos Itens:</span>
+            <span id="chkSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Taxa de Entrega:</span>
+            <span id="chkSummaryFeeText" class="font-bold text-gray-800">R$ 5,00</span>
+          </div>
+          <div class="flex justify-between font-black text-base pt-2 border-t border-gray-200">
+            <span class="text-brand-black">TOTAL A PAGAR:</span>
+            <span id="chkFinalTotalText" class="text-brand-red font-black">R$ 0,00</span>
           </div>
         </div>
 
-        <button type="submit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-4 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
+        <!-- BOTÃO COM O VALOR EXATO ESTAMPADO -->
+        <button type="submit" id="btnSubmitOrder" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-4 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <i class="fa-brands fa-whatsapp text-lg"></i>
-          <span>CONFIRMAR E ENVIAR NO WHATSAPP</span>
+          <span id="btnSubmitText">CONFIRMAR E ENVIAR NO WHATSAPP</span>
         </button>
       </form>
     </div>
@@ -554,7 +576,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT: CÁLCULO DE ROTA 100% AUTOMÁTICO E SILENCIOSO -->
+  <!-- JAVASCRIPT DO CLIENTE: FRETE TRANSPARENTE E ROTA PRECISA -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -577,6 +599,7 @@
     let storeCategories = [];
     let storeProducts = [];
     let cachedStoreCoords = null;
+    let autoCalcTimeout = null;
 
     let appState = {
       cart: [],
@@ -643,7 +666,7 @@
         if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
 
         const feeBadge = document.getElementById('chkDeliveryFeeText');
-        if (feeBadge) feeBadge.innerText = formatMoney(storeConfig.currentAutoFee);
+        if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
@@ -670,8 +693,14 @@
     }
 
     // ========================================================
-    // CÁLCULO DE ROTA AUTOMÁTICO, GRATUITO E SILENCIOSO (OSRM + OSM)
+    // CÁLCULO DE ROTA AUTOMÁTICO, SILENCIOSO E PRECISO
     // ========================================================
+    function scheduleAutoCalculate() {
+      clearTimeout(autoCalcTimeout);
+      // Aguarda 600ms após o cliente parar de digitar para calcular
+      autoCalcTimeout = setTimeout(autoCalculateRouteDelivery, 600);
+    }
+
     async function getCoordinates(addressText) {
       try {
         const cleanQuery = encodeURIComponent(addressText.trim());
@@ -691,23 +720,19 @@
       const number = document.getElementById('custNumber')?.value.trim();
       const neighborhood = document.getElementById('custNeighborhood')?.value.trim();
 
-      // Só calcula se já tiver rua e bairro preenchidos
       if (!street || !neighborhood) return;
 
       const customerAddressFull = `${street}, ${number || ''}, ${neighborhood}`;
 
       try {
-        // 1. Pega coordenadas da loja (guarda em cache para ser instantâneo)
         if (!cachedStoreCoords) {
           cachedStoreCoords = await getCoordinates(storeConfig.address);
         }
         if (!cachedStoreCoords) return;
 
-        // 2. Pega coordenadas do cliente
         const custCoords = await getCoordinates(customerAddressFull);
         if (!custCoords) return;
 
-        // 3. Traça a rota real pelas ruas via OSRM gratuito
         const routeUrl = `https://router.project-osrm.org/route/v1/driving/${cachedStoreCoords.lon},${cachedStoreCoords.lat};${custCoords.lon},${custCoords.lat}?overview=false`;
         const routeRes = await fetch(routeUrl);
         const routeData = await routeRes.json();
@@ -717,7 +742,6 @@
           const km = meters / 1000;
           storeConfig.currentCalculatedKm = km;
 
-          // 4. Encontra a faixa correspondente de preço cadastrada no Admin
           let appliedPrice = storeConfig.deliveryTiers[0].price;
           const sortedTiers = [...storeConfig.deliveryTiers].sort((a, b) => a.km - b.km);
 
@@ -727,20 +751,24 @@
               break;
             }
             if (i === sortedTiers.length - 1) {
-              appliedPrice = sortedTiers[i].price; // Se passar da última faixa, aplica o valor da 4ª faixa
+              appliedPrice = sortedTiers[i].price;
             }
           }
 
-          // 5. Atualiza o frete e o total SILENCIOSAMENTE na tela
           storeConfig.currentAutoFee = Number(appliedPrice);
+
+          // Atualiza com clareza o valor do frete e o aviso
           const feeBadge = document.getElementById('chkDeliveryFeeText');
-          if (feeBadge) feeBadge.innerText = formatMoney(storeConfig.currentAutoFee);
+          if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
+
+          const noticeTitle = document.getElementById('deliveryNoticeTitle');
+          const noticeSub = document.getElementById('deliveryNoticeSubtitle');
+          if (noticeTitle) noticeTitle.innerText = `Frete para seu endereço: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
+          if (noticeSub) noticeSub.innerText = `Distância calculada: ~${km.toFixed(1)} km da loja`;
 
           updateCheckoutTotals();
         }
-      } catch (err) {
-        // Se a internet falhar ou rua não existir, mantém a taxa padrão sem travar nada
-      }
+      } catch (err) {}
     }
 
     function setupRealtimeListeners() {
@@ -919,6 +947,7 @@
       document.getElementById("mobileCartTotal").innerText = `R$ ${formatMoney(subtotal)}`;
     }
 
+    // NA GAVETA: MOSTRA APENAS O SUBTOTAL REAL DOS LANCHES
     function renderCartDrawer() {
       const list = document.getElementById("cartItemsList");
       const footer = document.getElementById("cartFooterArea");
@@ -965,12 +994,9 @@
       }).join("");
 
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-      const delivery = storeConfig.currentAutoFee;
-      const total = subtotal + delivery;
 
       document.getElementById("cartSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
-      document.getElementById("cartDeliveryFeeText").innerText = `R$ ${formatMoney(delivery)}`;
-      document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(total)}`;
+      document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(subtotal)}`;
     }
 
     function changeCartItemQty(index, delta) {
@@ -1035,13 +1061,31 @@
       else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
     }
 
+    // ATUALIZAÇÃO CLARA E TRANSPARENTE DOS TOTAIS
     function updateCheckoutTotals() {
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
       const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
       const grandTotal = subtotal + delivery;
 
-      document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
+      // Resumo final
+      if (document.getElementById("chkSubtotalText")) {
+        document.getElementById("chkSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
+      }
+      if (document.getElementById("chkSummaryFeeText")) {
+        document.getElementById("chkSummaryFeeText").innerText = orderType === "delivery" 
+          ? `R$ ${formatMoney(delivery)}` 
+          : "Grátis (Retirada)";
+      }
+      if (document.getElementById("chkFinalTotalText")) {
+        document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
+      }
+
+      // O próprio botão amarelo exibe o total final exato
+      const btnText = document.getElementById("btnSubmitText");
+      if (btnText) {
+        btnText.innerText = `CONFIRMAR E ENVIAR NO WHATSAPP • R$ ${formatMoney(grandTotal)}`;
+      }
     }
 
     async function processOrderSubmission(e) {
@@ -1075,7 +1119,7 @@
         }
 
         deliveryFeeApplied = Number(storeConfig.currentAutoFee);
-        deliveryKmInfo = storeConfig.currentCalculatedKm ? `${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
+        deliveryKmInfo = storeConfig.currentCalculatedKm ? `~${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
         deliveryAddressText = `${street}, nº ${number} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
       }
 
@@ -1099,7 +1143,7 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
-      // MENSAGEM DO WHATSAPP
+      // MENSAGEM DO WHATSAPP: TOTALMENTE TRANSPARENTE COM O QUE O CLIENTE VIU
       const message = 
 `🍔 *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
