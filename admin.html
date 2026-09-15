@@ -192,14 +192,15 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS COM ARQUIVO DE TURNOS FECHADOS ORGANIZADOS -->
+      <!-- ABA 1: FILA DE PEDIDOS -->
       <section id="tab-orders" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
             <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual ou consulte arquivos de turnos fechados</p>
           </div>
-</div>
+        </div>
+
         <!-- BARRA DE FILTROS -->
         <div class="flex flex-wrap items-center gap-2 mb-6 border-b border-neutral-800 pb-3">
           <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
@@ -218,7 +219,6 @@
             ❌ Cancelados (<span id="countFilterCancelados">0</span>)
           </button>
 
-          <!-- BOTÃO DE TURNOS FECHADOS -->
           <button onclick="setOrderFilter('arquivados')" id="filterBtn-arquivados" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-gray-400 hover:text-amber-400 hover:border-amber-400 transition cursor-pointer ml-auto">
             <i class="fa-solid fa-box-archive mr-1.5 text-brand-yellow"></i>
             Turnos Fechados (<span id="countFilterArquivados">0</span>)
@@ -389,7 +389,7 @@
         </div>
       </section>
 
-      <!-- ABA 3: CARDÁPIO -->
+      <!-- ABA 3: CARDÁPIO (COM BARRA DE BUSCA E ABAS POR CATEGORIA) -->
       <section id="tab-products" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -408,6 +408,25 @@
           </div>
         </div>
 
+        <!-- BARRA DE BUSCA & FILTROS POR CATEGORIA -->
+        <div class="space-y-3 mb-6">
+          <!-- CAMPO DE PESQUISA -->
+          <div class="relative w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-xs"></i>
+            <input 
+              type="text" 
+              id="adminSearchProductInput" 
+              oninput="handleAdminProductSearch(this.value)" 
+              placeholder="Buscar item pelo nome ou descrição..." 
+              class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
+            />
+          </div>
+
+          <!-- ABAS DE CATEGORIAS (PILLS) -->
+          <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
+        </div>
+
+        <!-- TABELA DE PRODUTOS -->
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
@@ -821,6 +840,10 @@
     window.closureIdToDelete = null;
     window.selectedArchiveClosureId = 'todos';
 
+    // ESTADOS PARA PESQUISA E FILTROS DO CARDÁPIO
+    window.adminSelectedCategory = 'all';
+    window.adminProductSearchQuery = '';
+
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
       const icon = document.getElementById("toastIcon");
@@ -862,6 +885,7 @@
       if (data) {
         window.storeCategories = data;
         updateCategorySelectOptions();
+        renderAdminCategoryPills();
       }
     }
 
@@ -869,6 +893,7 @@
       const { data } = await db.from('products').select('*').order('created_at', { ascending: false });
       if (data) {
         window.storeProducts = data;
+        renderAdminCategoryPills();
         renderProductsList();
       }
     }
@@ -1514,7 +1539,7 @@
     }
 
     // ========================================================
-    // RENDERIZAR PEDIDOS (TURNO ATUAL VS TURNOS ARQUIVADOS)
+    // RENDERIZAR PEDIDOS
     // ========================================================
     function setOrderFilter(filter) {
       window.activeFilter = filter;
@@ -1732,7 +1757,7 @@
 
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
+          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
           <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
           <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
           
@@ -1801,157 +1826,91 @@
       } catch (e) {}
     }
 
-    // PLACAS DE MESA
-    function generateTableCards() {
-      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
-      const container = document.getElementById('tableCardsGrid');
-      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
-      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
+    // ========================================================
+    // GERENCIAMENTO DO CARDÁPIO: PESQUISA & FILTROS POR CATEGORIA
+    // ========================================================
+    function handleAdminProductSearch(query) {
+      window.adminProductSearchQuery = (query || '').toLowerCase().trim();
+      renderProductsList();
+    }
 
-      let html = '';
-      for (let i = 1; i <= numTables; i++) {
-        const tableUrl = `${baseUrl}?mesa=${i}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tableUrl)}`;
+    function selectAdminProductCategory(catId) {
+      window.adminSelectedCategory = catId;
+      renderAdminCategoryPills();
+      renderProductsList();
+    }
 
-        html += `
-          <div class="bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg">
-            <span class="text-[11px] font-black uppercase text-gray-500 tracking-wider mb-1">${storeName}</span>
-            <div class="w-12 h-12 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black text-xl mb-3 shadow-sm">
-              ${i}
-            </div>
-            <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
-            
-            <div class="p-2 bg-white rounded-xl border border-gray-200 mb-3">
-              <img src="${qrUrl}" alt="QR Code Mesa ${i}" class="w-36 h-36 mx-auto object-contain" />
-            </div>
+    function renderAdminCategoryPills() {
+      const container = document.getElementById("adminCategoryPills");
+      if (!container) return;
 
-            <p class="text-[11px] font-extrabold text-gray-800 leading-tight">Aponte a câmera do celular<br>para fazer seu pedido!</p>
-            <span class="text-[9px] text-gray-400 mt-2">Autoatendimento Digital</span>
-          </div>
+      const totalCount = window.storeProducts.length;
+      let pills = [
+        { id: 'all', name: 'Todas', count: totalCount, icon: 'fa-solid fa-layer-group' }
+      ];
+
+      window.storeCategories.forEach(cat => {
+        const count = window.storeProducts.filter(p => (p.category || '').toLowerCase() === cat.name.toLowerCase()).length;
+        pills.push({
+          id: cat.name,
+          name: cat.name,
+          count: count,
+          icon: cat.icon || 'fa-solid fa-tag'
+        });
+      });
+
+      container.innerHTML = pills.map(pill => {
+        const isActive = (window.adminSelectedCategory || 'all').toLowerCase() === pill.id.toLowerCase();
+        const activeClass = isActive
+          ? "bg-brand-yellow text-brand-black font-extrabold shadow-md scale-105"
+          : "bg-neutral-900 hover:bg-neutral-800 text-gray-300 hover:text-white border border-neutral-700 font-semibold";
+
+        return `
+          <button 
+            type="button"
+            onclick="selectAdminProductCategory('${pill.id}')"
+            class="text-xs px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition whitespace-nowrap cursor-pointer ${activeClass}">
+            <i class="${pill.icon} text-[11px]"></i>
+            <span>${pill.name}</span>
+            <span class="text-[10px] opacity-80">(${pill.count})</span>
+          </button>
         `;
-      }
-
-      container.innerHTML = html;
+      }).join("");
     }
 
-    function printTableCards() {
-      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
-      const printArea = document.getElementById('printAreaTables');
-      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
-      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
-
-      let html = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="text-align: center; margin-bottom: 20px;">Placas de Mesa • ${storeName}</h2>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-      `;
-
-      for (let i = 1; i <= numTables; i++) {
-        const tableUrl = `${baseUrl}?mesa=${i}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(tableUrl)}`;
-
-        html += `
-          <div style="border: 3px solid #FFB800; border-radius: 15px; padding: 25px; text-align: center; page-break-inside: avoid;">
-            <p style="margin: 0; font-size: 13px; font-weight: bold; text-transform: uppercase; color: #555;">${storeName}</p>
-            <h1 style="margin: 10px 0; font-size: 28px; font-weight: 900;">MESA 0${i}</h1>
-            <img src="${qrUrl}" style="width: 170px; height: 170px; margin: 10px auto; display: block;" />
-            <p style="margin: 10px 0 0 0; font-size: 14px; font-weight: bold; color: #111;">Aponte a câmera para pedir!</p>
-            <p style="margin: 5px 0 0 0; font-size: 11px; color: #777;">Cardápio Digital na Mesa</p>
-          </div>
-        `;
-      }
-
-      html += `</div></div>`;
-      printArea.innerHTML = html;
-      printArea.classList.remove('hidden');
-      window.print();
-      printArea.classList.add('hidden');
-    }
-
-    // CATEGORIAS
-    function openCategoryManagerModal() {
-      renderCategoriesList();
-      document.getElementById("categoryManagerModal").classList.remove("hidden");
-    }
-
-    function closeCategoryManagerModal() {
-      document.getElementById("categoryManagerModal").classList.add("hidden");
-    }
-
-    function renderCategoriesList() {
-      const container = document.getElementById("categoriesList");
-      container.innerHTML = window.storeCategories.map(cat => `
-        <div class="py-2.5 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <i class="${cat.icon || 'fa-solid fa-tag'} text-brand-yellow"></i>
-            <span class="font-bold text-white text-xs">${cat.name}</span>
-          </div>
-          <div class="flex items-center space-x-1.5">
-            <button onclick="editCategoryName('${cat.id}')" class="p-1.5 text-gray-400 hover:text-brand-yellow transition cursor-pointer" title="Renomear">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button onclick="deleteCategory('${cat.id}')" class="p-1.5 text-gray-400 hover:text-rose-400 transition cursor-pointer" title="Excluir">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `).join("");
-      updateCategorySelectOptions();
-    }
-
-    function updateCategorySelectOptions() {
-      const select = document.getElementById("prodCategory");
-      if (!select) return;
-      select.innerHTML = window.storeCategories.map(c => `
-        <option value="${c.name}">${c.name}</option>
-      `).join("");
-    }
-
-    async function handleAddCategory(e) {
-      e.preventDefault();
-      const input = document.getElementById("newCategoryInput");
-      const name = input.value.trim();
-      if (!name) return;
-
-      const { error } = await db.from('categories').insert([{ id: name, name: name, icon: 'fa-solid fa-tag' }]);
-      if (!error) {
-        input.value = "";
-        await fetchCategories();
-        renderCategoriesList();
-        showToast("Categoria Criada!", `${name} foi adicionada ao cardápio.`);
-      } else {
-        showToast("Erro ao criar", "Essa categoria já existe.", true);
-      }
-    }
-
-    async function editCategoryName(id) {
-      const newName = prompt(`Digite o novo nome para "${id}":`, id);
-      if (newName && newName.trim() && newName.trim() !== id) {
-        await db.from('categories').update({ name: newName.trim() }).eq('id', id);
-        await db.from('products').update({ category: newName.trim() }).eq('category', id);
-        await fetchCategories();
-        await fetchProducts();
-        renderCategoriesList();
-        showToast("Categoria Atualizada!", `Renomeada para ${newName.trim()}.`);
-      }
-    }
-
-    async function deleteCategory(id) {
-      if (confirm(`Deseja realmente excluir a categoria "${id}"?`)) {
-        await db.from('categories').delete().eq('id', id);
-        await fetchCategories();
-        renderCategoriesList();
-        showToast("Categoria Removida", `A categoria ${id} foi excluída.`);
-      }
-    }
-
-    // PRODUTOS
     function renderProductsList() {
       const container = document.getElementById("adminProductTable");
       if (!container) return;
 
-      container.innerHTML = window.storeProducts.map(prod => `
-        <div class="p-4 bg-brand-dark rounded-2xl border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-neutral-700 transition">
+      let list = [...window.storeProducts];
+
+      // Filtro por Categoria Selecionada
+      if (window.adminSelectedCategory && window.adminSelectedCategory !== 'all') {
+        list = list.filter(p => (p.category || '').toLowerCase() === window.adminSelectedCategory.toLowerCase());
+      }
+
+      // Filtro por Termo de Pesquisa
+      if (window.adminProductSearchQuery) {
+        const q = window.adminProductSearchQuery;
+        list = list.filter(p => 
+          (p.name || '').toLowerCase().includes(q) || 
+          (p.description || '').toLowerCase().includes(q)
+        );
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-brand-dark rounded-2xl border border-neutral-800">
+            <i class="fa-solid fa-magnifying-glass text-3xl text-neutral-600 mb-2"></i>
+            <p class="text-sm font-bold text-white">Nenhum produto encontrado</p>
+            <p class="text-xs text-gray-400 mt-0.5">Tente buscar por outro termo ou selecione outra categoria acima.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(prod => `
+        <div class="p-4 bg-brand-dark rounded-2xl border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-neutral-700 transition shadow-sm">
           <div class="flex items-center space-x-3.5">
             <img src="${prod.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-14 h-14 rounded-xl object-cover bg-neutral-800 border border-neutral-700 shrink-0" />
             <div>
@@ -2133,6 +2092,83 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
+    // CATEGORIAS
+    function openCategoryManagerModal() {
+      renderCategoriesList();
+      document.getElementById("categoryManagerModal").classList.remove("hidden");
+    }
+
+    function closeCategoryManagerModal() {
+      document.getElementById("categoryManagerModal").classList.add("hidden");
+    }
+
+    function renderCategoriesList() {
+      const container = document.getElementById("categoriesList");
+      container.innerHTML = window.storeCategories.map(cat => `
+        <div class="py-2.5 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="${cat.icon || 'fa-solid fa-tag'} text-brand-yellow"></i>
+            <span class="font-bold text-white text-xs">${cat.name}</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <button onclick="editCategoryName('${cat.id}')" class="p-1.5 text-gray-400 hover:text-brand-yellow transition cursor-pointer" title="Renomear">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button onclick="deleteCategory('${cat.id}')" class="p-1.5 text-gray-400 hover:text-rose-400 transition cursor-pointer" title="Excluir">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join("");
+      updateCategorySelectOptions();
+    }
+
+    function updateCategorySelectOptions() {
+      const select = document.getElementById("prodCategory");
+      if (!select) return;
+      select.innerHTML = window.storeCategories.map(c => `
+        <option value="${c.name}">${c.name}</option>
+      `).join("");
+    }
+
+    async function handleAddCategory(e) {
+      e.preventDefault();
+      const input = document.getElementById("newCategoryInput");
+      const name = input.value.trim();
+      if (!name) return;
+
+      const { error } = await db.from('categories').insert([{ id: name, name: name, icon: 'fa-solid fa-tag' }]);
+      if (!error) {
+        input.value = "";
+        await fetchCategories();
+        renderCategoriesList();
+        showToast("Categoria Criada!", `${name} foi adicionada ao cardápio.`);
+      } else {
+        showToast("Erro ao criar", "Essa categoria já existe.", true);
+      }
+    }
+
+    async function editCategoryName(id) {
+      const newName = prompt(`Digite o novo nome para "${id}":`, id);
+      if (newName && newName.trim() && newName.trim() !== id) {
+        await db.from('categories').update({ name: newName.trim() }).eq('id', id);
+        await db.from('products').update({ category: newName.trim() }).eq('category', id);
+        await fetchCategories();
+        await fetchProducts();
+        renderCategoriesList();
+        showToast("Categoria Atualizada!", `Renomeada para ${newName.trim()}.`);
+      }
+    }
+
+    async function deleteCategory(id) {
+      if (confirm(`Deseja realmente excluir a categoria "${id}"?`)) {
+        await db.from('categories').delete().eq('id', id);
+        await fetchCategories();
+        renderCategoriesList();
+        showToast("Categoria Removida", `A categoria ${id} foi excluída.`);
+      }
+    }
+
     // ========================================================
     // LOGIN REAL CRIPTOGRAFADO COM SUPABASE AUTH
     // ========================================================
@@ -2144,13 +2180,11 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
 
       let userInput = document.getElementById("loginUser").value.trim();
-      // SE O USUÁRIO DIGITOU APENAS "adimim", COMPLETA O @loja.com AUTOMATICAMENTE!
       if (!userInput.includes("@")) {
         userInput = userInput + "@loja.com";
       }
       const passInput = document.getElementById("loginPass").value;
 
-      // AUTENTICAÇÃO OFICIAL NO SUPABASE
       const { data, error } = await db.auth.signInWithPassword({
         email: userInput,
         password: passInput
@@ -2170,7 +2204,6 @@
       showToast("Bem-vindo!", "Sessão iniciada com segurança.");
     };
 
-    // VERIFICA SE JÁ EXISTE SESSÃO ATIVA AO CARREGAR A PÁGINA
     async function checkAuthSession() {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
@@ -2280,6 +2313,73 @@
         generateTableCards();
         showToast("Configurações Salvas!", "Nome, horários e frete foram atualizados na nuvem.");
       }
+    }
+
+    // PLACAS DE MESA
+    function generateTableCards() {
+      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
+      const container = document.getElementById('tableCardsGrid');
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
+
+      let html = '';
+      for (let i = 1; i <= numTables; i++) {
+        const tableUrl = `${baseUrl}?mesa=${i}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tableUrl)}`;
+
+        html += `
+          <div class="bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg">
+            <span class="text-[11px] font-black uppercase text-gray-500 tracking-wider mb-1">${storeName}</span>
+            <div class="w-12 h-12 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black text-xl mb-3 shadow-sm">
+              ${i}
+            </div>
+            <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
+            
+            <div class="p-2 bg-white rounded-xl border border-gray-200 mb-3">
+              <img src="${qrUrl}" alt="QR Code Mesa ${i}" class="w-36 h-36 mx-auto object-contain" />
+            </div>
+
+            <p class="text-[11px] font-extrabold text-gray-800 leading-tight">Aponte a câmera do celular<br>para fazer seu pedido!</p>
+            <span class="text-[9px] text-gray-400 mt-2">Autoatendimento Digital</span>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function printTableCards() {
+      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
+      const printArea = document.getElementById('printAreaTables');
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
+
+      let html = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="text-align: center; margin-bottom: 20px;">Placas de Mesa • ${storeName}</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+      `;
+
+      for (let i = 1; i <= numTables; i++) {
+        const tableUrl = `${baseUrl}?mesa=${i}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(tableUrl)}`;
+
+        html += `
+          <div style="border: 3px solid #FFB800; border-radius: 15px; padding: 25px; text-align: center; page-break-inside: avoid;">
+            <p style="margin: 0; font-size: 13px; font-weight: bold; text-transform: uppercase; color: #555;">${storeName}</p>
+            <h1 style="margin: 10px 0; font-size: 28px; font-weight: 900;">MESA 0${i}</h1>
+            <img src="${qrUrl}" style="width: 170px; height: 170px; margin: 10px auto; display: block;" />
+            <p style="margin: 10px 0 0 0; font-size: 14px; font-weight: bold; color: #111;">Aponte a câmera para pedir!</p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; color: #777;">Cardápio Digital na Mesa</p>
+          </div>
+        `;
+      }
+
+      html += `</div></div>`;
+      printArea.innerHTML = html;
+      printArea.classList.remove('hidden');
+      window.print();
+      printArea.classList.add('hidden');
     }
   </script>
 </body>
