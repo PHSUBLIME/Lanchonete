@@ -189,12 +189,12 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS -->
+      <!-- ABA 1: FILA DE PEDIDOS COM ARQUIVO DE TURNOS FECHADOS -->
       <section id="tab-orders" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos de Mesas do Salão, Delivery e Retiradas</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual aberto ou consulte pedidos de turnos arquivados</p>
           </div>
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
@@ -204,9 +204,10 @@
           </div>
         </div>
 
+        <!-- BARRA DE FILTROS: TURNO ATUAL + BOTÃO DE ARQUIVO -->
         <div class="flex flex-wrap items-center gap-2 mb-6 border-b border-neutral-800 pb-3">
           <button onclick="setOrderFilter('todos')" id="filterBtn-todos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
-            Todos (<span id="countFilterTodos">0</span>)
+            Todos do Turno (<span id="countFilterTodos">0</span>)
           </button>
           <button onclick="setOrderFilter('abertos')" id="filterBtn-abertos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
             🔥 Em Aberto (<span id="countFilterAbertos">0</span>)
@@ -219,6 +220,12 @@
           </button>
           <button onclick="setOrderFilter('cancelados')" id="filterBtn-cancelados" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
             ❌ Cancelados (<span id="countFilterCancelados">0</span>)
+          </button>
+
+          <!-- NOVO BOTÃO: SEPARA E GUARDA OS PEDIDOS DE TURNOS JÁ FECHADOS -->
+          <button onclick="setOrderFilter('arquivados')" id="filterBtn-arquivados" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-gray-400 hover:text-amber-400 hover:border-amber-400 transition cursor-pointer ml-auto">
+            <i class="fa-solid fa-box-archive mr-1.5 text-brand-yellow"></i>
+            Turnos Fechados (<span id="countFilterArquivados">0</span>)
           </button>
         </div>
 
@@ -247,7 +254,7 @@
           </div>
         </div>
 
-        <!-- 3 CARDS PRINCIPAIS DO TURNO ATUAL (ZERAM AO FECHAR O CAIXA) -->
+        <!-- 3 CARDS PRINCIPAIS DO TURNO ATUAL -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
             <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Bruto (Turno)</span>
@@ -565,7 +572,7 @@
     </main>
   </div>
 
-  <!-- MODAL CUSTOMIZADO: EXCLUIR FECHAMENTO (SUBSTITUI A CAIXA CINZA FEIA DO NAVEGADOR) -->
+  <!-- MODAL CUSTOMIZADO: EXCLUIR FECHAMENTO -->
   <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
       <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl mb-3">
@@ -868,6 +875,7 @@
         window.dailyClosures = data;
         populateMonthSelector();
         renderClosuresTable();
+        renderOrders();
         updateDashboardMetrics();
       }
     }
@@ -1025,7 +1033,6 @@
     // CÁLCULOS DO TURNO ATUAL (ZERAM APÓS O FECHAMENTO DO CAIXA)
     // ========================================================
     function calculateShiftMetrics() {
-      // Pega a data/hora do fechamento mais recente
       const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 
         ? window.dailyClosures[0] 
         : null;
@@ -1082,24 +1089,20 @@
     function updateDashboardMetrics() {
       const m = calculateShiftMetrics();
 
-      // Atualiza Cards Principais
       document.getElementById("dashGrossRevenue").innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashValidCount").innerText = `${m.validCount} pedidos`;
       document.getElementById("dashCancelledLoss").innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashCancelledCount").innerText = `${m.cancelledCount} pedido(s) cancelado(s)`;
 
-      // Bate-Caixa
       document.getElementById("dashCashTotal").innerText = `R$ ${m.cash.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashPixTotal").innerText = `R$ ${m.pix.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashCreditTotal").innerText = `R$ ${m.credit.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashDebitTotal").innerText = `R$ ${m.debit.toFixed(2).replace('.', ',')}`;
 
-      // Canais
       document.getElementById("dashChannelTable").innerText = `R$ ${m.table.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashChannelDelivery").innerText = `R$ ${m.delivery.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashChannelPickup").innerText = `R$ ${m.pickup.toFixed(2).replace('.', ',')}`;
 
-      // Badge de Status do Turno
       const badge = document.getElementById("shiftBadgeStatus");
       const sub = document.getElementById("dashRevenueSubtitle");
       if (m.hasOpenShift) {
@@ -1189,9 +1192,7 @@
       }
     }
 
-    // ========================================================
-    // MODAL MODERNO DE EXCLUSÃO (SEM CAIXA CINZA FEIA DO NAVEGADOR)
-    // ========================================================
+    // MODAL CUSTOMIZADO DE EXCLUSÃO
     function openDeleteConfirmModal(closureId, closureDate) {
       window.closureIdToDelete = closureId;
       document.getElementById('deleteConfirmModalText').innerText = `Deseja realmente excluir o fechamento de ${closureDate}? O valor acumulado do mês será recalculado na mesma hora.`;
@@ -1318,9 +1319,7 @@
       receiptArea.classList.add("hidden");
     }
 
-    // ========================================================
     // TABELA DE DIAS FECHADOS & FILTRO DO MÊS
-    // ========================================================
     function populateMonthSelector() {
       const select = document.getElementById('selectMonthFilter');
       if (!select) return;
@@ -1439,14 +1438,23 @@
     }
 
     // ========================================================
-    // FILA DE PEDIDOS
+    // RENDERIZAR PEDIDOS (TURNO ATUAL VS ARQUIVO DE FECHADOS)
     // ========================================================
     function setOrderFilter(filter) {
       window.activeFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer";
       });
-      document.getElementById(`filterBtn-${filter}`).className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
+
+      const activeBtn = document.getElementById(`filterBtn-${filter}`);
+      if (activeBtn) {
+        if (filter === 'arquivados') {
+          activeBtn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-amber-500 text-brand-black transition cursor-pointer ml-auto shadow-md";
+        } else {
+          activeBtn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
+        }
+      }
+
       renderOrders();
     }
 
@@ -1455,30 +1463,67 @@
       const badge = document.getElementById("badgeLiveOrders");
       if (!container) return;
 
-      const totalCount = window.storeOrders.length;
-      const abertosCount = window.storeOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
-      const mesasCount = window.storeOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
-      const entreguesCount = window.storeOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
-      const canceladosCount = window.storeOrders.filter(o => o.status === "Cancelado").length;
+      // Pega data/hora do último fechamento de caixa
+      const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 
+        ? window.dailyClosures[0] 
+        : null;
+
+      const lastClosedTime = lastClosure && lastClosure.closed_at 
+        ? new Date(lastClosure.closed_at).getTime() 
+        : 0;
+
+      // Função para saber se o pedido é de turno já fechado
+      const isOrderFromClosedShift = (o) => {
+        if (lastClosedTime === 0) return false;
+        if (!o.created_at) return false;
+        return new Date(o.created_at).getTime() <= lastClosedTime && (o.status === "Entregue" || o.status === "Finalizado" || o.status === "Cancelado");
+      };
+
+      // Separa os pedidos ativos do turno atual vs pedidos arquivados em fechamentos
+      const shiftOrders = window.storeOrders.filter(o => !isOrderFromClosedShift(o));
+      const archivedOrders = window.storeOrders.filter(o => isOrderFromClosedShift(o));
+
+      // Contadores do Turno Atual
+      const totalCount = shiftOrders.length;
+      const abertosCount = shiftOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
+      const mesasCount = shiftOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
+      const entreguesCount = shiftOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
+      const canceladosCount = shiftOrders.filter(o => o.status === "Cancelado").length;
+      const arquivadosCount = archivedOrders.length;
 
       document.getElementById("countFilterTodos").innerText = totalCount;
       document.getElementById("countFilterAbertos").innerText = abertosCount;
       if (document.getElementById("countFilterMesas")) document.getElementById("countFilterMesas").innerText = mesasCount;
       document.getElementById("countFilterEntregues").innerText = entreguesCount;
       document.getElementById("countFilterCancelados").innerText = canceladosCount;
+      if (document.getElementById("countFilterArquivados")) document.getElementById("countFilterArquivados").innerText = arquivadosCount;
       badge.innerText = abertosCount;
 
-      let list = [...window.storeOrders];
-      if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
-      else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
-      else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
-      else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
+      // Determina qual lista exibir com base no filtro
+      let list = [];
+      let isViewingArchive = false;
+
+      if (window.activeFilter === 'arquivados') {
+        list = archivedOrders;
+        isViewingArchive = true;
+      } else {
+        list = [...shiftOrders];
+        if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
+        else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
+        else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
+        else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
+      }
 
       if (list.length === 0) {
         container.innerHTML = `
           <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
             <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
-            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
+            <h3 class="text-base font-extrabold text-white">
+              ${isViewingArchive ? 'Nenhum pedido em turnos arquivados' : 'Fila limpa • Aguardando novos pedidos para este turno'}
+            </h3>
+            <p class="text-xs text-gray-500 mt-1">
+              ${isViewingArchive ? 'Os pedidos aparecem aqui após fechar o caixa.' : 'Os pedidos do turno anterior foram arquivados com sucesso.'}
+            </p>
           </div>
         `;
         return;
@@ -1489,13 +1534,15 @@
         const isCancelado = ord.status === "Cancelado";
         const isMesa = isTableOrder(ord);
 
-        let cardBg = isMesa && !isEntregue && !isCancelado
-          ? 'bg-[#1f1a10] border-2 border-brand-yellow/80 shadow-xl' 
-          : isEntregue 
-            ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
-            : isCancelado 
-              ? 'bg-[#271616] border-rose-900/60 opacity-90' 
-              : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
+        let cardBg = isViewingArchive
+          ? 'bg-[#1a1a1a] border border-neutral-800 opacity-90'
+          : isMesa && !isEntregue && !isCancelado
+            ? 'bg-[#1f1a10] border-2 border-brand-yellow/80 shadow-xl' 
+            : isEntregue 
+              ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
+              : isCancelado 
+                ? 'bg-[#271616] border-rose-900/60 opacity-90' 
+                : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
 
         return `
           <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
@@ -1504,11 +1551,13 @@
                 <div class="flex items-center space-x-2">
                   <span class="text-sm font-black text-brand-yellow">#${ord.id}</span>
                   ${
-                    isCancelado
-                      ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
-                      : isEntregue 
-                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Concluído ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
-                        : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
+                    isViewingArchive
+                      ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-box-archive mr-1"></i> Caixa Fechado</span>`
+                      : isCancelado
+                        ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
+                        : isEntregue 
+                          ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Concluído ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
+                          : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
                   }
                 </div>
 
@@ -1539,42 +1588,51 @@
                 <span class="text-lg font-black ${isCancelado ? 'line-through text-gray-500' : 'text-brand-yellow'}">R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
               </div>
 
-              <select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
-                <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
-                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Preparando</option>
-                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto / Servir</option>
-                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu para Entrega</option>
-                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Concluído / Entregue</option>
-                <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
-              </select>
+              ${
+                isViewingArchive 
+                  ? `<div class="pt-1">
+                       <button onclick="printReceipt('${ord.id}')" class="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                         <i class="fa-solid fa-print"></i>
+                         <span>Reimprimir Comanda</span>
+                       </button>
+                     </div>`
+                  : `<select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
+                       <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
+                       <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Preparando</option>
+                       <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto / Servir</option>
+                       <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu para Entrega</option>
+                       <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Concluído / Entregue</option>
+                       <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
+                     </select>
 
-              <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
-                <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
-                  <i class="fa-solid fa-print"></i>
-                  <span>Comanda</span>
-                </button>
+                     <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
+                       <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                         <i class="fa-solid fa-print"></i>
+                         <span>Comanda</span>
+                       </button>
 
-                ${
-                  isCancelado 
-                    ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                         <i class="fa-solid fa-rotate-left"></i>
-                         <span>Reativar</span>
-                       </button>`
-                    : isEntregue 
-                      ? `<button onclick="openPaymentSettlementModal('${ord.id}')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                           <i class="fa-solid fa-check-double"></i>
-                           <span>Alterar Pgto</span>
-                         </button>`
-                      : `<button onclick="openPaymentSettlementModal('${ord.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
-                           <i class="fa-solid fa-check"></i>
-                           <span>Baixar</span>
-                         </button>
-                         <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                           <i class="fa-solid fa-ban"></i>
-                           <span>Cancelar</span>
-                         </button>`
-                }
-              </div>
+                       ${
+                         isCancelado 
+                           ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reativar</span>
+                              </button>`
+                           : isEntregue 
+                             ? `<button onclick="openPaymentSettlementModal('${ord.id}')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                                  <i class="fa-solid fa-check-double"></i>
+                                  <span>Alterar Pgto</span>
+                                </button>`
+                             : `<button onclick="openPaymentSettlementModal('${ord.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
+                                  <i class="fa-solid fa-check"></i>
+                                  <span>Baixar</span>
+                                </button>
+                                <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                                  <i class="fa-solid fa-ban"></i>
+                                  <span>Cancelar</span>
+                                </button>`
+                       }
+                     </div>`
+              }
             </div>
           </div>
         `;
