@@ -76,35 +76,38 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN -->
+  <!-- TELA DE LOGIN REAL E CRIPTOGRAFADA -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
         <div class="w-14 h-14 bg-brand-yellow rounded-2xl flex items-center justify-center mx-auto text-brand-black text-2xl font-black mb-3 shadow-lg">
-          <i class="fa-solid fa-lock"></i>
+          <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h2 class="text-2xl font-black tracking-tight text-white">Painel do Lojista</h2>
-        <p class="text-xs text-gray-400 mt-1">Acesso exclusivo para gestão do restaurante</p>
+        <h2 class="text-2xl font-black tracking-tight text-white">Acesso Restrito</h2>
+        <p class="text-xs text-gray-400 mt-1">Autenticação oficial do restaurante via Supabase</p>
       </div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-gray-300 mb-1">E-mail ou Usuário</label>
-          <input type="text" id="loginUser" value="gerente@phsublimefood.com" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+          <label class="block font-bold text-gray-300 mb-1">Usuário / Login</label>
+          <input type="text" id="loginUser" value="adimim" placeholder="Ex: adimim" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
         <div>
-          <label class="block font-bold text-gray-300 mb-1">Senha de Acesso</label>
-          <input type="password" id="loginPass" value="123456" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
+          <label class="block font-bold text-gray-300 mb-1">Sua Senha</label>
+          <input type="password" id="loginPass" placeholder="••••••••" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
 
-        <button type="submit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg active:scale-95">
+        <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg active:scale-95">
           <span>ENTRAR NO PAINEL</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
 
       <div class="mt-6 pt-6 border-t border-neutral-800 text-center">
-        <span class="text-[11px] text-gray-500">Tecnologia desenvolvida por <strong class="text-gray-400">PHSUBLIME</strong></span>
+        <span class="text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-lock text-emerald-500"></i>
+          Conexão Segura Criptografada SSL
+        </span>
       </div>
     </div>
   </div>
@@ -199,7 +202,7 @@
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              Supabase Nuvem Ativa
+              Supabase Nuvem Protegida
             </span>
           </div>
         </div>
@@ -229,7 +232,7 @@
           </button>
         </div>
 
-        <!-- SELETOR DINÂMICO DE TURNOS ARQUIVADOS (VISÍVEL APENAS EM 'TURNOS FECHADOS') -->
+        <!-- SELETOR DINÂMICO DE TURNOS ARQUIVADOS -->
         <div id="closedShiftSelectorArea" class="hidden mb-6 p-4 bg-neutral-900/90 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md">
           <div class="flex items-center space-x-2.5">
             <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-brand-yellow flex items-center justify-center font-black text-sm">
@@ -241,9 +244,7 @@
             </div>
           </div>
           <div class="w-full sm:w-auto">
-            <select id="selectClosedShiftArchive" onchange="handleClosedShiftSelect(this.value)" class="w-full sm:w-auto p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-black focus:outline-none focus:border-brand-yellow cursor-pointer shadow-sm text-xs">
-              <!-- Gerado dinamicamente -->
-            </select>
+            <select id="selectClosedShiftArchive" onchange="handleClosedShiftSelect(this.value)" class="w-full sm:w-auto p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-black focus:outline-none focus:border-brand-yellow cursor-pointer shadow-sm text-xs"></select>
           </div>
         </div>
 
@@ -1169,7 +1170,6 @@
       const todayStr = now.toLocaleDateString('pt-BR');
       const nowTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      // DATA OPERACIONAL: Se fechou entre 00h e 06h da manhã, o turno pertence à noite anterior!
       let opDate = new Date(now);
       if (now.getHours() < 6) {
         opDate.setDate(opDate.getDate() - 1);
@@ -1466,7 +1466,7 @@
     }
 
     // ========================================================
-    // SEPARADOR DE PEDIDOS POR TURNO FECHADO (SELETOR DE ARQUIVO)
+    // SEPARADOR DE PEDIDOS POR TURNO FECHADO
     // ========================================================
     function populateClosedShiftDropdown() {
       const select = document.getElementById('selectClosedShiftArchive');
@@ -1493,7 +1493,6 @@
       renderOrders();
     }
 
-    // Retorna os pedidos pertencentes a um turno fechado específico
     function getOrdersForSpecificClosure(closureId) {
       if (!closureId || closureId === 'todos') {
         const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 ? window.dailyClosures[0] : null;
@@ -2141,19 +2140,65 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
-    // LOGIN E NAVEGAÇÃO
+    // ========================================================
+    // LOGIN REAL CRIPTOGRAFADO COM SUPABASE AUTH
+    // ========================================================
     window.handleLogin = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
+
+      const submitBtn = document.getElementById("btnLoginSubmit");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
+
+      let userInput = document.getElementById("loginUser").value.trim();
+      // SE O USUÁRIO DIGITOU APENAS "adimim", COMPLETA O @loja.com AUTOMATICAMENTE!
+      if (!userInput.includes("@")) {
+        userInput = userInput + "@loja.com";
+      }
+      const passInput = document.getElementById("loginPass").value;
+
+      // AUTENTICAÇÃO OFICIAL NO SUPABASE
+      const { data, error } = await db.auth.signInWithPassword({
+        email: userInput,
+        password: passInput
+      });
+
+      if (error) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>ENTRAR NO PAINEL</span><i class="fa-solid fa-arrow-right"></i>';
+        showToast("Acesso Recusado", "Usuário ou senha incorretos!", true);
+        return;
+      }
+
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("mainDashboard").classList.remove("hidden");
       await loadAllData();
       setupRealtimeListeners();
+      showToast("Bem-vindo!", "Sessão iniciada com segurança.");
     };
 
-    window.handleLogout = function() {
+    // VERIFICA SE JÁ EXISTE SESSÃO ATIVA AO CARREGAR A PÁGINA
+    async function checkAuthSession() {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("mainDashboard").classList.remove("hidden");
+        await loadAllData();
+        setupRealtimeListeners();
+      }
+    }
+
+    window.handleLogout = async function() {
+      await db.auth.signOut();
       document.getElementById("mainDashboard").classList.add("hidden");
       document.getElementById("loginScreen").classList.remove("hidden");
+      document.getElementById("loginPass").value = "";
+      showToast("Sessão Encerrada", "Você saiu do painel com segurança.");
     };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAuthSession();
+    });
 
     function navigateTab(tabId) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
