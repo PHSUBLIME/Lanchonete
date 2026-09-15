@@ -225,17 +225,20 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: MÓDULO FINANCEIRO / FECHAMENTO DE CAIXA -->
+      <!-- ABA 2: MÓDULO FINANCEIRO / CAIXA ZERÁVEL POR TURNO -->
       <section id="tab-dashboard" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h2 class="text-2xl font-black text-white">Controle Financeiro & Fechamento de Caixa</h2>
-            <p class="text-xs text-gray-400">Resumo financeiro do turno atual, conciliação de pagamentos e histórico</p>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-black text-white">Controle Financeiro & Caixa do Turno</h2>
+              <span id="shiftBadgeStatus" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">CAIXA ABERTO</span>
+            </div>
+            <p class="text-xs text-gray-400">Ao fechar o caixa, os cartões zeram para o próximo turno e o total vai para o Histórico</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="printTodayClosingReceipt()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
               <i class="fa-solid fa-print"></i>
-              <span>Imprimir Fechamento</span>
+              <span>Imprimir Turno Atual</span>
             </button>
             <button onclick="openCloseShiftModal()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-black px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg cursor-pointer">
               <i class="fa-solid fa-lock"></i>
@@ -244,35 +247,35 @@
           </div>
         </div>
 
-        <!-- 3 CARDS PRINCIPAIS -->
+        <!-- 3 CARDS PRINCIPAIS DO TURNO ATUAL (ZERAM AO FECHAR O CAIXA) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
-            <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Bruto</span>
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Bruto (Turno)</span>
             <h3 class="text-3xl font-black text-emerald-400 mt-1" id="dashGrossRevenue">R$ 0,00</h3>
-            <span class="text-[11px] text-gray-400">Vendas válidas / concluídas</span>
+            <span class="text-[11px] text-gray-400" id="dashRevenueSubtitle">Vendas do turno aberto</span>
           </div>
 
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
-            <span class="text-[11px] font-bold text-gray-400 uppercase">Pedidos Válidos</span>
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Pedidos Válidos (Turno)</span>
             <h3 class="text-3xl font-black text-white mt-1" id="dashValidCount">0</h3>
-            <span class="text-[11px] text-gray-400">Entregues ou em andamento</span>
+            <span class="text-[11px] text-gray-400">Concluídos ou em preparo</span>
           </div>
 
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
             <span class="text-[11px] font-bold text-rose-400 uppercase">Cancelamentos & Perdas</span>
             <h3 class="text-3xl font-black text-rose-500 mt-1" id="dashCancelledLoss">R$ 0,00</h3>
-            <span class="text-[11px] text-rose-400 font-semibold" id="dashCancelledCount">0 pedidos cancelados</span>
+            <span class="text-[11px] text-rose-400 font-semibold" id="dashCancelledCount">0 pedido(s) cancelado(s)</span>
           </div>
         </div>
 
-        <!-- BATE-CAIXA -->
+        <!-- BATE-CAIXA DO TURNO ATUAL -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-6">
           <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
-            <i class="fa-solid fa-money-check-dollar"></i> Entradas por Meio de Pagamento (Bate-Caixa)
+            <i class="fa-solid fa-money-check-dollar"></i> Entradas por Meio de Pagamento (Turno Atual)
           </h4>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
-              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-1"></i> Dinheiro no Caixa</span>
+              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-1"></i> Dinheiro na Gaveta</span>
               <p class="text-lg font-black text-white" id="dashCashTotal">R$ 0,00</p>
               <span class="text-[10px] text-gray-500">Conferir na gaveta física</span>
             </div>
@@ -284,20 +287,20 @@
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-blue-400 mr-1"></i> Cartão Crédito</span>
               <p class="text-lg font-black text-white" id="dashCreditTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir relatório maquininha</span>
+              <span class="text-[10px] text-gray-500">Conferir maquininha</span>
             </div>
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-purple-400 mr-1"></i> Cartão Débito</span>
               <p class="text-lg font-black text-white" id="dashDebitTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir relatório maquininha</span>
+              <span class="text-[10px] text-gray-500">Conferir maquininha</span>
             </div>
           </div>
         </div>
 
-        <!-- VENDAS POR CANAL -->
+        <!-- VENDAS POR CANAL DO TURNO ATUAL -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-8">
           <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
-            <i class="fa-solid fa-chart-simple"></i> Vendas por Canal de Atendimento
+            <i class="fa-solid fa-chart-simple"></i> Vendas por Canal (Turno Atual)
           </h4>
           <div class="grid grid-cols-3 gap-3 text-xs">
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800 text-center">
@@ -315,12 +318,12 @@
           </div>
         </div>
 
-        <!-- HISTÓRICO DE FECHAMENTOS COM EXCLUSÃO E TRAVA -->
+        <!-- HISTÓRICO DE DIAS FECHADOS & ACUMULADOR DO MÊS -->
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
               <h4 class="text-sm font-black text-white">Histórico de Fechamentos & Consulta Mensal</h4>
-              <p class="text-[11px] text-gray-400">Auditoria e reimpressão de turnos anteriores</p>
+              <p class="text-[11px] text-gray-400">Todos os fechamentos consolidados ficam registrados permanentemente aqui</p>
             </div>
             <div class="flex items-center space-x-2">
               <select id="selectMonthFilter" onchange="filterClosuresByMonth(this.value)" class="text-xs font-extrabold p-2 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none"></select>
@@ -350,7 +353,7 @@
               <thead class="bg-neutral-900 text-[10px] text-gray-400 uppercase tracking-wider">
                 <tr>
                   <th class="p-3">Data</th>
-                  <th class="p-3">Faturamento Bruto</th>
+                  <th class="p-3">Faturamento Fechado</th>
                   <th class="p-3">Pedidos</th>
                   <th class="p-3">Cancelados (Perdas)</th>
                   <th class="p-3">Operador</th>
@@ -562,6 +565,25 @@
     </main>
   </div>
 
+  <!-- MODAL CUSTOMIZADO: EXCLUIR FECHAMENTO (SUBSTITUI A CAIXA CINZA FEIA DO NAVEGADOR) -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl mb-3">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="text-base font-black text-white mb-1">Excluir Fechamento?</h3>
+      <p class="text-gray-300 text-[11px] mb-4" id="deleteConfirmModalText">Esta ação removerá este registro e recalculará o acumulado do mês na mesma hora.</p>
+      <div class="flex gap-2">
+        <button onclick="closeDeleteConfirmModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">
+          Cancelar
+        </button>
+        <button id="btnExecuteDeleteClosure" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">
+          Sim, Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: BAIXAR COM FORMA DE PAGAMENTO REAL -->
   <div id="paymentSettlementModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border-2 border-brand-yellow shadow-2xl text-xs">
@@ -628,7 +650,7 @@
 
       <div class="space-y-2 p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4">
         <div class="flex justify-between text-gray-300">
-          <span>Faturamento Bruto:</span>
+          <span>Faturamento do Turno a Fechar:</span>
           <strong class="text-emerald-400 text-sm font-black" id="closeShiftGross">R$ 0,00</strong>
         </div>
         <div class="flex justify-between text-gray-300">
@@ -777,6 +799,7 @@
     window.dailyClosures = [];
     window.isStoreOpen = true;
     window.currentSettleOrderId = null;
+    window.closureIdToDelete = null;
 
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
@@ -845,6 +868,7 @@
         window.dailyClosures = data;
         populateMonthSelector();
         renderClosuresTable();
+        updateDashboardMetrics();
       }
     }
 
@@ -997,10 +1021,27 @@
       showToast("Pedido Concluído!", `Pedido #${orderId} baixado como ${chosenMethod}.`);
     }
 
-    // CÁLCULOS DO TURNO
+    // ========================================================
+    // CÁLCULOS DO TURNO ATUAL (ZERAM APÓS O FECHAMENTO DO CAIXA)
+    // ========================================================
     function calculateShiftMetrics() {
-      const validOrders = window.storeOrders.filter(o => o.status !== "Cancelado");
-      const cancelledOrders = window.storeOrders.filter(o => o.status === "Cancelado");
+      // Pega a data/hora do fechamento mais recente
+      const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 
+        ? window.dailyClosures[0] 
+        : null;
+
+      const lastClosedTime = lastClosure && lastClosure.closed_at 
+        ? new Date(lastClosure.closed_at).getTime() 
+        : 0;
+
+      // FILTRA APENAS PEDIDOS REALIZADOS APÓS O ÚLTIMO FECHAMENTO!
+      const currentShiftOrders = window.storeOrders.filter(o => {
+        if (!o.created_at) return lastClosedTime === 0;
+        return new Date(o.created_at).getTime() > lastClosedTime;
+      });
+
+      const validOrders = currentShiftOrders.filter(o => o.status !== "Cancelado");
+      const cancelledOrders = currentShiftOrders.filter(o => o.status === "Cancelado");
 
       const grossRevenue = validOrders.reduce((acc, o) => acc + Number(o.total || 0), 0);
       const validCount = validOrders.length;
@@ -1032,36 +1073,59 @@
         cancelledCount,
         cancelledLoss,
         cash, pix, credit, debit,
-        table, delivery, pickup
+        table, delivery, pickup,
+        totalShiftOrders: currentShiftOrders.length,
+        hasOpenShift: currentShiftOrders.length > 0
       };
     }
 
     function updateDashboardMetrics() {
       const m = calculateShiftMetrics();
 
+      // Atualiza Cards Principais
       document.getElementById("dashGrossRevenue").innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashValidCount").innerText = `${m.validCount} pedidos`;
       document.getElementById("dashCancelledLoss").innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashCancelledCount").innerText = `${m.cancelledCount} pedido(s) cancelado(s)`;
 
+      // Bate-Caixa
       document.getElementById("dashCashTotal").innerText = `R$ ${m.cash.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashPixTotal").innerText = `R$ ${m.pix.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashCreditTotal").innerText = `R$ ${m.credit.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashDebitTotal").innerText = `R$ ${m.debit.toFixed(2).replace('.', ',')}`;
 
+      // Canais
       document.getElementById("dashChannelTable").innerText = `R$ ${m.table.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashChannelDelivery").innerText = `R$ ${m.delivery.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashChannelPickup").innerText = `R$ ${m.pickup.toFixed(2).replace('.', ',')}`;
+
+      // Badge de Status do Turno
+      const badge = document.getElementById("shiftBadgeStatus");
+      const sub = document.getElementById("dashRevenueSubtitle");
+      if (m.hasOpenShift) {
+        badge.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800";
+        badge.innerText = "TURNO ATUAL EM ABERTO";
+        sub.innerText = "Vendas acumulando neste turno";
+      } else {
+        badge.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full bg-neutral-800 text-gray-400 border border-neutral-700";
+        badge.innerText = "CAIXA FECHADO • NOVO TURNO";
+        sub.innerText = "Aguardando novos pedidos";
+      }
     }
 
     // ========================================================
-    // FECHAMENTO DO DIA (COM TRAVA DE DUPLICIDADE UPSERT)
+    // FECHAMENTO DE CAIXA / TURNO
     // ========================================================
     function openCloseShiftModal() {
       const m = calculateShiftMetrics();
+      if (m.totalShiftOrders === 0) {
+        showToast("Caixa Vazio", "Não há pedidos no turno atual para fechar.", true);
+        return;
+      }
+
       const todayStr = new Date().toLocaleDateString('pt-BR');
 
-      document.getElementById('closeShiftDateText').innerText = `Turno de hoje • ${todayStr}`;
+      document.getElementById('closeShiftDateText').innerText = `Turno atual • ${todayStr}`;
       document.getElementById('closeShiftGross').innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById('closeShiftOrders').innerText = `${m.validCount} pedidos válidos`;
       document.getElementById('closeShiftLoss').innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')} (${m.cancelledCount} cancelados)`;
@@ -1080,21 +1144,19 @@
 
     async function confirmCloseShift() {
       const m = calculateShiftMetrics();
-      const todayDate = new Date();
-      const todayStr = todayDate.toLocaleDateString('pt-BR');
+      const now = new Date();
+      const todayStr = now.toLocaleDateString('pt-BR');
+      const nowTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
-      // TRAVA DE DUPLICIDADE: O ID É FIXO PELA DATA DO DIA (ex: FC-2026-09-15)
-      // Se fechar 1x, 2x ou 5x no mesmo dia, ele ATUALIZA e NÃO duplica no mês!
-      const year = todayDate.getFullYear();
-      const month = String(todayDate.getMonth() + 1).padStart(2, '0');
-      const day = String(todayDate.getDate()).padStart(2, '0');
-      const closureId = `FC-${year}-${month}-${day}`;
-
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const closureId = `FC-${year}${month}${day}-${Date.now().toString().slice(-4)}`;
       const operator = document.getElementById('closeShiftOperator').value.trim() || 'Gerente';
 
       const closureData = {
         id: closureId,
-        date: todayStr,
+        date: `${todayStr} às ${nowTime}`,
         gross_revenue: m.grossRevenue,
         total_orders: m.validCount,
         cancelled_orders: m.cancelledCount,
@@ -1110,43 +1172,65 @@
           delivery: m.delivery,
           balcao: m.pickup
         },
-        operator: operator
+        operator: operator,
+        closed_at: now.toISOString()
       };
 
-      // UPSERT EVITA DUPLICAR NO BANCO
-      const { error } = await db.from('daily_closures').upsert([closureData]);
+      const { error } = await db.from('daily_closures').insert([closureData]);
 
       if (error) {
         showToast("Erro ao Fechar", error.message, true);
       } else {
         closeCloseShiftModal();
         await fetchClosures();
-        showToast("Caixa Fechado!", `Fechamento do dia ${todayStr} gravado/atualizado com sucesso!`);
+        updateDashboardMetrics();
+        showToast("Caixa Fechado com Sucesso!", "O turno foi arquivado e os cartões zeraram para o próximo.");
         printClosureReportObject(closureData);
       }
     }
 
-    // EXCLUIR FECHAMENTO COM 1 CLIQUE DIRETO DO PAINEL
-    async function deleteClosureRecord(closureId) {
-      if (confirm(`Deseja realmente excluir este fechamento (${closureId})? Esta ação corrigirá o cálculo acumulado do mês.`)) {
-        const { error } = await db.from('daily_closures').delete().eq('id', closureId);
-        if (error) {
-          showToast("Erro ao Excluir", error.message, true);
-        } else {
-          await fetchClosures();
-          showToast("Registro Excluído", "O fechamento duplicado foi removido.");
-        }
+    // ========================================================
+    // MODAL MODERNO DE EXCLUSÃO (SEM CAIXA CINZA FEIA DO NAVEGADOR)
+    // ========================================================
+    function openDeleteConfirmModal(closureId, closureDate) {
+      window.closureIdToDelete = closureId;
+      document.getElementById('deleteConfirmModalText').innerText = `Deseja realmente excluir o fechamento de ${closureDate}? O valor acumulado do mês será recalculado na mesma hora.`;
+      
+      const btnConfirm = document.getElementById('btnExecuteDeleteClosure');
+      btnConfirm.onclick = executeDeleteClosureAction;
+
+      document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    }
+
+    function closeDeleteConfirmModal() {
+      document.getElementById('deleteConfirmModal').classList.add('hidden');
+      window.closureIdToDelete = null;
+    }
+
+    async function executeDeleteClosureAction() {
+      if (!window.closureIdToDelete) return;
+      const closureId = window.closureIdToDelete;
+
+      const { error } = await db.from('daily_closures').delete().eq('id', closureId);
+      closeDeleteConfirmModal();
+
+      if (error) {
+        showToast("Erro ao Excluir", error.message, true);
+      } else {
+        await fetchClosures();
+        updateDashboardMetrics();
+        showToast("Registro Excluído!", "O fechamento foi removido e os valores recalculados.");
       }
     }
 
-    // IMPRESSÃO TÉRMICA DO FECHAMENTO
+    // IMPRESSÃO DE FECHAMENTO
     function printTodayClosingReceipt() {
       const m = calculateShiftMetrics();
       const todayStr = new Date().toLocaleDateString('pt-BR');
       const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       printClosureReportObject({
-        id: 'PREVIA',
+        id: 'TURNO_ATUAL',
         date: `${todayStr} às ${nowTime}`,
         gross_revenue: m.grossRevenue,
         total_orders: m.validCount,
@@ -1305,7 +1389,7 @@
             <button onclick='printClosureReportObject(${JSON.stringify(c)})' class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold text-[11px] transition cursor-pointer shadow-sm">
               <i class="fa-solid fa-print mr-1"></i> Reimprimir
             </button>
-            <button onclick="deleteClosureRecord('${c.id}')" title="Excluir Fechamento Duplicado" class="px-2 py-1 rounded-lg bg-neutral-800 hover:bg-rose-950/80 text-gray-400 hover:text-rose-400 border border-neutral-700 hover:border-rose-800 transition cursor-pointer">
+            <button onclick="openDeleteConfirmModal('${c.id}', '${c.date}')" title="Excluir Registro" class="px-2 py-1 rounded-lg bg-neutral-800 hover:bg-rose-950/80 text-gray-400 hover:text-rose-400 border border-neutral-700 hover:border-rose-800 transition cursor-pointer">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>
@@ -1355,7 +1439,7 @@
     }
 
     // ========================================================
-    // RENDERIZAR PEDIDOS
+    // FILA DE PEDIDOS
     // ========================================================
     function setOrderFilter(filter) {
       window.activeFilter = filter;
@@ -1584,6 +1668,7 @@
       } catch (e) {}
     }
 
+    // PLACAS DE MESA
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       const container = document.getElementById('tableCardsGrid');
