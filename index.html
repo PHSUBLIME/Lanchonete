@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- CONEXÃO SUPABASE (BANCO DE DADOS EM NUVEM) -->
+  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -63,8 +63,14 @@
         <span id="storeStatusText">ABERTO AGORA</span>
       </span>
       <span class="text-neutral-500">|</span>
-      <span class="text-neutral-300" id="storeScheduleText">Atendimento e Entregas Disponíveis</span>
+      <span class="text-neutral-300" id="storeScheduleText">Atendimento Disponível</span>
     </div>
+  </div>
+
+  <!-- AVISO ELEGANTE SE FOR RECONHECIDA UMA MESA POR QR CODE -->
+  <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2.5 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
+    <i class="fa-solid fa-utensils text-sm"></i>
+    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Seu pedido será servido aqui na mesa!</span>
   </div>
 
   <!-- HEADER -->
@@ -107,7 +113,7 @@
           </div>
           <h2 id="bannerTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-3">PHSUBLIME FOOD</h2>
           <p class="text-base sm:text-lg text-gray-300 font-normal mb-2">"Sabor que combina com você!"</p>
-          <p class="text-sm text-gray-400 mb-6">Peça online agora e receba com agilidade na sua casa ou retire no local sem filas.</p>
+          <p class="text-sm text-gray-400 mb-6">Peça online no salão ou receba com agilidade na sua casa sem complicação.</p>
           
           <div class="flex flex-wrap gap-3">
             <button onclick="scrollToSection('cardapio')" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition shadow-lg flex items-center space-x-2 text-sm cursor-pointer">
@@ -136,8 +142,8 @@
               <i class="fa-solid fa-motorcycle"></i>
             </div>
             <div>
-              <p class="text-xs sm:text-sm font-bold">Entrega Rápida</p>
-              <p class="text-[11px] text-gray-400 hidden sm:block">35 a 50 min</p>
+              <p class="text-xs sm:text-sm font-bold">Entrega & Salão</p>
+              <p class="text-[11px] text-gray-400 hidden sm:block">Rápido e quentinho</p>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
@@ -290,7 +296,7 @@
     </div>
   </div>
 
-  <!-- DRAWER DO CARRINHO (TRANSPARENTE: NÃO SOMA FRETE FALSO AQUI!) -->
+  <!-- DRAWER DO CARRINHO -->
   <div id="cartBackdrop" onclick="closeCartDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-black text-white">
@@ -313,7 +319,7 @@
         </div>
         <div class="flex justify-between text-gray-500">
           <span>Taxa de Entrega</span>
-          <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Calculada no endereço</span>
+          <span id="cartDeliveryFeeIndicator" class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Calculada na finalização</span>
         </div>
         <div class="flex justify-between text-base font-black text-brand-black pt-2 border-t border-gray-200">
           <span>SUBTOTAL</span>
@@ -338,13 +344,13 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT (TOTALMENTE CLARO E TRANSPARENTE) -->
+  <!-- MODAL DE CHECKOUT: 3 EM 1 (DELIVERY, RETIRADA E MESA) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
         <div>
           <h3 class="font-extrabold text-base">Finalize seu Pedido</h3>
-          <p class="text-xs text-gray-400">Preencha seus dados para entrega</p>
+          <p class="text-xs text-gray-400">Preencha seus dados para entrega ou mesa</p>
         </div>
         <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-gray-300 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -363,35 +369,46 @@
               <input type="text" id="custName" placeholder="Ex: Roberto Silva" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
             <div>
-              <label class="block font-bold text-gray-700 mb-1">WhatsApp / Telefone *</label>
-              <input type="tel" id="custPhone" placeholder="Ex: 21 98888-7777" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              <label class="block font-bold text-gray-700 mb-1">WhatsApp / Telefone <span id="phoneRequiredMark">*</span></label>
+              <input type="tel" id="custPhone" placeholder="Ex: 21 98888-7777" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
           </div>
         </div>
 
+        <!-- ESCOLHA DO TIPO DE PEDIDO: 3 EM 1 -->
         <div class="pt-3 border-t border-gray-100">
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">2</span>
-            Como deseja receber?
+            Como deseja receber seu pedido?
           </h4>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="cursor-pointer border rounded-xl p-3 flex items-center space-x-2.5 transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50/50">
-              <input type="radio" name="orderType" value="delivery" checked onchange="toggleDeliveryFields()" class="accent-brand-yellow text-brand-yellow" />
-              <div>
-                <p class="font-bold text-gray-800">🛵 Entrega Delivery</p>
-                <p class="text-[10px] text-gray-500">Frete calculado pelo endereço</p>
-              </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <!-- 1. DELIVERY -->
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="orderType" value="delivery" checked onchange="handleOrderTypeChange()" class="sr-only" />
+              <i class="fa-solid fa-motorcycle text-brand-yellow text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[11px]">Delivery</p>
+              <p class="text-[9px] text-gray-500">Na sua casa</p>
             </label>
-            <label class="cursor-pointer border rounded-xl p-3 flex items-center space-x-2.5 transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50/50">
-              <input type="radio" name="orderType" value="pickup" onchange="toggleDeliveryFields()" class="accent-brand-yellow text-brand-yellow" />
-              <div>
-                <p class="font-bold text-gray-800">🏪 Retirada no Local</p>
-                <p class="text-[10px] text-emerald-600 font-bold">Sem taxa (Grátis)</p>
-              </div>
+
+            <!-- 2. RETIRADA -->
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="orderType" value="pickup" onchange="handleOrderTypeChange()" class="sr-only" />
+              <i class="fa-solid fa-store text-blue-500 text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[11px]">Retirada</p>
+              <p class="text-[9px] text-emerald-600 font-bold">Sem taxa</p>
+            </label>
+
+            <!-- 3. MESA / SALÃO -->
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="orderType" value="dine_in" onchange="handleOrderTypeChange()" class="sr-only" />
+              <i class="fa-solid fa-utensils text-emerald-500 text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[11px]">Na Mesa</p>
+              <p class="text-[9px] text-brand-yellow font-black">No Salão</p>
             </label>
           </div>
 
-          <!-- CAMPOS DE ENDEREÇO -->
+          <!-- ÁREA: DELIVERY (ENDEREÇO E FRETE) -->
           <div id="deliveryFieldsArea" class="mt-4 space-y-3">
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
@@ -418,7 +435,7 @@
               <input type="text" id="custReference" placeholder="Ex: Próximo à praça" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
 
-            <!-- QUADRO DE FRETE CLARO E TRANSPARENTE -->
+            <!-- QUADRO DE FRETE CLARO -->
             <div id="deliveryFeeNoticeBox" class="p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-xs flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-motorcycle text-brand-yellow text-base"></i>
@@ -431,9 +448,25 @@
             </div>
           </div>
 
+          <!-- ÁREA: RETIRADA NO BALCÃO -->
           <div id="pickupAlert" class="hidden mt-3 p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-neutral-700 text-xs">
             <i class="fa-solid fa-location-dot text-brand-red mr-1.5"></i>
             Retirada no endereço: <strong id="pickupAddressText">Rua das Delícias, 100 - Rio de Janeiro - RJ</strong>
+          </div>
+
+          <!-- ÁREA: CONSUMO NA MESA / SALÃO -->
+          <div id="dineInArea" class="hidden mt-3 p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs space-y-2">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-utensils text-brand-yellow text-base"></i>
+              <div>
+                <p class="font-black text-gray-800 text-xs">Consumo no Salão do Restaurante</p>
+                <p class="text-[10px] text-gray-600">Frete Grátis • Seu pedido será servido na sua mesa</p>
+              </div>
+            </div>
+            <div class="pt-2">
+              <label class="block font-black text-gray-800 mb-1">Qual o número da sua mesa? *</label>
+              <input type="text" id="custTableInput" placeholder="Ex: Mesa 03" class="w-full sm:w-48 p-2.5 rounded-xl border border-amber-300 bg-white font-black text-sm text-brand-black focus:outline-none focus:border-brand-yellow" />
+            </div>
           </div>
         </div>
 
@@ -486,17 +519,17 @@
 
         <div class="pt-3 border-t border-gray-100">
           <label class="block font-bold text-gray-700 mb-1">Observações do Pedido</label>
-          <input type="text" id="orderNotes" placeholder="Ex: Tocar o interfone, campainha estragada..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+          <input type="text" id="orderNotes" placeholder="Ex: Ponto da carne, talheres..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
-        <!-- RESUMO FINAL COM TOTAL CLARO -->
+        <!-- RESUMO FINAL -->
         <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
           <div class="flex justify-between text-gray-600">
             <span>Subtotal dos Itens:</span>
             <span id="chkSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
           </div>
           <div class="flex justify-between text-gray-600">
-            <span>Taxa de Entrega:</span>
+            <span id="chkFeeLabel">Taxa de Entrega:</span>
             <span id="chkSummaryFeeText" class="font-bold text-gray-800">R$ 5,00</span>
           </div>
           <div class="flex justify-between font-black text-base pt-2 border-t border-gray-200">
@@ -505,7 +538,6 @@
           </div>
         </div>
 
-        <!-- BOTÃO COM O VALOR EXATO ESTAMPADO -->
         <button type="submit" id="btnSubmitOrder" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-4 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <i class="fa-brands fa-whatsapp text-lg"></i>
           <span id="btnSubmitText">CONFIRMAR E ENVIAR NO WHATSAPP</span>
@@ -576,7 +608,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO CLIENTE: FRETE TRANSPARENTE E ROTA PRECISA -->
+  <!-- JAVASCRIPT: RECONHECIMENTO DE MESA E CÁLCULO DE FRETE AUTOMÁTICO -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -600,6 +632,7 @@
     let storeProducts = [];
     let cachedStoreCoords = null;
     let autoCalcTimeout = null;
+    let identifiedTable = null; // Mesa identificada pelo QR Code
 
     let appState = {
       cart: [],
@@ -617,7 +650,30 @@
       return clean;
     }
 
+    // DETECTA PARÂMETRO ?mesa=X NA URL
+    function detectTableUrlParam() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mesa = urlParams.get('mesa');
+      if (mesa) {
+        identifiedTable = mesa.trim();
+        const banner = document.getElementById('tableBannerNotice');
+        const bannerNum = document.getElementById('tableBannerNumber');
+        if (banner && bannerNum) {
+          bannerNum.innerText = `MESA ${identifiedTable.padStart(2, '0')}`;
+          banner.classList.remove('hidden');
+        }
+
+        // Já pré-seleciona a opção de Mesa no checkout
+        const dineInRadio = document.querySelector('input[name="orderType"][value="dine_in"]');
+        if (dineInRadio) dineInRadio.checked = true;
+        const tableInput = document.getElementById('custTableInput');
+        if (tableInput) tableInput.value = `Mesa ${identifiedTable.padStart(2, '0')}`;
+        handleOrderTypeChange();
+      }
+    }
+
     async function loadStoreData() {
+      detectTableUrlParam();
       await Promise.all([
         fetchCategories(),
         fetchProducts(),
@@ -672,7 +728,7 @@
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
         if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
 
-        // Status Aberto/Pausado
+        // Status
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -693,11 +749,10 @@
     }
 
     // ========================================================
-    // CÁLCULO DE ROTA AUTOMÁTICO, SILENCIOSO E PRECISO
+    // CÁLCULO DE FRETE POR ROTA
     // ========================================================
     function scheduleAutoCalculate() {
       clearTimeout(autoCalcTimeout);
-      // Aguarda 600ms após o cliente parar de digitar para calcular
       autoCalcTimeout = setTimeout(autoCalculateRouteDelivery, 600);
     }
 
@@ -757,7 +812,6 @@
 
           storeConfig.currentAutoFee = Number(appliedPrice);
 
-          // Atualiza com clareza o valor do frete e o aviso
           const feeBadge = document.getElementById('chkDeliveryFeeText');
           if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
@@ -947,7 +1001,6 @@
       document.getElementById("mobileCartTotal").innerText = `R$ ${formatMoney(subtotal)}`;
     }
 
-    // NA GAVETA: MOSTRA APENAS O SUBTOTAL REAL DOS LANCHES
     function renderCartDrawer() {
       const list = document.getElementById("cartItemsList");
       const footer = document.getElementById("cartFooterArea");
@@ -994,9 +1047,17 @@
       }).join("");
 
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-
       document.getElementById("cartSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
       document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(subtotal)}`;
+
+      const feeIndicator = document.getElementById("cartDeliveryFeeIndicator");
+      if (feeIndicator) {
+        if (identifiedTable) {
+          feeIndicator.innerText = "Grátis (Mesa " + identifiedTable + ")";
+        } else {
+          feeIndicator.innerText = "Calculada na finalização";
+        }
+      }
     }
 
     function changeCartItemQty(index, delta) {
@@ -1025,7 +1086,7 @@
     function startCheckout() {
       if (appState.cart.length === 0) return;
       closeCartDrawer();
-      updateCheckoutTotals();
+      handleOrderTypeChange();
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
 
@@ -1033,18 +1094,27 @@
       document.getElementById("checkoutModal").classList.add("hidden");
     }
 
-    function toggleDeliveryFields() {
-      const orderType = document.querySelector('input[name="orderType"]:checked').value;
+    // ALTERNÂNCIA ENTRE DELIVERY, RETIRADA E MESA
+    function handleOrderTypeChange() {
+      const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const deliveryFields = document.getElementById("deliveryFieldsArea");
       const pickupAlert = document.getElementById("pickupAlert");
+      const dineInArea = document.getElementById("dineInArea");
 
       if (orderType === "delivery") {
         deliveryFields.classList.remove("hidden");
         pickupAlert.classList.add("hidden");
-      } else {
+        dineInArea.classList.add("hidden");
+      } else if (orderType === "pickup") {
         deliveryFields.classList.add("hidden");
         pickupAlert.classList.remove("hidden");
+        dineInArea.classList.add("hidden");
+      } else if (orderType === "dine_in") {
+        deliveryFields.classList.add("hidden");
+        pickupAlert.classList.add("hidden");
+        dineInArea.classList.remove("hidden");
       }
+
       updateCheckoutTotals();
     }
 
@@ -1061,33 +1131,35 @@
       else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
     }
 
-    // ATUALIZAÇÃO CLARA E TRANSPARENTE DOS TOTAIS
     function updateCheckoutTotals() {
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
+      
+      // Frete só existe para entrega delivery
       const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
       const grandTotal = subtotal + delivery;
 
-      // Resumo final
       if (document.getElementById("chkSubtotalText")) {
         document.getElementById("chkSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
       }
       if (document.getElementById("chkSummaryFeeText")) {
         document.getElementById("chkSummaryFeeText").innerText = orderType === "delivery" 
           ? `R$ ${formatMoney(delivery)}` 
-          : "Grátis (Retirada)";
+          : orderType === "dine_in" 
+            ? "Grátis (Mesa)" 
+            : "Grátis (Retirada)";
       }
       if (document.getElementById("chkFinalTotalText")) {
         document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
       }
 
-      // O próprio botão amarelo exibe o total final exato
       const btnText = document.getElementById("btnSubmitText");
       if (btnText) {
         btnText.innerText = `CONFIRMAR E ENVIAR NO WHATSAPP • R$ ${formatMoney(grandTotal)}`;
       }
     }
 
+    // SUBMISSÃO DO PEDIDO (DELIVERY, RETIRADA OU MESA)
     async function processOrderSubmission(e) {
       e.preventDefault();
 
@@ -1102,9 +1174,10 @@
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
       const orderNotes = document.getElementById("orderNotes").value.trim() || "Nenhuma";
 
+      let destinationType = "Delivery";
       let deliveryAddressText = "Retirada no Balcão";
       let deliveryFeeApplied = 0;
-      let deliveryKmInfo = "Retirada no Local";
+      let deliveryDetailHeader = "";
 
       if (orderType === "delivery") {
         const street = document.getElementById("custStreet").value.trim();
@@ -1113,14 +1186,25 @@
         const complement = document.getElementById("custComplement").value.trim();
         const reference = document.getElementById("custReference").value.trim();
 
-        if (!street || !number || !neighborhood) {
-          alert("Por favor, preencha Rua, Número e Bairro para entrega.");
+        if (!street || !neighborhood) {
+          alert("Por favor, preencha Rua e Bairro para entrega.");
           return;
         }
 
         deliveryFeeApplied = Number(storeConfig.currentAutoFee);
-        deliveryKmInfo = storeConfig.currentCalculatedKm ? `~${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
-        deliveryAddressText = `${street}, nº ${number} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
+        const kmText = storeConfig.currentCalculatedKm ? `~${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
+        destinationType = `Delivery (${kmText})`;
+        deliveryAddressText = `${street}, nº ${number || 'S/N'} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
+        deliveryDetailHeader = `🛵 *ENTREGA DELIVERY:*\n${deliveryAddressText}\n*Taxa:* R$ ${formatMoney(deliveryFeeApplied)} (${kmText})`;
+      } else if (orderType === "pickup") {
+        destinationType = "Retirada no Balcão";
+        deliveryAddressText = "Balcão da Loja";
+        deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis`;
+      } else if (orderType === "dine_in") {
+        const tableNumber = document.getElementById('custTableInput').value.trim() || 'Mesa não informada';
+        destinationType = `${tableNumber}`;
+        deliveryAddressText = `${tableNumber} (Salão)`;
+        deliveryDetailHeader = `🍽️ *CONSUMO NO LOCAL:* ${tableNumber.toUpperCase()}\n*Taxa:* Grátis (Na Mesa)`;
       }
 
       let paymentDetails = paymentMethod;
@@ -1143,26 +1227,25 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
-      // MENSAGEM DO WHATSAPP: TOTALMENTE TRANSPARENTE COM O QUE O CLIENTE VIU
+      // MENSAGEM DO WHATSAPP FORMATADA
       const message = 
 `🍔 *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
 
-👤 *CLIENTE:*
+${orderType === 'dine_in' ? `🍽️ *MESA:* ${deliveryAddressText.toUpperCase()}\n` : ''}👤 *CLIENTE:*
 ${name}
 
 📱 *TELEFONE:*
-${phone}
+${phone || 'Não informado'}
 
 🛒 *PEDIDO:*
 ${itemsListFormatted}
 
 💰 *SUBTOTAL:* R$ ${formatMoney(subtotal)}
-🛵 *ENTREGA:* ${deliveryFeeApplied > 0 ? `R$ ${formatMoney(deliveryFeeApplied)} (${deliveryKmInfo})` : "Grátis (Retirada)"}
 💵 *TOTAL:* R$ ${formatMoney(grandTotal)}
 
-📍 *ENDEREÇO:*
-${deliveryAddressText}
+📍 *DESTINO DO PEDIDO:*
+${deliveryDetailHeader}
 
 💳 *PAGAMENTO:*
 ${paymentDetails}
@@ -1180,9 +1263,9 @@ Obrigado pelo pedido!`;
         items: appState.cart.map(i => `${i.quantity}x ${i.product.name}`).join(", "),
         total: grandTotal,
         payment: paymentDetails,
-        type: orderType === 'delivery' ? `Delivery (${deliveryKmInfo})` : 'Retirada',
+        type: destinationType,
         address: deliveryAddressText,
-        notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "delivery" ? ` [Distância: ${deliveryKmInfo}]` : ""),
+        notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "dine_in" ? ` [Consumo Local - ${deliveryAddressText}]` : ""),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: "Novo"
       }]);
