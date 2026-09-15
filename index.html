@@ -312,8 +312,8 @@
           <span id="cartSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
         </div>
         <div class="flex justify-between text-gray-600">
-          <span>Frete estimado</span>
-          <span id="cartDeliveryFeeText" class="font-bold text-gray-800">A partir de R$ 0,00</span>
+          <span>Frete</span>
+          <span id="cartDeliveryFeeText" class="font-bold text-gray-800">Calculado no endereço</span>
         </div>
         <div class="flex justify-between text-base font-black text-brand-black pt-2 border-t border-gray-200">
           <span>TOTAL</span>
@@ -338,7 +338,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT (COM O SELETOR DE KM E FRETE) -->
+  <!-- MODAL DE CHECKOUT -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -391,34 +391,22 @@
             </label>
           </div>
 
-          <!-- CAMPOS DE ENTREGA -->
+          <!-- CAMPOS DE ENDEREÇO (AO DIGITAR, O FRETE ATUALIZA SOZINHO E SILENCIOSAMENTE) -->
           <div id="deliveryFieldsArea" class="mt-4 space-y-3">
-            
-            <!-- SELETOR DINÂMICO DE DISTÂNCIA / KM -->
-            <div class="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-1.5">
-              <label class="block font-black text-gray-800 text-[11px]">
-                <i class="fa-solid fa-map-location-dot text-brand-yellow mr-1"></i> Selecione a distância do seu endereço *
-              </label>
-              <select id="custDeliveryTier" onchange="handleDeliveryTierChange(this.value)" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white font-extrabold text-brand-black focus:outline-none focus:border-brand-yellow text-xs shadow-sm cursor-pointer">
-                <!-- Gerado via JavaScript de acordo com o Admin -->
-              </select>
-              <p class="text-[10px] text-gray-500 italic">O valor do frete é calculado automaticamente com base na distância da loja.</p>
-            </div>
-
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
                 <label class="block font-bold text-gray-700 mb-1">Rua / Logradouro *</label>
-                <input type="text" id="custStreet" placeholder="Ex: Rua das Flores" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custStreet" onchange="autoCalculateRouteDelivery()" placeholder="Ex: Rua Barata Ribeiro" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Número *</label>
-                <input type="text" id="custNumber" placeholder="Ex: 120" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custNumber" onchange="autoCalculateRouteDelivery()" placeholder="Ex: 500" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Bairro *</label>
-                <input type="text" id="custNeighborhood" placeholder="Ex: Copacabana" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+                <input type="text" id="custNeighborhood" onchange="autoCalculateRouteDelivery()" placeholder="Ex: Copacabana" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
               </div>
               <div>
                 <label class="block font-bold text-gray-700 mb-1">Complemento / Apto</label>
@@ -427,7 +415,7 @@
             </div>
             <div>
               <label class="block font-bold text-gray-700 mb-1">Ponto de Referência</label>
-              <input type="text" id="custReference" placeholder="Ex: Próximo ao mercado" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              <input type="text" id="custReference" placeholder="Ex: Próximo à praça" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
           </div>
 
@@ -491,7 +479,7 @@
 
         <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-1.5">
           <div class="flex justify-between font-bold text-gray-700">
-            <span>Total com frete:</span>
+            <span>Total com entrega:</span>
             <span id="chkFinalTotalText" class="text-brand-red font-black text-base"></span>
           </div>
         </div>
@@ -566,7 +554,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT DO CLIENTE CONECTADO AO SUPABASE COM 4 FAIXAS DE KM -->
+  <!-- JAVASCRIPT: CÁLCULO DE ROTA 100% AUTOMÁTICO E SILENCIOSO -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -581,12 +569,14 @@
         { km: 10, price: 12.00 },
         { km: 15, price: 15.00 }
       ],
-      selectedTierIndex: 0,
+      currentAutoFee: 5.00,
+      currentCalculatedKm: null,
       address: "Rua das Delícias, 100 - Rio de Janeiro - RJ"
     };
 
     let storeCategories = [];
     let storeProducts = [];
+    let cachedStoreCoords = null;
 
     let appState = {
       cart: [],
@@ -616,15 +606,9 @@
     async function fetchCategories() {
       const { data } = await db.from('categories').select('*').order('created_at', { ascending: true });
       if (data && data.length > 0) {
-        storeCategories = [
-          { id: "all", name: "Todos os Itens", icon: "fa-solid fa-list" },
-          ...data
-        ];
+        storeCategories = [{ id: "all", name: "Todos os Itens", icon: "fa-solid fa-list" }, ...data];
       } else {
-        storeCategories = [
-          { id: "all", name: "Todos os Itens", icon: "fa-solid fa-list" },
-          { id: "Hambúrgueres", name: "Hambúrgueres", icon: "fa-solid fa-burger" }
-        ];
+        storeCategories = [{ id: "all", name: "Todos os Itens", icon: "fa-solid fa-list" }];
       }
       renderCategories();
     }
@@ -637,7 +621,6 @@
       }
     }
 
-    // CARREGA DADOS E FAIXAS DE KM DO SUPABASE
     async function fetchSettings() {
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       
@@ -646,9 +629,9 @@
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
         storeConfig.address = data.address || storeConfig.address;
 
-        // FAIXAS DE KM CARREGADAS DA NUVEM
         if (Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4) {
           storeConfig.deliveryTiers = data.delivery_tiers;
+          storeConfig.currentAutoFee = Number(data.delivery_tiers[0].price);
         }
 
         document.title = `${storeConfig.name} | Cardápio Digital`;
@@ -659,11 +642,14 @@
         if (document.getElementById('footerStoreWhatsapp')) document.getElementById('footerStoreWhatsapp').innerText = storeConfig.whatsapp;
         if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
 
+        const feeBadge = document.getElementById('chkDeliveryFeeText');
+        if (feeBadge) feeBadge.innerText = formatMoney(storeConfig.currentAutoFee);
+
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
         if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
 
-        // Status Aberto/Fechado
+        // Status Aberto/Pausado
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -678,39 +664,83 @@
           text.innerText = "FECHADO NO MOMENTO";
         }
 
-        renderDeliveryTierOptions();
         updateCheckoutTotals();
         if (appState.cart.length > 0) renderCartDrawer();
       }
     }
 
-    // GERA O SELETOR DE KM NO CHECKOUT
-    function renderDeliveryTierOptions() {
-      const select = document.getElementById('custDeliveryTier');
-      if (!select) return;
-
-      select.innerHTML = storeConfig.deliveryTiers.map((tier, idx) => {
-        let label = '';
-        if (idx === 0) {
-          label = `Até ${tier.km} km ➔ Frete: R$ ${formatMoney(tier.price)}`;
-        } else {
-          const prevKm = storeConfig.deliveryTiers[idx - 1].km;
-          label = `De ${prevKm} a ${tier.km} km ➔ Frete: R$ ${formatMoney(tier.price)}`;
+    // ========================================================
+    // CÁLCULO DE ROTA AUTOMÁTICO, GRATUITO E SILENCIOSO (OSRM + OSM)
+    // ========================================================
+    async function getCoordinates(addressText) {
+      try {
+        const cleanQuery = encodeURIComponent(addressText.trim());
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${cleanQuery}&limit=1`, {
+          headers: { 'Accept-Language': 'pt-BR' }
+        });
+        const json = await res.json();
+        if (json && json.length > 0) {
+          return { lat: parseFloat(json[0].lat), lon: parseFloat(json[0].lon) };
         }
-        return `<option value="${idx}" ${idx === storeConfig.selectedTierIndex ? 'selected' : ''}>🛵 ${label}</option>`;
-      }).join("");
-
-      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
-      const feeBadge = document.getElementById('chkDeliveryFeeText');
-      if (feeBadge) feeBadge.innerText = formatMoney(currentTier.price);
+      } catch (e) {}
+      return null;
     }
 
-    function handleDeliveryTierChange(val) {
-      storeConfig.selectedTierIndex = parseInt(val, 10) || 0;
-      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex];
-      const feeBadge = document.getElementById('chkDeliveryFeeText');
-      if (feeBadge) feeBadge.innerText = formatMoney(currentTier.price);
-      updateCheckoutTotals();
+    async function autoCalculateRouteDelivery() {
+      const street = document.getElementById('custStreet')?.value.trim();
+      const number = document.getElementById('custNumber')?.value.trim();
+      const neighborhood = document.getElementById('custNeighborhood')?.value.trim();
+
+      // Só calcula se já tiver rua e bairro preenchidos
+      if (!street || !neighborhood) return;
+
+      const customerAddressFull = `${street}, ${number || ''}, ${neighborhood}`;
+
+      try {
+        // 1. Pega coordenadas da loja (guarda em cache para ser instantâneo)
+        if (!cachedStoreCoords) {
+          cachedStoreCoords = await getCoordinates(storeConfig.address);
+        }
+        if (!cachedStoreCoords) return;
+
+        // 2. Pega coordenadas do cliente
+        const custCoords = await getCoordinates(customerAddressFull);
+        if (!custCoords) return;
+
+        // 3. Traça a rota real pelas ruas via OSRM gratuito
+        const routeUrl = `https://router.project-osrm.org/route/v1/driving/${cachedStoreCoords.lon},${cachedStoreCoords.lat};${custCoords.lon},${custCoords.lat}?overview=false`;
+        const routeRes = await fetch(routeUrl);
+        const routeData = await routeRes.json();
+
+        if (routeData && routeData.routes && routeData.routes.length > 0) {
+          const meters = routeData.routes[0].distance;
+          const km = meters / 1000;
+          storeConfig.currentCalculatedKm = km;
+
+          // 4. Encontra a faixa correspondente de preço cadastrada no Admin
+          let appliedPrice = storeConfig.deliveryTiers[0].price;
+          const sortedTiers = [...storeConfig.deliveryTiers].sort((a, b) => a.km - b.km);
+
+          for (let i = 0; i < sortedTiers.length; i++) {
+            if (km <= sortedTiers[i].km) {
+              appliedPrice = sortedTiers[i].price;
+              break;
+            }
+            if (i === sortedTiers.length - 1) {
+              appliedPrice = sortedTiers[i].price; // Se passar da última faixa, aplica o valor da 4ª faixa
+            }
+          }
+
+          // 5. Atualiza o frete e o total SILENCIOSAMENTE na tela
+          storeConfig.currentAutoFee = Number(appliedPrice);
+          const feeBadge = document.getElementById('chkDeliveryFeeText');
+          if (feeBadge) feeBadge.innerText = formatMoney(storeConfig.currentAutoFee);
+
+          updateCheckoutTotals();
+        }
+      } catch (err) {
+        // Se a internet falhar ou rua não existir, mantém a taxa padrão sem travar nada
+      }
     }
 
     function setupRealtimeListeners() {
@@ -935,11 +965,11 @@
       }).join("");
 
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-      const minDeliveryFee = storeConfig.deliveryTiers[0]?.price || 5.00;
-      const total = subtotal + minDeliveryFee;
+      const delivery = storeConfig.currentAutoFee;
+      const total = subtotal + delivery;
 
       document.getElementById("cartSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
-      document.getElementById("cartDeliveryFeeText").innerText = `A partir de R$ ${formatMoney(minDeliveryFee)}`;
+      document.getElementById("cartDeliveryFeeText").innerText = `R$ ${formatMoney(delivery)}`;
       document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(total)}`;
     }
 
@@ -969,7 +999,6 @@
     function startCheckout() {
       if (appState.cart.length === 0) return;
       closeCartDrawer();
-      renderDeliveryTierOptions();
       updateCheckoutTotals();
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
@@ -1006,13 +1035,10 @@
       else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
     }
 
-    // ATUALIZA OS TOTAIS COM A FAIXA DE KM ESCOLHIDA
     function updateCheckoutTotals() {
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
-      
-      const currentTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
-      const delivery = orderType === "delivery" ? Number(currentTier.price) : 0;
+      const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
       const grandTotal = subtotal + delivery;
 
       document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
@@ -1048,9 +1074,8 @@
           return;
         }
 
-        const chosenTier = storeConfig.deliveryTiers[storeConfig.selectedTierIndex] || storeConfig.deliveryTiers[0];
-        deliveryFeeApplied = Number(chosenTier.price);
-        deliveryKmInfo = `Até ${chosenTier.km} km`;
+        deliveryFeeApplied = Number(storeConfig.currentAutoFee);
+        deliveryKmInfo = storeConfig.currentCalculatedKm ? `${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
         deliveryAddressText = `${street}, nº ${number} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
       }
 
@@ -1074,7 +1099,7 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
-      // MENSAGEM DO WHATSAPP COM A FAIXA DE KM INFORMADA
+      // MENSAGEM DO WHATSAPP
       const message = 
 `🍔 *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
@@ -1103,7 +1128,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // REGISTRA O PEDIDO NO SUPABASE
+      // REGISTRA NO SUPABASE
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
@@ -1113,12 +1138,11 @@ Obrigado pelo pedido!`;
         payment: paymentDetails,
         type: orderType === 'delivery' ? `Delivery (${deliveryKmInfo})` : 'Retirada',
         address: deliveryAddressText,
-        notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "delivery" ? ` [Frete: ${deliveryKmInfo}]` : ""),
+        notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "delivery" ? ` [Distância: ${deliveryKmInfo}]` : ""),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: "Novo"
       }]);
 
-      // ABRE O WHATSAPP
       const waNumber = getCleanWaNumber(storeConfig.whatsapp);
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
