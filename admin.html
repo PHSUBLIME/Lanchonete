@@ -51,12 +51,21 @@
         font-family: monospace;
         font-size: 12px;
       }
+      #printAreaTables, #printAreaTables * { visibility: visible; }
+      #printAreaTables {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff;
+        color: #000;
+      }
     }
   </style>
 </head>
 <body class="bg-[#0F0F0F] text-gray-100 antialiased min-h-screen font-sans flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-black">
 
-  <!-- NOTIFICAÇÃO FLUTUANTE MODERNA -->
+  <!-- TOAST NOTIFICATION -->
   <div id="toastNotification" class="fixed top-5 right-5 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-neutral-900 border border-emerald-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl">
     <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
       <i class="fa-solid fa-check"></i>
@@ -67,7 +76,7 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN -->
+  <!-- LOGIN SCREEN -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -100,7 +109,7 @@
     </div>
   </div>
 
-  <!-- ESTRUTURA PRINCIPAL -->
+  <!-- ESTRUTURA PRINCIPAL DO PAINEL -->
   <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
 
     <!-- MENU LATERAL -->
@@ -134,7 +143,7 @@
         </div>
 
         <nav class="p-3 space-y-1 text-xs font-bold">
-          <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
+          <button onclick="navigateTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
             <i class="fa-solid fa-bell text-sm"></i>
             <span class="flex-1 text-left">Fila de Pedidos</span>
             <span id="badgeLiveOrders" class="bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
@@ -150,7 +159,13 @@
             <span class="flex-1 text-left">Gerenciar Cardápio</span>
           </button>
 
-          <button onclick="navigateTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer">
+          <!-- ABA DE PLACAS DE MESA COM QR CODE -->
+          <button onclick="navigateTab('tables')" id="nav-tables" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
+            <i class="fa-solid fa-qrcode text-sm text-brand-yellow"></i>
+            <span class="flex-1 text-left">Placas de Mesa (QR Code)</span>
+          </button>
+
+          <button onclick="navigateTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
             <i class="fa-solid fa-gear text-sm"></i>
             <span class="flex-1 text-left">Configurações da Loja</span>
           </button>
@@ -176,11 +191,11 @@
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
       <!-- ABA 1: FILA DE PEDIDOS -->
-      <section id="tab-orders" class="tab-content hidden">
+      <section id="tab-orders" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos ativos, baixas e cancelamentos</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos de Delivery, Retirada e Mesas do Salão</p>
           </div>
           <div>
             <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2">
@@ -197,8 +212,11 @@
           <button onclick="setOrderFilter('abertos')" id="filterBtn-abertos" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
             🔥 Em Aberto (<span id="countFilterAbertos">0</span>)
           </button>
+          <button onclick="setOrderFilter('mesas')" id="filterBtn-mesas" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
+            🍽️ Mesas (<span id="countFilterMesas">0</span>)
+          </button>
           <button onclick="setOrderFilter('entregues')" id="filterBtn-entregues" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
-            ✅ Entregues / Baixados (<span id="countFilterEntregues">0</span>)
+            ✅ Concluídos (<span id="countFilterEntregues">0</span>)
           </button>
           <button onclick="setOrderFilter('cancelados')" id="filterBtn-cancelados" class="filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer">
             ❌ Cancelados (<span id="countFilterCancelados">0</span>)
@@ -261,15 +279,41 @@
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA 4: CONFIGURAÇÕES DA LOJA (COM 4 FAIXAS DE KM E PREÇO) -->
-      <section id="tab-settings" class="tab-content max-w-2xl">
+      <!-- ABA NOVA: GERADOR DE PLACAS DE MESA COM QR CODE -->
+      <section id="tab-tables" class="tab-content hidden max-w-4xl">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-white">Placas de Mesa com QR Code</h2>
+            <p class="text-xs text-gray-400">Gere e imprima displays de mesa para autoatendimento dos clientes</p>
+          </div>
+          <button onclick="printTableCards()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg cursor-pointer">
+            <i class="fa-solid fa-print text-sm"></i>
+            <span>Imprimir Placas de Mesa</span>
+          </button>
+        </div>
+
+        <div class="bg-brand-dark p-6 rounded-2xl border border-neutral-800 mb-6 flex flex-col sm:flex-row items-center gap-4 text-xs">
+          <div class="flex-1">
+            <label class="block font-bold text-gray-300 mb-1">Quantas mesas tem seu estabelecimento?</label>
+            <input type="number" id="numTablesInput" value="6" min="1" max="50" class="w-full sm:w-48 p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white font-black text-sm" />
+          </div>
+          <button onclick="generateTableCards()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-black px-5 py-3 rounded-xl border border-neutral-700 transition cursor-pointer">
+            <i class="fa-solid fa-rotate mr-1"></i> Atualizar Placas
+          </button>
+        </div>
+
+        <!-- CONTAINER DAS PLACAS DE MESA -->
+        <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- ABA 5: CONFIGURAÇÕES DA LOJA -->
+      <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
           <p class="text-xs text-gray-400">Altere informações gerais e a tabela de frete por KM do seu restaurante</p>
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
-          <!-- DADOS GERAIS -->
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Contato
@@ -292,34 +336,27 @@
             </div>
           </div>
 
-          <!-- TABELA DE 4 FAIXAS DE KM -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
-                </h3>
-                <p class="text-[11px] text-gray-400">Configure até 4 faixas de distância e o valor do frete para cada uma</p>
-              </div>
-            </div>
+            <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
+            </h3>
+            <p class="text-[11px] text-gray-400">Configure até 4 faixas de distância para o cálculo automático</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <!-- FAIXA 1 -->
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
-                <span class="font-extrabold text-white text-xs block">🛵 Faixa 1 (Mais próxima)</span>
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 1</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
                     <input type="number" step="0.5" id="cfgKm1" value="3" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                   </div>
                   <div>
-                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor (R$)</label>
                     <input type="number" step="0.50" id="cfgPrice1" value="5.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
                   </div>
                 </div>
               </div>
 
-              <!-- FAIXA 2 -->
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 2</span>
                 <div class="grid grid-cols-2 gap-2">
@@ -328,13 +365,12 @@
                     <input type="number" step="0.5" id="cfgKm2" value="6" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                   </div>
                   <div>
-                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor (R$)</label>
                     <input type="number" step="0.50" id="cfgPrice2" value="8.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
                   </div>
                 </div>
               </div>
 
-              <!-- FAIXA 3 -->
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 3</span>
                 <div class="grid grid-cols-2 gap-2">
@@ -343,22 +379,21 @@
                     <input type="number" step="0.5" id="cfgKm3" value="10" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                   </div>
                   <div>
-                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor (R$)</label>
                     <input type="number" step="0.50" id="cfgPrice3" value="12.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
                   </div>
                 </div>
               </div>
 
-              <!-- FAIXA 4 -->
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
-                <span class="font-extrabold text-white text-xs block">🛵 Faixa 4 (Mais distante)</span>
+                <span class="font-extrabold text-white text-xs block">🛵 Faixa 4</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="text-[10px] text-gray-400 block mb-0.5">Até quantos KM?</label>
                     <input type="number" step="0.5" id="cfgKm4" value="15" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                   </div>
                   <div>
-                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor do Frete (R$)</label>
+                    <label class="text-[10px] text-gray-400 block mb-0.5">Valor (R$)</label>
                     <input type="number" step="0.50" id="cfgPrice4" value="15.00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black" required />
                   </div>
                 </div>
@@ -378,7 +413,7 @@
     </main>
   </div>
 
-  <!-- MODAL: GERENCIADOR DE CATEGORIAS -->
+  <!-- MODAL: GERENCIAR CATEGORIAS -->
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
@@ -473,8 +508,11 @@
     </div>
   </div>
 
-  <!-- ÁREA DE IMPRESSÃO TÉRMICA -->
+  <!-- ÁREA DE IMPRESSÃO TÉRMICA DE COMANDA -->
   <div id="printableReceipt" class="hidden"></div>
+
+  <!-- ÁREA OCULTA PARA IMPRESSÃO DAS PLACAS DE MESA -->
+  <div id="printAreaTables" class="hidden"></div>
 
   <!-- JAVASCRIPT DO PAINEL -->
   <script>
@@ -521,6 +559,7 @@
         fetchOrders(),
         fetchSettings()
       ]);
+      generateTableCards();
     }
 
     async function fetchCategories() {
@@ -559,7 +598,6 @@
         if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
         if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
 
-        // CARREGA AS 4 FAIXAS DE KM
         const tiers = Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4
           ? data.delivery_tiers
           : [
@@ -571,13 +609,10 @@
 
         document.getElementById('cfgKm1').value = tiers[0].km;
         document.getElementById('cfgPrice1').value = Number(tiers[0].price).toFixed(2);
-
         document.getElementById('cfgKm2').value = tiers[1].km;
         document.getElementById('cfgPrice2').value = Number(tiers[1].price).toFixed(2);
-
         document.getElementById('cfgKm3').value = tiers[2].km;
         document.getElementById('cfgPrice3').value = Number(tiers[2].price).toFixed(2);
-
         document.getElementById('cfgKm4').value = tiers[3].km;
         document.getElementById('cfgPrice4').value = Number(tiers[3].price).toFixed(2);
       }
@@ -588,7 +623,10 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
           if (payload.eventType === 'INSERT') {
             playOrderChime();
-            showToast(`Novo Pedido #${payload.new.id}!`, `${payload.new.client} enviou um pedido.`);
+            const orderTypeDesc = payload.new.type && payload.new.type.includes('Mesa') 
+              ? `🍽️ Pedido na ${payload.new.type}!` 
+              : `Novo Pedido #${payload.new.id}!`;
+            showToast(orderTypeDesc, `${payload.new.client} enviou um pedido.`);
           }
           fetchOrders();
         })
@@ -596,6 +634,77 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
         .subscribe();
+    }
+
+    // ========================================================
+    // GERADOR DE PLACAS DE MESA COM QR CODE
+    // ========================================================
+    function generateTableCards() {
+      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
+      const container = document.getElementById('tableCardsGrid');
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+      
+      // Base da URL da sua loja
+      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
+
+      let html = '';
+      for (let i = 1; i <= numTables; i++) {
+        const tableUrl = `${baseUrl}?mesa=${i}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tableUrl)}`;
+
+        html += `
+          <div class="bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg">
+            <span class="text-[11px] font-black uppercase text-gray-500 tracking-wider mb-1">${storeName}</span>
+            <div class="w-12 h-12 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black text-xl mb-3 shadow-sm">
+              ${i}
+            </div>
+            <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
+            
+            <div class="p-2 bg-white rounded-xl border border-gray-200 mb-3">
+              <img src="${qrUrl}" alt="QR Code Mesa ${i}" class="w-36 h-36 mx-auto object-contain" />
+            </div>
+
+            <p class="text-[11px] font-extrabold text-gray-800 leading-tight">Aponte a câmera do celular<br>para fazer seu pedido!</p>
+            <span class="text-[9px] text-gray-400 mt-2">Autoatendimento Digital</span>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function printTableCards() {
+      const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
+      const printArea = document.getElementById('printAreaTables');
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+      const baseUrl = "https://phsublime.github.io/Lanchonete/index.html";
+
+      let html = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="text-align: center; margin-bottom: 20px;">Placas de Mesa • ${storeName}</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+      `;
+
+      for (let i = 1; i <= numTables; i++) {
+        const tableUrl = `${baseUrl}?mesa=${i}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(tableUrl)}`;
+
+        html += `
+          <div style="border: 3px solid #FFB800; border-radius: 15px; padding: 25px; text-align: center; page-break-inside: avoid;">
+            <p style="margin: 0; font-size: 13px; font-weight: bold; text-transform: uppercase; color: #555;">${storeName}</p>
+            <h1 style="margin: 10px 0; font-size: 28px; font-weight: 900;">MESA 0${i}</h1>
+            <img src="${qrUrl}" style="width: 170px; height: 170px; margin: 10px auto; display: block;" />
+            <p style="margin: 10px 0 0 0; font-size: 14px; font-weight: bold; color: #111;">Aponte a câmera para pedir!</p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; color: #777;">Cardápio Digital na Mesa</p>
+          </div>
+        `;
+      }
+
+      html += `</div></div>`;
+      printArea.innerHTML = html;
+      printArea.classList.remove('hidden');
+      window.print();
+      printArea.classList.add('hidden');
     }
 
     // CATEGORIAS
@@ -863,7 +972,7 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
-    // PEDIDOS
+    // PEDIDOS (COM DISTINÇÃO DE MESAS E DELIVERY)
     function setOrderFilter(filter) {
       window.activeFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -880,17 +989,20 @@
 
       const totalCount = window.storeOrders.length;
       const abertosCount = window.storeOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
+      const mesasCount = window.storeOrders.filter(o => (o.type && o.type.includes('Mesa')) && o.status !== "Entregue" && o.status !== "Cancelado").length;
       const entreguesCount = window.storeOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
       const canceladosCount = window.storeOrders.filter(o => o.status === "Cancelado").length;
 
       document.getElementById("countFilterTodos").innerText = totalCount;
       document.getElementById("countFilterAbertos").innerText = abertosCount;
+      if (document.getElementById("countFilterMesas")) document.getElementById("countFilterMesas").innerText = mesasCount;
       document.getElementById("countFilterEntregues").innerText = entreguesCount;
       document.getElementById("countFilterCancelados").innerText = canceladosCount;
       badge.innerText = abertosCount;
 
       let list = [...window.storeOrders];
       if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
+      else if (window.activeFilter === 'mesas') list = list.filter(o => o.type && o.type.includes('Mesa'));
       else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
       else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
 
@@ -907,7 +1019,15 @@
       container.innerHTML = list.map(ord => {
         const isEntregue = ord.status === "Entregue" || ord.status === "Finalizado";
         const isCancelado = ord.status === "Cancelado";
-        let cardBg = isEntregue ? 'bg-[#18241C] border-emerald-900/60 opacity-95' : isCancelado ? 'bg-[#271616] border-rose-900/60 opacity-90' : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
+        const isMesa = ord.type && ord.type.includes('Mesa');
+
+        let cardBg = isMesa && !isEntregue && !isCancelado
+          ? 'bg-[#221f15] border-brand-yellow/80 shadow-md' 
+          : isEntregue 
+            ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
+            : isCancelado 
+              ? 'bg-[#271616] border-rose-900/60 opacity-90' 
+              : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
 
         return `
           <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
@@ -919,20 +1039,31 @@
                     isCancelado
                       ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
                       : isEntregue 
-                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Entregue ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
+                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Concluído ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
                         : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
                   }
                 </div>
-                <span class="text-[11px] font-bold text-gray-400">${ord.type}</span>
+
+                <!-- BADGE DESTACADO DO TIPO DE PEDIDO -->
+                ${
+                  isMesa 
+                    ? `<span class="bg-brand-yellow text-brand-black px-2.5 py-1 rounded-lg text-xs font-black flex items-center gap-1 shadow-sm">
+                         <i class="fa-solid fa-utensils"></i> ${ord.type.toUpperCase()}
+                       </span>`
+                    : `<span class="text-[11px] font-bold text-gray-400">${ord.type}</span>`
+                }
               </div>
 
               <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
-              <p class="text-xs text-gray-400 mb-3">${ord.phone}</p>
+              <p class="text-xs text-gray-400 mb-3">${ord.phone || 'Sem telefone'}</p>
 
               <div class="p-3 bg-neutral-900/90 rounded-xl text-xs mb-3 space-y-1.5 border border-neutral-800">
                 <p class="font-bold text-gray-200">${ord.items}</p>
                 ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
-                <p class="text-[11px] text-gray-400"><i class="fa-solid fa-location-dot text-brand-red mr-1"></i> ${ord.address}</p>
+                <p class="text-[11px] text-gray-400">
+                  <i class="${isMesa ? 'fa-solid fa-utensils text-brand-yellow' : 'fa-solid fa-location-dot text-brand-red'} mr-1"></i> 
+                  ${ord.address}
+                </p>
                 <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
               </div>
             </div>
@@ -945,17 +1076,17 @@
 
               <select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
                 <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
-                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Em preparo</option>
-                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto para Entrega</option>
-                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu com Motoboy</option>
-                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Entregue / Finalizado</option>
+                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Preparando</option>
+                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto / Servir</option>
+                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu para Entrega</option>
+                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Concluído / Entregue</option>
                 <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
               </select>
 
               <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
                 <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
                   <i class="fa-solid fa-print"></i>
-                  <span>Imprimir</span>
+                  <span>Comanda</span>
                 </button>
 
                 ${
@@ -967,11 +1098,11 @@
                     : isEntregue 
                       ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
                            <i class="fa-solid fa-check-double"></i>
-                           <span>Baixado</span>
+                           <span>Concluído</span>
                          </button>`
                       : `<button onclick="changeOrderStatus('${ord.id}', 'Entregue')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
                            <i class="fa-solid fa-check"></i>
-                           <span>Baixar</span>
+                           <span>Concluir</span>
                          </button>
                          <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 transition cursor-pointer">
                            <i class="fa-solid fa-ban"></i>
@@ -999,28 +1130,30 @@
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (!ord) return;
       const receiptArea = document.getElementById("printableReceipt");
+      const isMesa = ord.type && ord.type.includes('Mesa');
 
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
           <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
           <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
           <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
-          <p style="margin: 4px 0 0 0; font-weight: bold; font-size: 14px;">COMPROVANTE DE PEDIDO</p>
+          <p style="margin: 6px 0 0 0; font-weight: 900; font-size: 15px;">
+            ${isMesa ? `🍽️ ATENDIMENTO SALÃO • ${ord.type.toUpperCase()}` : 'COMPROVANTE DE PEDIDO'}
+          </p>
         </div>
 
         <div style="margin-bottom: 8px; font-size: 11px;">
           <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
-          <p style="margin: 2px 0;"><strong>STATUS:</strong> ${ord.status.toUpperCase()}</p>
           <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
-          <p style="margin: 2px 0;"><strong>TIPO:</strong> ${ord.type.toUpperCase()}</p>
+          <p style="margin: 2px 0; font-size: 13px;"><strong>DESTINO:</strong> <span style="font-weight:900;">${ord.type.toUpperCase()}</span></p>
           <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
-          <p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>
-          <p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>
+          ${ord.phone ? `<p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>` : ''}
+          ${!isMesa ? `<p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>` : ''}
         </div>
 
         <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0; margin-bottom: 8px;">
           <p style="margin: 0 0 4px 0; font-weight: bold;">ITENS DO PEDIDO:</p>
-          <p style="margin: 0; font-size: 12px; white-space: pre-line;">${ord.items}</p>
+          <p style="margin: 0; font-size: 13px; font-weight: bold; white-space: pre-line;">${ord.items}</p>
         </div>
 
         ${ord.notes ? `
@@ -1035,14 +1168,14 @@
             <span>PAGAMENTO:</span>
             <strong>${ord.payment}</strong>
           </p>
-          <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: bold; display:flex; justify-content:space-between;">
+          <p style="margin: 4px 0 0 0; font-size: 15px; font-weight: 900; display:flex; justify-content:space-between;">
             <span>TOTAL:</span>
             <span>R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
           </p>
         </div>
 
         <div style="text-align:center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 8px; font-size: 10px;">
-          <p style="margin:0;">Sistema desenvolvido por PHSUBLIME</p>
+          <p style="margin:0;">Sistema de Comandas • PHSUBLIME</p>
           <p style="margin:0;">Obrigado pela preferência!</p>
         </div>
       `;
@@ -1141,7 +1274,6 @@
       }
     }
 
-    // SALVAR CONFIGURAÇÕES COM AS 4 FAIXAS DE KM
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1149,7 +1281,6 @@
       const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
       const newAddress = document.getElementById('cfgAddress').value.trim();
 
-      // MONTA O ARRAY DAS 4 FAIXAS DE KM
       const tiers = [
         { km: parseFloat(document.getElementById('cfgKm1').value) || 3, price: parseFloat(document.getElementById('cfgPrice1').value) || 5.00 },
         { km: parseFloat(document.getElementById('cfgKm2').value) || 6, price: parseFloat(document.getElementById('cfgPrice2').value) || 8.00 },
@@ -1173,7 +1304,8 @@
       } else {
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
-        showToast("Configurações Salvas!", "A tabela de frete por KM e dados da loja foram salvos na nuvem.");
+        generateTableCards();
+        showToast("Configurações Salvas!", "Os dados da loja foram atualizados.");
       }
     }
   </script>
