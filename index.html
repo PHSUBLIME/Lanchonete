@@ -109,7 +109,7 @@
       <div class="max-w-6xl mx-auto px-4 relative z-10">
         <div class="max-w-2xl">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-800 text-brand-yellow text-xs font-bold mb-4 border border-neutral-700">
-            <i class="fa-solid fa-fire"></i> O melhor artesanal da região
+            <i class="fa-solid fa-fire"></i> O melhor da região
           </div>
           <h2 id="bannerTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-3">PHSUBLIME FOOD</h2>
           <p class="text-base sm:text-lg text-gray-300 font-normal mb-2">"Sabor que combina com você!"</p>
@@ -143,7 +143,7 @@
             </div>
             <div>
               <p class="text-xs sm:text-sm font-bold">Entrega & Salão</p>
-              <p class="text-[11px] text-gray-400 hidden sm:block">Rápido e quentinho</p>
+              <p class="text-[11px] text-gray-400 hidden sm:block">Rápido e fresquinho</p>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
@@ -178,7 +178,7 @@
             type="text" 
             id="searchInput" 
             oninput="handleSearch(this.value)" 
-            placeholder="Buscar sabor..." 
+            placeholder="Buscar item..." 
             class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-yellow transition"
           />
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
@@ -189,7 +189,7 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- FOOTER (COM DIAS E HORÁRIOS DINÂMICOS DA NUVEM) -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-6xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -213,7 +213,7 @@
 
         <div>
           <h4 class="font-extrabold text-white uppercase tracking-wider text-xs mb-3">Horário de Atendimento</h4>
-          <ul class="text-xs space-y-1.5 text-neutral-400">
+          <ul id="footerScheduleList" class="text-xs space-y-1.5 text-neutral-400">
             <li class="flex justify-between"><span>Segunda a Quinta:</span><span class="text-white font-medium">18:00 às 23:00</span></li>
             <li class="flex justify-between"><span>Sexta e Sábado:</span><span class="text-white font-medium">18:00 às 00:00</span></li>
             <li class="flex justify-between"><span>Domingo:</span><span class="text-white font-medium">18:00 às 23:00</span></li>
@@ -275,7 +275,7 @@
           <input 
             type="text" 
             id="modalProductNotes" 
-            placeholder="Ex: Ponto da carne bem passado, sem cebola..." 
+            placeholder="Ex: Sem açúcar, ponto da carne..." 
             class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
           />
         </div>
@@ -466,7 +466,7 @@
           </div>
         </div>
 
-        <!-- 3. FORMAS DE PAGAMENTO (OCULTA AUTOMATICAMENTE QUANDO FOR MESA!) -->
+        <!-- 3. FORMAS DE PAGAMENTO (OCULTA QUANDO FOR MESA) -->
         <div id="paymentSectionBlock" class="pt-3 border-t border-gray-100">
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">3</span>
@@ -475,7 +475,6 @@
 
           <div id="paymentOptionsContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
 
-          <!-- CAMPO DE TROCO -->
           <div id="cashChangeArea" class="hidden mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
             <span class="font-bold text-gray-700 block">Precisa de troco?</span>
             <div class="flex items-center space-x-4">
@@ -497,7 +496,7 @@
 
         <div class="pt-3 border-t border-gray-100">
           <label class="block font-bold text-gray-700 mb-1">Observações do Pedido</label>
-          <input type="text" id="orderNotes" placeholder="Ex: Ponto da carne, sem cebola..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+          <input type="text" id="orderNotes" placeholder="Ex: Sem açúcar, sem gelo..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
         <!-- RESUMO FINAL -->
@@ -516,7 +515,6 @@
           </div>
         </div>
 
-        <!-- BOTÃO DE CONFIRMAÇÃO -->
         <button type="submit" id="btnSubmitOrder" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-4 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <i class="fa-brands fa-whatsapp text-lg"></i>
           <span id="btnSubmitText">CONFIRMAR E ENVIAR NO WHATSAPP</span>
@@ -698,6 +696,17 @@
         if (document.getElementById('footerStoreWhatsapp')) document.getElementById('footerStoreWhatsapp').innerText = storeConfig.whatsapp;
         if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
 
+        // ATUALIZA O RODAPÉ COM OS HORÁRIOS DA NUVEM
+        const scheduleList = document.getElementById('footerScheduleList');
+        if (scheduleList && Array.isArray(data.business_hours) && data.business_hours.length === 3) {
+          scheduleList.innerHTML = data.business_hours.map(item => `
+            <li class="flex justify-between">
+              <span>${item.days}</span>
+              <span class="text-white font-medium">${item.hours}</span>
+            </li>
+          `).join("");
+        }
+
         const feeBadge = document.getElementById('chkDeliveryFeeText');
         if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
@@ -725,9 +734,6 @@
       }
     }
 
-    // ========================================================
-    // RENDERIZAR OPÇÕES DE PAGAMENTO (OCULTA QUANDO FOR MESA)
-    // ========================================================
     function renderPaymentOptions() {
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const paymentSectionBlock = document.getElementById('paymentSectionBlock');
@@ -736,7 +742,6 @@
       if (!container || !paymentSectionBlock) return;
 
       if (orderType === 'dine_in') {
-        // QUANDO FOR MESA: OCULTA COMPLETAMENTE O BLOCO DE PAGAMENTO
         paymentSectionBlock.classList.add('hidden');
         cashArea.classList.add('hidden');
         container.innerHTML = `
@@ -764,7 +769,6 @@
           </label>
         `;
       } else {
-        // Delivery normal
         paymentSectionBlock.classList.remove('hidden');
         container.innerHTML = `
           <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
@@ -791,7 +795,6 @@
       }
     }
 
-    // ALTERNÂNCIA DE TIPO (DELIVERY, RETIRADA OU MESA)
     function handleOrderTypeChange() {
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const deliveryFields = document.getElementById("deliveryFieldsArea");
@@ -830,7 +833,6 @@
       else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
     }
 
-    // CÁLCULO DE FRETE
     function scheduleAutoCalculate() {
       clearTimeout(autoCalcTimeout);
       autoCalcTimeout = setTimeout(autoCalculateRouteDelivery, 600);
@@ -1205,7 +1207,6 @@
       }
     }
 
-    // ENVIO DO PEDIDO
     async function processOrderSubmission(e) {
       e.preventDefault();
 
@@ -1267,7 +1268,6 @@
         destinationType = `${tableNumber}`;
         deliveryAddressText = `${tableNumber} (Salão)`;
         deliveryDetailHeader = `🍽️ *CONSUMO NO LOCAL:* ${tableNumber.toUpperCase()}\n*Taxa:* Grátis (Na Mesa)`;
-        // DEFINIDO AUTOMATICAMENTE PARA MESA
         paymentDetails = "Acerto no Caixa ao Fechar a Conta";
       }
 
@@ -1280,9 +1280,8 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
-      // MENSAGEM DO WHATSAPP
       const message = 
-`🍔 *NOVO PEDIDO - ${storeConfig.name}*
+`☕ *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
 
 ${orderType === 'dine_in' ? `🍽️ *MESA:* ${deliveryAddressText.toUpperCase()}\n` : ''}👤 *CLIENTE:*
@@ -1308,7 +1307,6 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // REGISTRA NO SUPABASE
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
