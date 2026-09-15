@@ -150,8 +150,8 @@
           </button>
 
           <button onclick="navigateTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
-            <i class="fa-solid fa-chart-pie text-sm"></i>
-            <span class="flex-1 text-left">Visão Geral / Vendas</span>
+            <i class="fa-solid fa-cash-register text-sm"></i>
+            <span class="flex-1 text-left">Financeiro / Caixa</span>
           </button>
 
           <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
@@ -225,33 +225,148 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: DASHBOARD -->
+      <!-- ABA 2: MÓDULO FINANCEIRO REAL / FECHAMENTO DE CAIXA -->
       <section id="tab-dashboard" class="tab-content hidden">
-        <div class="mb-6">
-          <h2 class="text-2xl font-black text-white">Desempenho Comercial</h2>
-          <p class="text-xs text-gray-400">Métricas consolidadas (exclui pedidos cancelados)</p>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-white">Controle Financeiro & Fechamento de Caixa</h2>
+            <p class="text-xs text-gray-400">Resumo financeiro do turno atual, conciliação de pagamentos e histórico</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="printTodayClosingReceipt()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
+              <i class="fa-solid fa-print"></i>
+              <span>Imprimir Fechamento</span>
+            </button>
+            <button onclick="openCloseShiftModal()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-black px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg cursor-pointer">
+              <i class="fa-solid fa-lock"></i>
+              <span>Fechar o Dia / Caixa</span>
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- 3 CARDS PRINCIPAIS PROFISSIONAIS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
-            <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Líquido</span>
-            <h3 class="text-2xl font-black text-white mt-1" id="dashRevenue">R$ 0,00</h3>
-            <span class="text-[11px] text-emerald-400 font-bold">100% livre de taxas</span>
+            <span class="text-[11px] font-bold text-gray-400 uppercase">Faturamento Bruto</span>
+            <h3 class="text-3xl font-black text-emerald-400 mt-1" id="dashGrossRevenue">R$ 0,00</h3>
+            <span class="text-[11px] text-gray-400">Vendas válidas / concluídas</span>
           </div>
+
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
             <span class="text-[11px] font-bold text-gray-400 uppercase">Pedidos Válidos</span>
-            <h3 class="text-2xl font-black text-white mt-1" id="dashTotalCount">0</h3>
-            <span class="text-[11px] text-gray-400 font-medium">Cadastrados no dia</span>
+            <h3 class="text-3xl font-black text-white mt-1" id="dashValidCount">0</h3>
+            <span class="text-[11px] text-gray-400">Entregues ou em andamento</span>
           </div>
+
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
-            <span class="text-[11px] font-bold text-gray-400 uppercase">Ticket Médio</span>
-            <h3 class="text-2xl font-black text-white mt-1" id="dashAverageTicket">R$ 0,00</h3>
-            <span class="text-[11px] text-gray-400 font-medium">Por pedido</span>
+            <span class="text-[11px] font-bold text-rose-400 uppercase">Cancelamentos & Perdas</span>
+            <h3 class="text-3xl font-black text-rose-500 mt-1" id="dashCancelledLoss">R$ 0,00</h3>
+            <span class="text-[11px] text-rose-400 font-semibold" id="dashCancelledCount">0 pedidos cancelados</span>
           </div>
-          <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
-            <span class="text-[11px] font-bold text-gray-400 uppercase">Economia sem iFood</span>
-            <h3 class="text-2xl font-black text-brand-yellow mt-1" id="dashSavings">R$ 0,00</h3>
-            <span class="text-[11px] text-brand-yellow font-bold">Economizado pelo lojista</span>
+        </div>
+
+        <!-- BATE-CAIXA: DETALHAMENTO POR FORMA DE PAGAMENTO -->
+        <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-6">
+          <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
+            <i class="fa-solid fa-money-check-dollar"></i> Entradas por Meio de Pagamento (Bate-Caixa)
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
+              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-1"></i> Dinheiro no Caixa</span>
+              <p class="text-lg font-black text-white" id="dashCashTotal">R$ 0,00</p>
+              <span class="text-[10px] text-gray-500">Conferir na gaveta física</span>
+            </div>
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
+              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-brands fa-pix text-emerald-400 mr-1"></i> Pix</span>
+              <p class="text-lg font-black text-white" id="dashPixTotal">R$ 0,00</p>
+              <span class="text-[10px] text-gray-500">Conferir extrato bancário</span>
+            </div>
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
+              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-blue-400 mr-1"></i> Cartão Crédito</span>
+              <p class="text-lg font-black text-white" id="dashCreditTotal">R$ 0,00</p>
+              <span class="text-[10px] text-gray-500">Conferir relatório maquininha</span>
+            </div>
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
+              <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-purple-400 mr-1"></i> Cartão Débito</span>
+              <p class="text-lg font-black text-white" id="dashDebitTotal">R$ 0,00</p>
+              <span class="text-[10px] text-gray-500">Conferir relatório maquininha</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VENDAS POR CANAL (MESA VS DELIVERY VS BALCÃO) -->
+        <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 mb-8">
+          <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-4 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-simple"></i> Vendas por Canal de Atendimento
+          </h4>
+          <div class="grid grid-cols-3 gap-3 text-xs">
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800 text-center">
+              <span class="text-[11px] text-gray-400 block mb-0.5">🍽️ Salão (Mesas)</span>
+              <p class="text-lg font-black text-brand-yellow" id="dashChannelTable">R$ 0,00</p>
+            </div>
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800 text-center">
+              <span class="text-[11px] text-gray-400 block mb-0.5">🛵 Delivery</span>
+              <p class="text-lg font-black text-blue-400" id="dashChannelDelivery">R$ 0,00</p>
+            </div>
+            <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800 text-center">
+              <span class="text-[11px] text-gray-400 block mb-0.5">🏪 Balcão (Retirada)</span>
+              <p class="text-lg font-black text-emerald-400" id="dashChannelPickup">R$ 0,00</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTÓRICO DE FECHAMENTOS & VISÃO DO MÊS -->
+        <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <div>
+              <h4 class="text-sm font-black text-white">Histórico de Fechamentos & Consulta Mensal</h4>
+              <p class="text-[11px] text-gray-400">Auditoria de dias fechados anteriormente</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select id="selectMonthFilter" onchange="filterClosuresByMonth(this.value)" class="text-xs font-extrabold p-2 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none">
+                <!-- Gerado dinamicamente -->
+              </select>
+              <button onclick="printMonthlyReport()" class="bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold px-3 py-2 rounded-xl border border-neutral-700 transition cursor-pointer">
+                <i class="fa-solid fa-file-invoice mr-1"></i> Relatório Mês
+              </button>
+            </div>
+          </div>
+
+          <!-- RESUMO DO MÊS SELECIONADO -->
+          <div class="p-3.5 bg-neutral-900/80 rounded-xl border border-neutral-800 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <span class="text-gray-400 block text-[10px]">Faturamento Acumulado no Mês</span>
+              <p class="text-lg font-black text-emerald-400" id="monthTotalGross">R$ 0,00</p>
+            </div>
+            <div>
+              <span class="text-gray-400 block text-[10px]">Total de Pedidos no Mês</span>
+              <p class="text-lg font-black text-white" id="monthTotalOrders">0 pedidos</p>
+            </div>
+            <div>
+              <span class="text-gray-400 block text-[10px]">Perdas no Mês</span>
+              <p class="text-lg font-black text-rose-400" id="monthTotalLoss">R$ 0,00</p>
+            </div>
+          </div>
+
+          <!-- TABELA DE DIAS FECHADOS -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-neutral-900 text-[10px] text-gray-400 uppercase tracking-wider">
+                <tr>
+                  <th class="p-3">Data</th>
+                  <th class="p-3">Faturamento Bruto</th>
+                  <th class="p-3">Pedidos</th>
+                  <th class="p-3">Cancelados (Perdas)</th>
+                  <th class="p-3">Operador</th>
+                  <th class="p-3 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="closuresTableBody" class="divide-y divide-neutral-800">
+                <tr>
+                  <td colspan="6" class="p-4 text-center text-gray-500">Nenhum fechamento registrado ainda.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -304,7 +419,7 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 5: CONFIGURAÇÕES DA LOJA (COM DIAS E HORÁRIOS EDITÁVEIS) -->
+      <!-- ABA 5: CONFIGURAÇÕES DA LOJA -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
@@ -312,7 +427,6 @@
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
-          <!-- 1. IDENTIDADE E CONTATO -->
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Contato
@@ -335,7 +449,6 @@
             </div>
           </div>
 
-          <!-- 2. HORÁRIOS DE ATENDIMENTO EDITÁVEIS (DIAS E HORÁRIOS LIVRES) -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-clock"></i> Horário de Atendimento no Rodapé
@@ -343,51 +456,45 @@
             <p class="text-[11px] text-gray-400">Personalize os dias da semana e os horários de funcionamento do seu negócio</p>
 
             <div class="space-y-2.5">
-              <!-- LINHA 1 -->
               <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 1)</label>
-                  <input type="text" id="cfgDays1" value="Segunda a Quinta:" placeholder="Ex: Segunda a Sexta:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  <input type="text" id="cfgDays1" value="Segunda a Quinta:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                 </div>
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
-                  <input type="text" id="cfgHours1" value="18:00 às 23:00" placeholder="Ex: 08:00 às 18:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                  <input type="text" id="cfgHours1" value="18:00 às 23:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
                 </div>
               </div>
 
-              <!-- LINHA 2 -->
               <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 2)</label>
-                  <input type="text" id="cfgDays2" value="Sexta e Sábado:" placeholder="Ex: Sábado:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  <input type="text" id="cfgDays2" value="Sexta e Sábado:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                 </div>
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
-                  <input type="text" id="cfgHours2" value="18:00 às 00:00" placeholder="Ex: 08:00 às 14:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                  <input type="text" id="cfgHours2" value="18:00 às 00:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
                 </div>
               </div>
 
-              <!-- LINHA 3 -->
               <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 3)</label>
-                  <input type="text" id="cfgDays3" value="Domingo:" placeholder="Ex: Domingo:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+                  <input type="text" id="cfgDays3" value="Domingo:" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white font-bold" required />
                 </div>
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Horário</label>
-                  <input type="text" id="cfgHours3" value="18:00 às 23:00" placeholder="Ex: Fechado" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
+                  <input type="text" id="cfgHours3" value="18:00 às 23:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 3. FRETE POR KM -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
             </h3>
-            <p class="text-[11px] text-gray-400">Configure até 4 faixas de distância para o cálculo automático</p>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 1</span>
@@ -459,13 +566,115 @@
     </main>
   </div>
 
-  <!-- MODAL DE CATEGORIAS -->
+  <!-- MODAL: RECEBER / BAIXAR PEDIDO COM FORMA DE PAGAMENTO REAL -->
+  <div id="paymentSettlementModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border-2 border-brand-yellow shadow-2xl text-xs">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h3 class="text-base font-black text-white">Baixar / Receber Pedido</h3>
+          <p class="text-[11px] text-gray-400" id="settleOrderSubtitle">Pedido #----</p>
+        </div>
+        <button onclick="closePaymentSettlementModal()" class="text-gray-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4 text-center">
+        <span class="text-[11px] text-gray-400 font-bold block">Valor Total a Receber:</span>
+        <h4 class="text-2xl font-black text-brand-yellow mt-0.5" id="settleOrderAmount">R$ 0,00</h4>
+        <span class="text-[10px] text-gray-400 block mt-1" id="settleOrderOriginalPayment">Original: ---</span>
+      </div>
+
+      <p class="text-[11px] font-black text-gray-300 uppercase tracking-wider mb-2 text-center">Como o cliente pagou de verdade?</p>
+      
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button onclick="confirmOrderPayment('Pix')" class="p-3 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/80 text-emerald-300 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
+          <i class="fa-brands fa-pix text-lg"></i>
+          <span>PIX</span>
+        </button>
+
+        <button onclick="confirmOrderPayment('Dinheiro')" class="p-3 bg-neutral-900 hover:bg-neutral-800 border border-emerald-500/60 text-emerald-400 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
+          <i class="fa-solid fa-money-bill-wave text-lg"></i>
+          <span>DINHEIRO</span>
+        </button>
+
+        <button onclick="confirmOrderPayment('Cartão de Crédito')" class="p-3 bg-blue-950/80 hover:bg-blue-900 border border-blue-600/80 text-blue-300 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
+          <i class="fa-solid fa-credit-card text-lg"></i>
+          <span>CRÉDITO</span>
+        </button>
+
+        <button onclick="confirmOrderPayment('Cartão de Débito')" class="p-3 bg-purple-950/80 hover:bg-purple-900 border border-purple-600/80 text-purple-300 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
+          <i class="fa-solid fa-credit-card text-lg"></i>
+          <span>DÉBITO</span>
+        </button>
+      </div>
+
+      <button onclick="closePaymentSettlementModal()" class="w-full bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition text-xs cursor-pointer">
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: FECHAR O DIA / CAIXA -->
+  <div id="closeShiftModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border-2 border-rose-500 shadow-2xl text-xs">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h3 class="text-base font-black text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-lock text-rose-500"></i> Fechamento de Turno / Caixa
+          </h3>
+          <p class="text-[11px] text-gray-400" id="closeShiftDateText">Data de hoje</p>
+        </div>
+        <button onclick="closeCloseShiftModal()" class="text-gray-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2 p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4">
+        <div class="flex justify-between text-gray-300">
+          <span>Faturamento Bruto:</span>
+          <strong class="text-emerald-400 text-sm font-black" id="closeShiftGross">R$ 0,00</strong>
+        </div>
+        <div class="flex justify-between text-gray-300">
+          <span>Pedidos Concluídos:</span>
+          <strong class="text-white font-bold" id="closeShiftOrders">0</strong>
+        </div>
+        <div class="flex justify-between text-gray-300">
+          <span>Perdas / Cancelados:</span>
+          <strong class="text-rose-400 font-bold" id="closeShiftLoss">R$ 0,00</strong>
+        </div>
+        <div class="pt-2 border-t border-neutral-800 grid grid-cols-2 gap-1.5 text-[11px] text-gray-400">
+          <span>💵 Dinheiro: <strong class="text-white" id="closeShiftCash">R$ 0,00</strong></span>
+          <span>🟢 Pix: <strong class="text-white" id="closeShiftPix">R$ 0,00</strong></span>
+          <span>🔵 Crédito: <strong class="text-white" id="closeShiftCredit">R$ 0,00</strong></span>
+          <span>🟣 Débito: <strong class="text-white" id="closeShiftDebit">R$ 0,00</strong></span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block font-bold text-gray-300 mb-1">Nome do Operador / Caixa</label>
+        <input type="text" id="closeShiftOperator" value="Gerente" class="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-bold" required />
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeCloseShiftModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-3 rounded-xl transition cursor-pointer">
+          Voltar
+        </button>
+        <button onclick="confirmCloseShift()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-3 rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>Confirmar e Fechar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GERENCIAR CATEGORIAS -->
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
         <div>
           <h3 class="text-base font-black text-white">Gerenciar Categorias</h3>
-          <p class="text-[11px] text-gray-400">Adicione, edite ou exclua categorias do cardápio</p>
+          <p class="text-[11px] text-gray-400">Adicione, edite ou exclua categorias</p>
         </div>
         <button onclick="closeCategoryManagerModal()" class="text-gray-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -487,7 +696,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE PRODUTO -->
+  <!-- MODAL DE PRODUTO COM FOTO -->
   <div id="productEditModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 sm:p-7 rounded-3xl max-w-lg w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[92vh]">
       <div class="flex justify-between items-center mb-4">
@@ -527,12 +736,12 @@
 
         <div>
           <label class="block font-bold text-gray-300 mb-1">Nome do Produto *</label>
-          <input type="text" id="prodName" placeholder="Ex: Café Expresso Duplo" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
+          <input type="text" id="prodName" placeholder="Ex: Café Especial" required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white" />
         </div>
 
         <div>
           <label class="block font-bold text-gray-300 mb-1">Descrição do Produto *</label>
-          <textarea id="prodDesc" rows="2" placeholder="Ex: Grãos especiais moídos na hora." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white resize-none"></textarea>
+          <textarea id="prodDesc" rows="2" placeholder="Ex: Grãos selecionados." required class="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white resize-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -554,7 +763,7 @@
     </div>
   </div>
 
-  <!-- ÁREA DE IMPRESSÃO TÉRMICA DE COMANDA -->
+  <!-- ÁREA DE IMPRESSÃO TÉRMICA (COMANDAS E FECHAMENTO DE CAIXA) -->
   <div id="printableReceipt" class="hidden"></div>
 
   <!-- ÁREA DE IMPRESSÃO DAS PLACAS DE MESA -->
@@ -571,7 +780,9 @@
     window.storeCategories = [];
     window.storeProducts = [];
     window.storeOrders = [];
+    window.dailyClosures = [];
     window.isStoreOpen = true;
+    window.currentSettleOrderId = null;
 
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
@@ -603,7 +814,8 @@
         fetchCategories(),
         fetchProducts(),
         fetchOrders(),
-        fetchSettings()
+        fetchSettings(),
+        fetchClosures()
       ]);
       generateTableCards();
     }
@@ -633,6 +845,15 @@
       }
     }
 
+    async function fetchClosures() {
+      const { data } = await db.from('daily_closures').select('*').order('closed_at', { ascending: false });
+      if (data) {
+        window.dailyClosures = data;
+        populateMonthSelector();
+        renderClosuresTable();
+      }
+    }
+
     async function fetchSettings() {
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       if (data) {
@@ -644,19 +865,15 @@
         if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
         if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
 
-        // CARREGA HORÁRIOS DE ATENDIMENTO
         if (Array.isArray(data.business_hours) && data.business_hours.length === 3) {
           document.getElementById('cfgDays1').value = data.business_hours[0].days;
           document.getElementById('cfgHours1').value = data.business_hours[0].hours;
-
           document.getElementById('cfgDays2').value = data.business_hours[1].days;
           document.getElementById('cfgHours2').value = data.business_hours[1].hours;
-
           document.getElementById('cfgDays3').value = data.business_hours[2].days;
           document.getElementById('cfgHours3').value = data.business_hours[2].hours;
         }
 
-        // CARREGA FAIXAS DE KM
         const tiers = Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4
           ? data.delivery_tiers
           : [
@@ -693,6 +910,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .subscribe();
     }
 
@@ -726,7 +944,7 @@
       if (isTableOrder(ord)) {
         const tableTxt = formatTableNumber(ord);
         return `
-          <span class="bg-amber-400 text-neutral-950 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md border border-amber-300 uppercase tracking-wide animate-pulse">
+          <span class="bg-amber-400 text-neutral-950 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md border border-amber-300 uppercase tracking-wide">
             <i class="fa-solid fa-utensils text-sm"></i>
             <span>${tableTxt}</span>
           </span>
@@ -751,6 +969,614 @@
       `;
     }
 
+    // ========================================================
+    // BAIXA DE PEDIDOS COM FORMA DE PAGAMENTO REAL
+    // ========================================================
+    function openPaymentSettlementModal(orderId) {
+      const ord = window.storeOrders.find(o => o.id === orderId);
+      if (!ord) return;
+
+      window.currentSettleOrderId = orderId;
+      document.getElementById('settleOrderSubtitle').innerText = `Pedido #${ord.id} • ${ord.client}`;
+      document.getElementById('settleOrderAmount').innerText = `R$ ${Number(ord.total).toFixed(2).replace('.', ',')}`;
+      document.getElementById('settleOrderOriginalPayment').innerText = `Informado: ${ord.payment || 'A Combinar'}`;
+
+      document.getElementById('paymentSettlementModal').classList.remove('hidden');
+    }
+
+    function closePaymentSettlementModal() {
+      document.getElementById('paymentSettlementModal').classList.add('hidden');
+      window.currentSettleOrderId = null;
+    }
+
+    async function confirmOrderPayment(chosenMethod) {
+      if (!window.currentSettleOrderId) return;
+      const orderId = window.currentSettleOrderId;
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      await db.from('orders').update({
+        status: 'Entregue',
+        payment: chosenMethod,
+        delivered_at: nowTime
+      }).eq('id', orderId);
+
+      closePaymentSettlementModal();
+      await fetchOrders();
+      showToast("Pedido Concluído!", `Pedido #${orderId} baixado como ${chosenMethod}.`);
+    }
+
+    // ========================================================
+    // MÓDULO FINANCEIRO: CÁLCULOS EXATOS DO TURNO
+    // ========================================================
+    function calculateShiftMetrics() {
+      const validOrders = window.storeOrders.filter(o => o.status !== "Cancelado");
+      const cancelledOrders = window.storeOrders.filter(o => o.status === "Cancelado");
+
+      const grossRevenue = validOrders.reduce((acc, o) => acc + Number(o.total || 0), 0);
+      const validCount = validOrders.length;
+      const cancelledCount = cancelledOrders.length;
+      const cancelledLoss = cancelledOrders.reduce((acc, o) => acc + Number(o.total || 0), 0);
+
+      let cash = 0, pix = 0, credit = 0, debit = 0;
+      validOrders.forEach(o => {
+        const p = (o.payment || '').toLowerCase();
+        const val = Number(o.total || 0);
+        if (p.includes('pix')) pix += val;
+        else if (p.includes('crédito') || p.includes('credito')) credit += val;
+        else if (p.includes('débito') || p.includes('debito')) debit += val;
+        else if (p.includes('dinheiro')) cash += val;
+        else cash += val;
+      });
+
+      let table = 0, delivery = 0, pickup = 0;
+      validOrders.forEach(o => {
+        const val = Number(o.total || 0);
+        if (isTableOrder(o)) table += val;
+        else if ((o.type || '').toLowerCase().includes('retirada') || (o.address || '').toLowerCase().includes('balcão')) pickup += val;
+        else delivery += val;
+      });
+
+      return {
+        grossRevenue,
+        validCount,
+        cancelledCount,
+        cancelledLoss,
+        cash, pix, credit, debit,
+        table, delivery, pickup
+      };
+    }
+
+    function updateDashboardMetrics() {
+      const m = calculateShiftMetrics();
+
+      // Cards Principais
+      document.getElementById("dashGrossRevenue").innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashValidCount").innerText = `${m.validCount} pedidos`;
+      document.getElementById("dashCancelledLoss").innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashCancelledCount").innerText = `${m.cancelledCount} pedido(s) cancelado(s)`;
+
+      // Bate-Caixa (Formas de Pagamento)
+      document.getElementById("dashCashTotal").innerText = `R$ ${m.cash.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashPixTotal").innerText = `R$ ${m.pix.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashCreditTotal").innerText = `R$ ${m.credit.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashDebitTotal").innerText = `R$ ${m.debit.toFixed(2).replace('.', ',')}`;
+
+      // Canais
+      document.getElementById("dashChannelTable").innerText = `R$ ${m.table.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashChannelDelivery").innerText = `R$ ${m.delivery.toFixed(2).replace('.', ',')}`;
+      document.getElementById("dashChannelPickup").innerText = `R$ ${m.pickup.toFixed(2).replace('.', ',')}`;
+    }
+
+    // ========================================================
+    // FECHAMENTO DO DIA / CAIXA
+    // ========================================================
+    function openCloseShiftModal() {
+      const m = calculateShiftMetrics();
+      const todayStr = new Date().toLocaleDateString('pt-BR');
+
+      document.getElementById('closeShiftDateText').innerText = `Turno de hoje • ${todayStr}`;
+      document.getElementById('closeShiftGross').innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
+      document.getElementById('closeShiftOrders').innerText = `${m.validCount} pedidos válidos`;
+      document.getElementById('closeShiftLoss').innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')} (${m.cancelledCount} cancelados)`;
+
+      document.getElementById('closeShiftCash').innerText = `R$ ${m.cash.toFixed(2).replace('.', ',')}`;
+      document.getElementById('closeShiftPix').innerText = `R$ ${m.pix.toFixed(2).replace('.', ',')}`;
+      document.getElementById('closeShiftCredit').innerText = `R$ ${m.credit.toFixed(2).replace('.', ',')}`;
+      document.getElementById('closeShiftDebit').innerText = `R$ ${m.debit.toFixed(2).replace('.', ',')}`;
+
+      document.getElementById('closeShiftModal').classList.remove('hidden');
+    }
+
+    function closeCloseShiftModal() {
+      document.getElementById('closeShiftModal').classList.add('hidden');
+    }
+
+    async function confirmCloseShift() {
+      const m = calculateShiftMetrics();
+      const todayStr = new Date().toLocaleDateString('pt-BR');
+      const closureId = `FC-${Date.now().toString().slice(-6)}`;
+      const operator = document.getElementById('closeShiftOperator').value.trim() || 'Gerente';
+
+      const closureData = {
+        id: closureId,
+        date: todayStr,
+        gross_revenue: m.grossRevenue,
+        total_orders: m.validCount,
+        cancelled_orders: m.cancelledCount,
+        cancelled_amount: m.cancelledLoss,
+        payment_breakdown: {
+          dinheiro: m.cash,
+          pix: m.pix,
+          credito: m.credit,
+          debito: m.debit
+        },
+        channel_breakdown: {
+          salao: m.table,
+          delivery: m.delivery,
+          balcao: m.pickup
+        },
+        operator: operator
+      };
+
+      const { error } = await db.from('daily_closures').insert([closureData]);
+
+      if (error) {
+        showToast("Erro ao Fechar", error.message, true);
+      } else {
+        closeCloseShiftModal();
+        await fetchClosures();
+        showToast("Caixa Fechado!", `Fechamento ${closureId} gravado com sucesso!`);
+        printClosureReportObject(closureData);
+      }
+    }
+
+    // ========================================================
+    // IMPRESSÃO DO FECHAMENTO DE CAIXA (CUPOM 80MM)
+    // ========================================================
+    function printTodayClosingReceipt() {
+      const m = calculateShiftMetrics();
+      const todayStr = new Date().toLocaleDateString('pt-BR');
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      printClosureReportObject({
+        id: 'PREVIA',
+        date: `${todayStr} às ${nowTime}`,
+        gross_revenue: m.grossRevenue,
+        total_orders: m.validCount,
+        cancelled_orders: m.cancelledCount,
+        cancelled_amount: m.cancelledLoss,
+        payment_breakdown: { dinheiro: m.cash, pix: m.pix, credito: m.credit, debito: m.debit },
+        channel_breakdown: { salao: m.table, delivery: m.delivery, balcao: m.pickup },
+        operator: document.getElementById('closeShiftOperator')?.value || 'Gerente'
+      });
+    }
+
+    function printClosureReportObject(data) {
+      const receiptArea = document.getElementById("printableReceipt");
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+
+      receiptArea.innerHTML = `
+        <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${storeName}</h2>
+          <p style="margin: 2px 0; font-size: 13px; font-weight: bold;">FECHAMENTO DE CAIXA / DIA</p>
+          <p style="margin: 2px 0; font-size: 11px;">Data: ${data.date}</p>
+          <p style="margin: 2px 0; font-size: 11px;">Operador: ${data.operator}</p>
+        </div>
+
+        <div style="font-size: 12px; margin-bottom: 8px;">
+          <p style="margin: 3px 0; display:flex; justify-content:space-between;">
+            <span>FATURAMENTO BRUTO:</span>
+            <strong style="font-size: 14px;">R$ ${Number(data.gross_revenue).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 3px 0; display:flex; justify-content:space-between;">
+            <span>PEDIDOS CONCLUÍDOS:</span>
+            <strong>${data.total_orders}</strong>
+          </p>
+          <p style="margin: 3px 0; display:flex; justify-content:space-between; color: #555;">
+            <span>CANCELADOS (PERDAS):</span>
+            <strong>${data.cancelled_orders} (R$ ${Number(data.cancelled_amount).toFixed(2).replace('.', ',')})</strong>
+          </p>
+        </div>
+
+        <div style="border-top: 1px dashed #000; padding-top: 6px; margin-bottom: 8px; font-size: 11px;">
+          <p style="margin: 0 0 4px 0; font-weight: bold;">BATE-CAIXA (FORMAS DE PAGAMENTO):</p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Dinheiro no Caixa:</span>
+            <strong>R$ ${Number(data.payment_breakdown?.dinheiro || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Pix (Banco):</span>
+            <strong>R$ ${Number(data.payment_breakdown?.pix || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Cartão Crédito:</span>
+            <strong>R$ ${Number(data.payment_breakdown?.credito || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Cartão Débito:</span>
+            <strong>R$ ${Number(data.payment_breakdown?.debito || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+        </div>
+
+        <div style="border-top: 1px dashed #000; padding-top: 6px; margin-bottom: 12px; font-size: 11px;">
+          <p style="margin: 0 0 4px 0; font-weight: bold;">VENDAS POR CANAL:</p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Salão (Mesas):</span>
+            <strong>R$ ${Number(data.channel_breakdown?.salao || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Delivery:</span>
+            <strong>R$ ${Number(data.channel_breakdown?.delivery || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>• Balcão:</span>
+            <strong>R$ ${Number(data.channel_breakdown?.balcao || 0).toFixed(2).replace('.', ',')}</strong>
+          </p>
+        </div>
+
+        <div style="text-align:center; border-top: 1px dashed #000; padding-top: 18px; font-size: 11px;">
+          <p style="margin: 0 0 25px 0;">Assinatura do Responsável:</p>
+          <p style="margin: 0; border-top: 1px solid #000; display: inline-block; width: 75%;">
+            ${data.operator}
+          </p>
+        </div>
+      `;
+
+      receiptArea.classList.remove("hidden");
+      window.print();
+      receiptArea.classList.add("hidden");
+    }
+
+    // ========================================================
+    // TABELA DE DIAS FECHADOS & FECHAMENTO DO MÊS
+    // ========================================================
+    function populateMonthSelector() {
+      const select = document.getElementById('selectMonthFilter');
+      if (!select) return;
+
+      const monthsMap = new Set();
+      window.dailyClosures.forEach(c => {
+        if (c.closed_at) {
+          const dt = new Date(c.closed_at);
+          const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+          monthsMap.add(key);
+        }
+      });
+
+      const currentDt = new Date();
+      const currentKey = `${currentDt.getFullYear()}-${String(currentDt.getMonth() + 1).padStart(2, '0')}`;
+      monthsMap.add(currentKey);
+
+      select.innerHTML = Array.from(monthsMap).sort().reverse().map(k => {
+        const [y, m] = k.split('-');
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const label = `${monthNames[parseInt(m) - 1]} de ${y}`;
+        return `<option value="${k}">${label}</option>`;
+      }).join("");
+
+      filterClosuresByMonth(select.value);
+    }
+
+    function filterClosuresByMonth(monthKey) {
+      if (!monthKey) return;
+      const [year, month] = monthKey.split('-');
+
+      const filtered = window.dailyClosures.filter(c => {
+        if (!c.closed_at) return false;
+        const dt = new Date(c.closed_at);
+        return dt.getFullYear() === parseInt(year) && (dt.getMonth() + 1) === parseInt(month);
+      });
+
+      const totalGross = filtered.reduce((acc, c) => acc + Number(c.gross_revenue || 0), 0);
+      const totalOrders = filtered.reduce((acc, c) => acc + Number(c.total_orders || 0), 0);
+      const totalLoss = filtered.reduce((acc, c) => acc + Number(c.cancelled_amount || 0), 0);
+
+      document.getElementById('monthTotalGross').innerText = `R$ ${totalGross.toFixed(2).replace('.', ',')}`;
+      document.getElementById('monthTotalOrders').innerText = `${totalOrders} pedidos`;
+      document.getElementById('monthTotalLoss').innerText = `R$ ${totalLoss.toFixed(2).replace('.', ',')}`;
+
+      renderClosuresTable(filtered);
+    }
+
+    function renderClosuresTable(list = window.dailyClosures) {
+      const tbody = document.getElementById('closuresTableBody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum fechamento registrado para este mês.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(c => `
+        <tr class="hover:bg-neutral-900/60 transition">
+          <td class="p-3 font-bold text-white">${c.date}</td>
+          <td class="p-3 font-black text-emerald-400">R$ ${Number(c.gross_revenue).toFixed(2).replace('.', ',')}</td>
+          <td class="p-3 font-bold text-gray-300">${c.total_orders}</td>
+          <td class="p-3 font-semibold text-rose-400">${c.cancelled_orders} (R$ ${Number(c.cancelled_amount).toFixed(2).replace('.', ',')})</td>
+          <td class="p-3 text-gray-400">${c.operator || 'Gerente'}</td>
+          <td class="p-3 text-right">
+            <button onclick='printClosureReportObject(${JSON.stringify(c)})' class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold text-[11px] transition cursor-pointer">
+              <i class="fa-solid fa-print mr-1"></i> Reimprimir
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function printMonthlyReport() {
+      const select = document.getElementById('selectMonthFilter');
+      const label = select.options[select.selectedIndex]?.text || 'Mês';
+      const totalGross = document.getElementById('monthTotalGross').innerText;
+      const totalOrders = document.getElementById('monthTotalOrders').innerText;
+      const totalLoss = document.getElementById('monthTotalLoss').innerText;
+      const storeName = document.getElementById('cfgName').value || 'PHSUBLIME FOOD';
+
+      const receiptArea = document.getElementById("printableReceipt");
+      receiptArea.innerHTML = `
+        <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${storeName}</h2>
+          <p style="margin: 2px 0; font-size: 13px; font-weight: bold;">CONSOLIDAÇÃO MENSAL</p>
+          <p style="margin: 2px 0; font-size: 11px;">Período: ${label}</p>
+        </div>
+
+        <div style="font-size: 12px; margin-bottom: 12px;">
+          <p style="margin: 4px 0; display:flex; justify-content:space-between;">
+            <span>TOTAL FATURADO NO MÊS:</span>
+            <strong style="font-size: 14px;">${totalGross}</strong>
+          </p>
+          <p style="margin: 4px 0; display:flex; justify-content:space-between;">
+            <span>PEDIDOS CONCLUÍDOS:</span>
+            <strong>${totalOrders}</strong>
+          </p>
+          <p style="margin: 4px 0; display:flex; justify-content:space-between; color: #555;">
+            <span>TOTAL DE PERDAS NO MÊS:</span>
+            <strong>${totalLoss}</strong>
+          </p>
+        </div>
+
+        <div style="text-align:center; border-top: 1px dashed #000; padding-top: 10px; font-size: 10px;">
+          <p style="margin:0;">Relatório Gerencial • PHSUBLIME</p>
+        </div>
+      `;
+
+      receiptArea.classList.remove("hidden");
+      window.print();
+      receiptArea.classList.add("hidden");
+    }
+
+    // ========================================================
+    // RENDERIZAR PEDIDOS
+    // ========================================================
+    function setOrderFilter(filter) {
+      window.activeFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer";
+      });
+      document.getElementById(`filterBtn-${filter}`).className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const container = document.getElementById("ordersContainer");
+      const badge = document.getElementById("badgeLiveOrders");
+      if (!container) return;
+
+      const totalCount = window.storeOrders.length;
+      const abertosCount = window.storeOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
+      const mesasCount = window.storeOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
+      const entreguesCount = window.storeOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
+      const canceladosCount = window.storeOrders.filter(o => o.status === "Cancelado").length;
+
+      document.getElementById("countFilterTodos").innerText = totalCount;
+      document.getElementById("countFilterAbertos").innerText = abertosCount;
+      if (document.getElementById("countFilterMesas")) document.getElementById("countFilterMesas").innerText = mesasCount;
+      document.getElementById("countFilterEntregues").innerText = entreguesCount;
+      document.getElementById("countFilterCancelados").innerText = canceladosCount;
+      badge.innerText = abertosCount;
+
+      let list = [...window.storeOrders];
+      if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
+      else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
+      else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
+      else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
+            <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
+            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(ord => {
+        const isEntregue = ord.status === "Entregue" || ord.status === "Finalizado";
+        const isCancelado = ord.status === "Cancelado";
+        const isMesa = isTableOrder(ord);
+
+        let cardBg = isMesa && !isEntregue && !isCancelado
+          ? 'bg-[#1f1a10] border-2 border-brand-yellow/80 shadow-xl' 
+          : isEntregue 
+            ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
+            : isCancelado 
+              ? 'bg-[#271616] border-rose-900/60 opacity-90' 
+              : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
+
+        return `
+          <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm font-black text-brand-yellow">#${ord.id}</span>
+                  ${
+                    isCancelado
+                      ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
+                      : isEntregue 
+                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Concluído ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
+                        : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
+                  }
+                </div>
+
+                <div>
+                  ${renderOrderDestinationBadge(ord)}
+                </div>
+              </div>
+
+              <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
+              <p class="text-xs text-gray-400 mb-3">${ord.phone || 'Sem telefone'}</p>
+
+              <div class="p-3 bg-neutral-900/90 rounded-xl text-xs mb-3 space-y-1.5 border border-neutral-800">
+                <p class="font-bold text-gray-200 text-sm">${ord.items}</p>
+                ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
+                <p class="text-[11px] text-gray-400">
+                  <i class="${isMesa ? 'fa-solid fa-utensils text-brand-yellow' : 'fa-solid fa-location-dot text-brand-red'} mr-1"></i> 
+                  ${isMesa ? formatTableNumber(ord) + ' (Consumo no Salão)' : ord.address}
+                </p>
+                <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">
+                  Pagamento: <strong class="text-emerald-400">${ord.payment}</strong>
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs text-gray-400 font-bold">Total do Pedido:</span>
+                <span class="text-lg font-black ${isCancelado ? 'line-through text-gray-500' : 'text-brand-yellow'}">R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
+              </div>
+
+              <select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
+                <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
+                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Preparando</option>
+                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto / Servir</option>
+                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu para Entrega</option>
+                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Concluído / Entregue</option>
+                <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
+              </select>
+
+              <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
+                <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                  <i class="fa-solid fa-print"></i>
+                  <span>Comanda</span>
+                </button>
+
+                ${
+                  isCancelado 
+                    ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                         <i class="fa-solid fa-rotate-left"></i>
+                         <span>Reativar</span>
+                       </button>`
+                    : isEntregue 
+                      ? `<button onclick="openPaymentSettlementModal('${ord.id}')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                           <i class="fa-solid fa-check-double"></i>
+                           <span>Alterar Pgto</span>
+                         </button>`
+                      : `<button onclick="openPaymentSettlementModal('${ord.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
+                           <i class="fa-solid fa-check"></i>
+                           <span>Baixar</span>
+                         </button>
+                         <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                           <i class="fa-solid fa-ban"></i>
+                           <span>Cancelar</span>
+                         </button>`
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function changeOrderStatus(id, newStatus) {
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      await db.from('orders').update({
+        status: newStatus,
+        delivered_at: newStatus === 'Entregue' ? nowTime : null
+      }).eq('id', id);
+      await fetchOrders();
+      showToast("Status Atualizado", `Pedido #${id} marcado como ${newStatus}.`);
+    }
+
+    function printReceipt(orderId) {
+      const ord = window.storeOrders.find(o => o.id === orderId);
+      if (!ord) return;
+      const receiptArea = document.getElementById("printableReceipt");
+      const isMesa = isTableOrder(ord);
+
+      receiptArea.innerHTML = `
+        <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+          <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
+          <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
+          <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
+          
+          <div style="margin: 8px 0; padding: 6px; background: #000; color: #fff; border-radius: 4px;">
+            <span style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">
+              ${isMesa ? `🍽️ ${formatTableNumber(ord)}` : '🛵 ENTREGA DELIVERY'}
+            </span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 8px; font-size: 11px;">
+          <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
+          <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
+          <p style="margin: 2px 0; font-size: 13px;"><strong>DESTINO:</strong> <span style="font-weight:900;">${isMesa ? formatTableNumber(ord) : ord.type.toUpperCase()}</span></p>
+          <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
+          ${ord.phone ? `<p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>` : ''}
+          ${!isMesa ? `<p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>` : ''}
+        </div>
+
+        <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0; margin-bottom: 8px;">
+          <p style="margin: 0 0 4px 0; font-weight: bold;">ITENS DO PEDIDO:</p>
+          <p style="margin: 0; font-size: 13px; font-weight: bold; white-space: pre-line;">${ord.items}</p>
+        </div>
+
+        ${ord.notes ? `
+          <div style="margin-bottom: 8px; font-size: 11px;">
+            <p style="margin: 0;"><strong>OBSERVAÇÕES:</strong></p>
+            <p style="margin: 0; font-style: italic;">${ord.notes}</p>
+          </div>
+        ` : ''}
+
+        <div style="border-top: 1px dashed #000; padding-top: 6px; font-size: 12px;">
+          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
+            <span>PAGAMENTO:</span>
+            <strong>${ord.payment}</strong>
+          </p>
+          <p style="margin: 4px 0 0 0; font-size: 15px; font-weight: 900; display:flex; justify-content:space-between;">
+            <span>TOTAL:</span>
+            <span>R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
+          </p>
+        </div>
+
+        <div style="text-align:center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 8px; font-size: 10px;">
+          <p style="margin:0;">Sistema de Comandas • PHSUBLIME</p>
+          <p style="margin:0;">Obrigado pela preferência!</p>
+        </div>
+      `;
+
+      receiptArea.classList.remove("hidden");
+      window.print();
+      receiptArea.classList.add("hidden");
+    }
+
+    function playOrderChime() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // GERAÇÃO DE PLACAS DE MESA
+    // ========================================================
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       const container = document.getElementById('tableCardsGrid');
@@ -817,7 +1643,9 @@
       printArea.classList.add('hidden');
     }
 
-    // CATEGORIAS
+    // ========================================================
+    // GERENCIAMENTO DE CATEGORIAS
+    // ========================================================
     function openCategoryManagerModal() {
       renderCategoriesList();
       document.getElementById("categoryManagerModal").classList.remove("hidden");
@@ -894,7 +1722,9 @@
       }
     }
 
-    // PRODUTOS
+    // ========================================================
+    // GERENCIAMENTO DE PRODUTOS
+    // ========================================================
     function renderProductsList() {
       const container = document.getElementById("adminProductTable");
       if (!container) return;
@@ -1082,246 +1912,9 @@
       showToast("Produto Salvo com Sucesso!", `${name} foi atualizado no banco de dados na nuvem.`);
     }
 
-    // FILA DE PEDIDOS
-    function setOrderFilter(filter) {
-      window.activeFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 hover:text-white transition cursor-pointer";
-      });
-      document.getElementById(`filterBtn-${filter}`).className = "filter-btn text-xs font-bold px-4 py-2 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
-      renderOrders();
-    }
-
-    function renderOrders() {
-      const container = document.getElementById("ordersContainer");
-      const badge = document.getElementById("badgeLiveOrders");
-      if (!container) return;
-
-      const totalCount = window.storeOrders.length;
-      const abertosCount = window.storeOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
-      const mesasCount = window.storeOrders.filter(o => isTableOrder(o) && o.status !== "Entregue" && o.status !== "Cancelado").length;
-      const entreguesCount = window.storeOrders.filter(o => o.status === "Entregue" || o.status === "Finalizado").length;
-      const canceladosCount = window.storeOrders.filter(o => o.status === "Cancelado").length;
-
-      document.getElementById("countFilterTodos").innerText = totalCount;
-      document.getElementById("countFilterAbertos").innerText = abertosCount;
-      if (document.getElementById("countFilterMesas")) document.getElementById("countFilterMesas").innerText = mesasCount;
-      document.getElementById("countFilterEntregues").innerText = entreguesCount;
-      document.getElementById("countFilterCancelados").innerText = canceladosCount;
-      badge.innerText = abertosCount;
-
-      let list = [...window.storeOrders];
-      if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
-      else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
-      else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
-      else if (window.activeFilter === 'cancelados') list = list.filter(o => o.status === "Cancelado");
-
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
-            <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
-            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = list.map(ord => {
-        const isEntregue = ord.status === "Entregue" || ord.status === "Finalizado";
-        const isCancelado = ord.status === "Cancelado";
-        const isMesa = isTableOrder(ord);
-
-        let cardBg = isMesa && !isEntregue && !isCancelado
-          ? 'bg-[#1f1a10] border-2 border-brand-yellow/80 shadow-xl' 
-          : isEntregue 
-            ? 'bg-[#18241C] border-emerald-900/60 opacity-95' 
-            : isCancelado 
-              ? 'bg-[#271616] border-rose-900/60 opacity-90' 
-              : 'bg-brand-dark border-neutral-800 hover:border-neutral-700';
-
-        return `
-          <div class="rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition ${cardBg}">
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center space-x-2">
-                  <span class="text-sm font-black text-brand-yellow">#${ord.id}</span>
-                  ${
-                    isCancelado
-                      ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-ban"></i> Cancelado</span>`
-                      : isEntregue 
-                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-md"><i class="fa-solid fa-check-double"></i> Concluído ${ord.delivered_at ? `(${ord.delivered_at})` : ''}</span>`
-                        : `<span class="text-[10px] text-gray-400 font-semibold bg-neutral-900 px-2 py-0.5 rounded-md">${ord.time}</span>`
-                  }
-                </div>
-
-                <div>
-                  ${renderOrderDestinationBadge(ord)}
-                </div>
-              </div>
-
-              <h4 class="font-extrabold text-white text-base">${ord.client}</h4>
-              <p class="text-xs text-gray-400 mb-3">${ord.phone || 'Sem telefone'}</p>
-
-              <div class="p-3 bg-neutral-900/90 rounded-xl text-xs mb-3 space-y-1.5 border border-neutral-800">
-                <p class="font-bold text-gray-200 text-sm">${ord.items}</p>
-                ${ord.notes ? `<p class="text-[11px] text-amber-400 bg-amber-950/40 border border-amber-900/50 p-1.5 rounded">Obs: ${ord.notes}</p>` : ''}
-                <p class="text-[11px] text-gray-400">
-                  <i class="${isMesa ? 'fa-solid fa-utensils text-brand-yellow' : 'fa-solid fa-location-dot text-brand-red'} mr-1"></i> 
-                  ${isMesa ? formatTableNumber(ord) + ' (Consumo no Salão)' : ord.address}
-                </p>
-                <p class="text-[11px] text-gray-300 font-semibold pt-1 border-t border-neutral-800">Pagamento: ${ord.payment}</p>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xs text-gray-400 font-bold">Total do Pedido:</span>
-                <span class="text-lg font-black ${isCancelado ? 'line-through text-gray-500' : 'text-brand-yellow'}">R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
-              </div>
-
-              <select onchange="changeOrderStatus('${ord.id}', this.value)" class="w-full text-xs font-extrabold p-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white mb-2 focus:outline-none">
-                <option value="Novo" ${ord.status === 'Novo' ? 'selected' : ''}>🟡 Novo Pedido</option>
-                <option value="Em preparo" ${ord.status === 'Em preparo' ? 'selected' : ''}>🔵 Na Cozinha / Preparando</option>
-                <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>🟢 Pronto / Servir</option>
-                <option value="Saiu" ${ord.status === 'Saiu' ? 'selected' : ''}>🚴 Saiu para Entrega</option>
-                <option value="Entregue" ${isEntregue ? 'selected' : ''}>✅ Concluído / Entregue</option>
-                <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
-              </select>
-
-              <div class="grid ${isCancelado ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 pt-1">
-                <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
-                  <i class="fa-solid fa-print"></i>
-                  <span>Comanda</span>
-                </button>
-
-                ${
-                  isCancelado 
-                    ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                         <i class="fa-solid fa-rotate-left"></i>
-                         <span>Reativar</span>
-                       </button>`
-                    : isEntregue 
-                      ? `<button onclick="changeOrderStatus('${ord.id}', 'Em preparo')" class="col-span-2 bg-emerald-950/70 border border-emerald-700/60 hover:bg-emerald-900 text-emerald-300 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                           <i class="fa-solid fa-check-double"></i>
-                           <span>Concluído</span>
-                         </button>`
-                      : `<button onclick="changeOrderStatus('${ord.id}', 'Entregue')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
-                           <i class="fa-solid fa-check"></i>
-                           <span>Concluir</span>
-                         </button>
-                         <button onclick="changeOrderStatus('${ord.id}', 'Cancelado')" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                           <i class="fa-solid fa-ban"></i>
-                           <span>Cancelar</span>
-                         </button>`
-                }
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function changeOrderStatus(id, newStatus) {
-      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      await db.from('orders').update({
-        status: newStatus,
-        delivered_at: newStatus === 'Entregue' ? nowTime : null
-      }).eq('id', id);
-      await fetchOrders();
-      showToast("Status Atualizado", `Pedido #${id} marcado como ${newStatus}.`);
-    }
-
-    function printReceipt(orderId) {
-      const ord = window.storeOrders.find(o => o.id === orderId);
-      if (!ord) return;
-      const receiptArea = document.getElementById("printableReceipt");
-      const isMesa = isTableOrder(ord);
-
-      receiptArea.innerHTML = `
-        <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; margin: 0; font-weight: bold;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
-          <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
-          <p style="margin: 2px 0; font-size: 11px;">WhatsApp: ${document.getElementById('cfgWhatsapp').value || ''}</p>
-          
-          <div style="margin: 8px 0; padding: 6px; background: #000; color: #fff; border-radius: 4px;">
-            <span style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">
-              ${isMesa ? `🍽️ ${formatTableNumber(ord)}` : '🛵 ENTREGA DELIVERY'}
-            </span>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 8px; font-size: 11px;">
-          <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
-          <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
-          <p style="margin: 2px 0; font-size: 13px;"><strong>DESTINO:</strong> <span style="font-weight:900;">${isMesa ? formatTableNumber(ord) : ord.type.toUpperCase()}</span></p>
-          <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
-          ${ord.phone ? `<p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>` : ''}
-          ${!isMesa ? `<p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>` : ''}
-        </div>
-
-        <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0; margin-bottom: 8px;">
-          <p style="margin: 0 0 4px 0; font-weight: bold;">ITENS DO PEDIDO:</p>
-          <p style="margin: 0; font-size: 13px; font-weight: bold; white-space: pre-line;">${ord.items}</p>
-        </div>
-
-        ${ord.notes ? `
-          <div style="margin-bottom: 8px; font-size: 11px;">
-            <p style="margin: 0;"><strong>OBSERVAÇÕES:</strong></p>
-            <p style="margin: 0; font-style: italic;">${ord.notes}</p>
-          </div>
-        ` : ''}
-
-        <div style="border-top: 1px dashed #000; padding-top: 6px; font-size: 12px;">
-          <p style="margin: 2px 0; display:flex; justify-content:space-between;">
-            <span>PAGAMENTO:</span>
-            <strong>${ord.payment}</strong>
-          </p>
-          <p style="margin: 4px 0 0 0; font-size: 15px; font-weight: 900; display:flex; justify-content:space-between;">
-            <span>TOTAL:</span>
-            <span>R$ ${Number(ord.total).toFixed(2).replace('.', ',')}</span>
-          </p>
-        </div>
-
-        <div style="text-align:center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 8px; font-size: 10px;">
-          <p style="margin:0;">Sistema de Comandas • PHSUBLIME</p>
-          <p style="margin:0;">Obrigado pela preferência!</p>
-        </div>
-      `;
-
-      receiptArea.classList.remove("hidden");
-      window.print();
-      receiptArea.classList.add("hidden");
-    }
-
-    function updateDashboardMetrics() {
-      const validOrders = window.storeOrders.filter(o => o.status !== "Cancelado");
-      const totalRev = validOrders.reduce((acc, o) => acc + Number(o.total), 0);
-      const totalOrders = validOrders.length;
-      const avgTicket = totalOrders > 0 ? (totalRev / totalOrders) : 0;
-      const savings = totalRev * 0.27;
-
-      document.getElementById("dashRevenue").innerText = `R$ ${totalRev.toFixed(2).replace('.', ',')}`;
-      document.getElementById("dashTotalCount").innerText = `${totalOrders} pedidos`;
-      document.getElementById("dashAverageTicket").innerText = `R$ ${avgTicket.toFixed(2).replace('.', ',')}`;
-      document.getElementById("dashSavings").innerText = `R$ ${savings.toFixed(2).replace('.', ',')}`;
-    }
-
-    function playOrderChime() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-      } catch (e) {}
-    }
-
-    // LOGIN E NAVEGAÇÃO
+    // ========================================================
+    // NAVEGAÇÃO E LOGIN
+    // ========================================================
     window.handleLogin = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       document.getElementById("loginScreen").classList.add("hidden");
@@ -1382,7 +1975,6 @@
       }
     }
 
-    // SALVAR CONFIGURAÇÕES (INCLUINDO OS DIAS E HORÁRIOS)
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1390,7 +1982,6 @@
       const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
       const newAddress = document.getElementById('cfgAddress').value.trim();
 
-      // MONTA OS HORÁRIOS DE ATENDIMENTO EDITÁVEIS
       const businessHours = [
         { days: document.getElementById('cfgDays1').value.trim(), hours: document.getElementById('cfgHours1').value.trim() },
         { days: document.getElementById('cfgDays2').value.trim(), hours: document.getElementById('cfgHours2').value.trim() },
@@ -1422,7 +2013,7 @@
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
         generateTableCards();
-        showToast("Configurações Salvas!", "Nome, horários de atendimento e frete atualizados com sucesso!");
+        showToast("Configurações Salvas!", "Nome, horários e frete foram atualizados na nuvem.");
       }
     }
   </script>
