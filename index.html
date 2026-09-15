@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PHSUBLIME FOOD | Cardápio Digital</title>
+  <title>Cardápio Digital</title>
 
   <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -76,7 +76,7 @@
         </div>
         <div>
           <h1 id="brandNameHeader" class="text-lg sm:text-xl font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
-          <p class="text-xs text-gray-500 hidden sm:block">Sabor que combina com você!</p>
+          <p id="brandSloganHeader" class="text-xs text-gray-500 hidden sm:block">Sabor que combina com você!</p>
         </div>
       </div>
 
@@ -555,7 +555,6 @@
 
   <!-- SCRIPT DO CLIENTE CONECTADO AO SUPABASE -->
   <script>
-    // CONFIGURAÇÃO CENTRAL SUPABASE
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -578,7 +577,6 @@
       modalQty: 1
     };
 
-    // FORMATAÇÃO DO WHATSAPP COM DDI 55
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
       if (clean.length === 10 || clean.length === 11) {
@@ -587,7 +585,6 @@
       return clean;
     }
 
-    // CARREGAR DADOS DO SUPABASE
     async function loadStoreData() {
       await Promise.all([
         fetchCategories(),
@@ -622,25 +619,30 @@
     }
 
     async function fetchSettings() {
-      const { data } = await db.from('store_settings').select('*').eq('id', 1).single();
+      const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
+      
       if (data) {
         storeConfig.name = data.store_name || storeConfig.name;
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
-        storeConfig.deliveryFee = Number(data.delivery_fee) || storeConfig.deliveryFee;
+        storeConfig.deliveryFee = Number(data.delivery_fee) !== undefined ? Number(data.delivery_fee) : storeConfig.deliveryFee;
         storeConfig.address = data.address || storeConfig.address;
 
-        document.getElementById('brandNameHeader').innerText = storeConfig.name;
-        document.getElementById('bannerTitle').innerText = storeConfig.name;
-        document.getElementById('footerStoreName').innerText = storeConfig.name;
-        document.getElementById('footerStoreAddress').innerText = storeConfig.address;
-        document.getElementById('pickupAddressText').innerText = storeConfig.address;
-        document.getElementById('chkDeliveryFeeText').innerText = formatMoney(storeConfig.deliveryFee);
+        // Atualização dinâmica em tempo real dos textos
+        document.title = `${storeConfig.name} | Cardápio Digital`;
+        if (document.getElementById('brandNameHeader')) document.getElementById('brandNameHeader').innerText = storeConfig.name;
+        if (document.getElementById('bannerTitle')) document.getElementById('bannerTitle').innerText = storeConfig.name;
+        if (document.getElementById('footerStoreName')) document.getElementById('footerStoreName').innerText = storeConfig.name;
+        if (document.getElementById('footerStoreAddress')) document.getElementById('footerStoreAddress').innerText = storeConfig.address;
+        if (document.getElementById('footerStoreWhatsapp')) document.getElementById('footerStoreWhatsapp').innerText = storeConfig.whatsapp;
+        if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
+        if (document.getElementById('chkDeliveryFeeText')) document.getElementById('chkDeliveryFeeText').innerText = formatMoney(storeConfig.deliveryFee);
 
+        // Links de WhatsApp
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
-        document.getElementById('btnHeroWhatsapp').href = waLink;
-        document.getElementById('mobileWhatsappLink').href = waLink;
+        if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
+        if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
 
-        // Status Aberto/Pausado
+        // Status Aberto/Fechado
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -654,10 +656,11 @@
           dot.className = "w-2 h-2 rounded-full mr-1.5 bg-rose-500";
           text.innerText = "FECHADO NO MOMENTO";
         }
+
+        if (appState.cart.length > 0) renderCartDrawer();
       }
     }
 
-    // ESCUTA EM TEMPO REAL SUPABASE
     function setupRealtimeListeners() {
       db.channel('client_live')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
@@ -669,6 +672,10 @@
     document.addEventListener("DOMContentLoaded", () => {
       loadStoreData();
       updateCartBadge();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) fetchSettings();
     });
 
     function renderCategories() {
@@ -823,7 +830,7 @@
 
     function updateCartBadge() {
       const totalItems = appState.cart.reduce((acc, item) => acc + item.quantity, 0);
-      const subtotal = appState.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
 
       document.getElementById("cartHeaderCount").innerText = totalItems;
       document.getElementById("mobileCartCount").innerText = totalItems;
@@ -851,7 +858,7 @@
       footer.classList.remove("hidden");
 
       list.innerHTML = appState.cart.map((item, index) => {
-        const itemSubtotal = item.product.price * item.quantity;
+        const itemSubtotal = Number(item.product.price) * item.quantity;
         return `
           <div class="py-3 flex items-start justify-between space-x-3">
             <img src="${item.product.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-14 h-14 rounded-xl object-cover" />
@@ -875,7 +882,7 @@
         `;
       }).join("");
 
-      const subtotal = appState.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const delivery = storeConfig.deliveryFee;
       const total = subtotal + delivery;
 
@@ -947,7 +954,7 @@
     }
 
     function updateCheckoutTotals() {
-      const subtotal = appState.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
       const delivery = orderType === "delivery" ? storeConfig.deliveryFee : 0;
       const grandTotal = subtotal + delivery;
@@ -999,12 +1006,12 @@
         }
       }
 
-      const subtotal = appState.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const grandTotal = subtotal + deliveryFeeApplied;
       const orderNumber = Math.floor(2000 + Math.random() * 8000);
 
       const itemsListFormatted = appState.cart.map(item => {
-        const itemTotal = item.product.price * item.quantity;
+        const itemTotal = Number(item.product.price) * item.quantity;
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
@@ -1036,7 +1043,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // SALVA O PEDIDO DIRETAMENTE NO BANCO SUPABASE
+      // SALVA O PEDIDO DIRETAMENTE NO SUPABASE
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
@@ -1051,7 +1058,7 @@ Obrigado pelo pedido!`;
         status: "Novo"
       }]);
 
-      // ABRIR WHATSAPP
+      // ABRIR WHATSAPP AUTOMÁTICO
       const waNumber = getCleanWaNumber(storeConfig.whatsapp);
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
