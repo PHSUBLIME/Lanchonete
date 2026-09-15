@@ -67,10 +67,10 @@
     </div>
   </div>
 
-  <!-- AVISO ELEGANTE SE FOR RECONHECIDA UMA MESA POR QR CODE -->
+  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2.5 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
-    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Seu pedido será servido aqui na mesa!</span>
+    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
   </div>
 
   <!-- HEADER -->
@@ -344,7 +344,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT: 3 EM 1 (DELIVERY, RETIRADA E MESA) -->
+  <!-- MODAL DE CHECKOUT: 3 EM 1 INTELIGENTE -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -375,7 +375,7 @@
           </div>
         </div>
 
-        <!-- ESCOLHA DO TIPO DE PEDIDO: 3 EM 1 -->
+        <!-- 2. DESTINO DO PEDIDO -->
         <div class="pt-3 border-t border-gray-100">
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">2</span>
@@ -383,7 +383,6 @@
           </h4>
 
           <div class="grid grid-cols-3 gap-2">
-            <!-- 1. DELIVERY -->
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="delivery" checked onchange="handleOrderTypeChange()" class="sr-only" />
               <i class="fa-solid fa-motorcycle text-brand-yellow text-base block mb-1"></i>
@@ -391,7 +390,6 @@
               <p class="text-[9px] text-gray-500">Na sua casa</p>
             </label>
 
-            <!-- 2. RETIRADA -->
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="pickup" onchange="handleOrderTypeChange()" class="sr-only" />
               <i class="fa-solid fa-store text-blue-500 text-base block mb-1"></i>
@@ -399,7 +397,6 @@
               <p class="text-[9px] text-emerald-600 font-bold">Sem taxa</p>
             </label>
 
-            <!-- 3. MESA / SALÃO -->
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="dine_in" onchange="handleOrderTypeChange()" class="sr-only" />
               <i class="fa-solid fa-utensils text-emerald-500 text-base block mb-1"></i>
@@ -408,7 +405,7 @@
             </label>
           </div>
 
-          <!-- ÁREA: DELIVERY (ENDEREÇO E FRETE) -->
+          <!-- CAMPOS DE DELIVERY -->
           <div id="deliveryFieldsArea" class="mt-4 space-y-3">
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
@@ -435,7 +432,6 @@
               <input type="text" id="custReference" placeholder="Ex: Próximo à praça" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
 
-            <!-- QUADRO DE FRETE CLARO -->
             <div id="deliveryFeeNoticeBox" class="p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-xs flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-motorcycle text-brand-yellow text-base"></i>
@@ -448,13 +444,13 @@
             </div>
           </div>
 
-          <!-- ÁREA: RETIRADA NO BALCÃO -->
+          <!-- RETIRADA NO BALCÃO -->
           <div id="pickupAlert" class="hidden mt-3 p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-neutral-700 text-xs">
             <i class="fa-solid fa-location-dot text-brand-red mr-1.5"></i>
-            Retirada no endereço: <strong id="pickupAddressText">Rua das Delícias, 100 - Rio de Janeiro - RJ</strong>
+            Retirada no balcão: <strong id="pickupAddressText">Rua das Delícias, 100 - Rio de Janeiro - RJ</strong>
           </div>
 
-          <!-- ÁREA: CONSUMO NA MESA / SALÃO -->
+          <!-- MESA / SALÃO -->
           <div id="dineInArea" class="hidden mt-3 p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs space-y-2">
             <div class="flex items-center space-x-2">
               <i class="fa-solid fa-utensils text-brand-yellow text-base"></i>
@@ -470,34 +466,17 @@
           </div>
         </div>
 
+        <!-- 3. FORMAS DE PAGAMENTO INTELIGENTES (DINÂMICAS) -->
         <div class="pt-3 border-t border-gray-100">
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">3</span>
             Forma de Pagamento
           </h4>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-              <input type="radio" name="paymentMethod" value="Pix" checked onchange="toggleCashChangeField()" class="sr-only" />
-              <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
-              <span class="font-bold">Pix</span>
-            </label>
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-              <input type="radio" name="paymentMethod" value="Cartão de Crédito" onchange="toggleCashChangeField()" class="sr-only" />
-              <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
-              <span class="font-bold">Crédito</span>
-            </label>
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-              <input type="radio" name="paymentMethod" value="Cartão de Débito" onchange="toggleCashChangeField()" class="sr-only" />
-              <i class="fa-solid fa-credit-card text-purple-500 text-base block mb-1"></i>
-              <span class="font-bold">Débito</span>
-            </label>
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-              <input type="radio" name="paymentMethod" value="Dinheiro" onchange="toggleCashChangeField()" class="sr-only" />
-              <i class="fa-solid fa-money-bill-wave text-emerald-600 text-base block mb-1"></i>
-              <span class="font-bold">Dinheiro</span>
-            </label>
-          </div>
 
+          <!-- CONTAINER DAS OPÇÕES DE PAGAMENTO (RENDERIZADAS VIA JS) -->
+          <div id="paymentOptionsContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+
+          <!-- CAMPO DE TROCO (QUANDO FOR DINHEIRO NO DELIVERY) -->
           <div id="cashChangeArea" class="hidden mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
             <span class="font-bold text-gray-700 block">Precisa de troco?</span>
             <div class="flex items-center space-x-4">
@@ -519,7 +498,7 @@
 
         <div class="pt-3 border-t border-gray-100">
           <label class="block font-bold text-gray-700 mb-1">Observações do Pedido</label>
-          <input type="text" id="orderNotes" placeholder="Ex: Ponto da carne, talheres..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+          <input type="text" id="orderNotes" placeholder="Ex: Ponto da carne, sem gelo..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
         <!-- RESUMO FINAL -->
@@ -533,7 +512,7 @@
             <span id="chkSummaryFeeText" class="font-bold text-gray-800">R$ 5,00</span>
           </div>
           <div class="flex justify-between font-black text-base pt-2 border-t border-gray-200">
-            <span class="text-brand-black">TOTAL A PAGAR:</span>
+            <span class="text-brand-black">TOTAL DO PEDIDO:</span>
             <span id="chkFinalTotalText" class="text-brand-red font-black">R$ 0,00</span>
           </div>
         </div>
@@ -608,7 +587,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT: RECONHECIMENTO DE MESA E CÁLCULO DE FRETE AUTOMÁTICO -->
+  <!-- JAVASCRIPT DO CLIENTE -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -632,7 +611,7 @@
     let storeProducts = [];
     let cachedStoreCoords = null;
     let autoCalcTimeout = null;
-    let identifiedTable = null; // Mesa identificada pelo QR Code
+    let identifiedTable = null;
 
     let appState = {
       cart: [],
@@ -650,7 +629,6 @@
       return clean;
     }
 
-    // DETECTA PARÂMETRO ?mesa=X NA URL
     function detectTableUrlParam() {
       const urlParams = new URLSearchParams(window.location.search);
       const mesa = urlParams.get('mesa');
@@ -663,7 +641,6 @@
           banner.classList.remove('hidden');
         }
 
-        // Já pré-seleciona a opção de Mesa no checkout
         const dineInRadio = document.querySelector('input[name="orderType"][value="dine_in"]');
         if (dineInRadio) dineInRadio.checked = true;
         const tableInput = document.getElementById('custTableInput');
@@ -728,7 +705,6 @@
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
         if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
 
-        // Status
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -743,14 +719,130 @@
           text.innerText = "FECHADO NO MOMENTO";
         }
 
+        renderPaymentOptions();
         updateCheckoutTotals();
         if (appState.cart.length > 0) renderCartDrawer();
       }
     }
 
     // ========================================================
-    // CÁLCULO DE FRETE POR ROTA
+    // RENDERIZAR OPÇÕES DE PAGAMENTO DE ACORDO COM O TIPO
     // ========================================================
+    function renderPaymentOptions() {
+      const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
+      const container = document.getElementById('paymentOptionsContainer');
+      const cashArea = document.getElementById('cashChangeArea');
+      if (!container) return;
+
+      if (orderType === 'dine_in') {
+        // Opções para Mesa
+        cashArea.classList.add('hidden');
+        container.innerHTML = `
+          <label class="col-span-2 sm:col-span-2 cursor-pointer border rounded-xl p-3 text-center transition border-brand-yellow bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Acerto ao Fechar a Conta" checked onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-receipt text-amber-500 text-lg block mb-1"></i>
+            <span class="font-extrabold text-brand-black block text-xs">Pagar ao Fechar a Conta</span>
+            <span class="text-[10px] text-gray-500 font-medium">Acerto no final (Dinheiro, Cartão ou Pix)</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Pix (Adiantado)" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
+            <span class="font-bold">Pix Agora</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Cartão na Mesa" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
+            <span class="font-bold">Cartão</span>
+          </label>
+        `;
+      } else if (orderType === 'pickup') {
+        // Opções para Retirada no Balcão
+        cashArea.classList.add('hidden');
+        container.innerHTML = `
+          <label class="col-span-2 sm:col-span-2 cursor-pointer border rounded-xl p-3 text-center transition border-brand-yellow bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Pagar na Retirada (Balcão)" checked onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-store text-emerald-600 text-lg block mb-1"></i>
+            <span class="font-extrabold text-brand-black block text-xs">Pagar no Balcão ao Retirar</span>
+            <span class="text-[10px] text-gray-500 font-medium">Dinheiro, Cartão ou Pix no Caixa</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Pix (Adiantado)" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
+            <span class="font-bold">Pix Agora</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Cartão no Balcão" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
+            <span class="font-bold">Cartão</span>
+          </label>
+        `;
+      } else {
+        // Opções normais de Delivery
+        container.innerHTML = `
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Pix" checked onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
+            <span class="font-bold">Pix</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Cartão de Crédito" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
+            <span class="font-bold">Crédito</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Cartão de Débito" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-credit-card text-purple-500 text-base block mb-1"></i>
+            <span class="font-bold">Débito</span>
+          </label>
+          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <input type="radio" name="paymentMethod" value="Dinheiro" onchange="toggleCashChangeField()" class="sr-only" />
+            <i class="fa-solid fa-money-bill-wave text-emerald-600 text-base block mb-1"></i>
+            <span class="font-bold">Dinheiro</span>
+          </label>
+        `;
+      }
+    }
+
+    // ALTERNÂNCIA DE TIPO (DELIVERY, RETIRADA OU MESA)
+    function handleOrderTypeChange() {
+      const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
+      const deliveryFields = document.getElementById("deliveryFieldsArea");
+      const pickupAlert = document.getElementById("pickupAlert");
+      const dineInArea = document.getElementById("dineInArea");
+
+      if (orderType === "delivery") {
+        deliveryFields.classList.remove("hidden");
+        pickupAlert.classList.add("hidden");
+        dineInArea.classList.add("hidden");
+      } else if (orderType === "pickup") {
+        deliveryFields.classList.add("hidden");
+        pickupAlert.classList.remove("hidden");
+        dineInArea.classList.add("hidden");
+      } else if (orderType === "dine_in") {
+        deliveryFields.classList.add("hidden");
+        pickupAlert.classList.add("hidden");
+        dineInArea.classList.remove("hidden");
+      }
+
+      renderPaymentOptions();
+      updateCheckoutTotals();
+    }
+
+    function toggleCashChangeField() {
+      const selected = document.querySelector('input[name="paymentMethod"]:checked');
+      if (!selected) return;
+      const cashArea = document.getElementById("cashChangeArea");
+      if (selected.value === "Dinheiro") cashArea.classList.remove("hidden");
+      else cashArea.classList.add("hidden");
+    }
+
+    function toggleChangeInput(show) {
+      const wrapper = document.getElementById("changeInputWrapper");
+      if (show) wrapper.classList.remove("hidden");
+      else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
+    }
+
+    // CÁLCULO DE FRETE
     function scheduleAutoCalculate() {
       clearTimeout(autoCalcTimeout);
       autoCalcTimeout = setTimeout(autoCalculateRouteDelivery, 600);
@@ -1094,48 +1186,10 @@
       document.getElementById("checkoutModal").classList.add("hidden");
     }
 
-    // ALTERNÂNCIA ENTRE DELIVERY, RETIRADA E MESA
-    function handleOrderTypeChange() {
-      const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
-      const deliveryFields = document.getElementById("deliveryFieldsArea");
-      const pickupAlert = document.getElementById("pickupAlert");
-      const dineInArea = document.getElementById("dineInArea");
-
-      if (orderType === "delivery") {
-        deliveryFields.classList.remove("hidden");
-        pickupAlert.classList.add("hidden");
-        dineInArea.classList.add("hidden");
-      } else if (orderType === "pickup") {
-        deliveryFields.classList.add("hidden");
-        pickupAlert.classList.remove("hidden");
-        dineInArea.classList.add("hidden");
-      } else if (orderType === "dine_in") {
-        deliveryFields.classList.add("hidden");
-        pickupAlert.classList.add("hidden");
-        dineInArea.classList.remove("hidden");
-      }
-
-      updateCheckoutTotals();
-    }
-
-    function toggleCashChangeField() {
-      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-      const cashArea = document.getElementById("cashChangeArea");
-      if (paymentMethod === "Dinheiro") cashArea.classList.remove("hidden");
-      else cashArea.classList.add("hidden");
-    }
-
-    function toggleChangeInput(show) {
-      const wrapper = document.getElementById("changeInputWrapper");
-      if (show) wrapper.classList.remove("hidden");
-      else { wrapper.classList.add("hidden"); document.getElementById("changeAmountInput").value = ""; }
-    }
-
     function updateCheckoutTotals() {
       const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
       
-      // Frete só existe para entrega delivery
       const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
       const grandTotal = subtotal + delivery;
 
@@ -1159,7 +1213,7 @@
       }
     }
 
-    // SUBMISSÃO DO PEDIDO (DELIVERY, RETIRADA OU MESA)
+    // ENVIO DO PEDIDO
     async function processOrderSubmission(e) {
       e.preventDefault();
 
@@ -1171,7 +1225,8 @@
       const name = document.getElementById("custName").value.trim();
       const phone = document.getElementById("custPhone").value.trim();
       const orderType = document.querySelector('input[name="orderType"]:checked').value;
-      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
+      const paymentMethod = paymentMethodRadio ? paymentMethodRadio.value : 'A Combinar';
       const orderNotes = document.getElementById("orderNotes").value.trim() || "Nenhuma";
 
       let destinationType = "Delivery";
@@ -1208,8 +1263,8 @@
       }
 
       let paymentDetails = paymentMethod;
-      if (paymentMethod === "Dinheiro") {
-        const needChange = document.querySelector('input[name="needChangeRadio"]:checked').value === "sim";
+      if (paymentMethod === "Dinheiro" && orderType === "delivery") {
+        const needChange = document.querySelector('input[name="needChangeRadio"]:checked')?.value === "sim";
         if (needChange) {
           const changeFor = document.getElementById("changeAmountInput").value.trim();
           paymentDetails += ` (Troco para R$ ${changeFor || "não informado"})`;
@@ -1227,7 +1282,7 @@
         return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
       }).join("\n");
 
-      // MENSAGEM DO WHATSAPP FORMATADA
+      // MENSAGEM DO WHATSAPP
       const message = 
 `🍔 *NOVO PEDIDO - ${storeConfig.name}*
 *Pedido nº:* #${orderNumber}
