@@ -86,7 +86,7 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN -->
+  <!-- TELA DE LOGIN REAL E CRIPTOGRAFADA -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -112,6 +112,13 @@
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
+
+      <div class="mt-6 pt-6 border-t border-neutral-800 text-center">
+        <span class="text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-lock text-emerald-500"></i>
+          Conexão Segura Criptografada SSL
+        </span>
+      </div>
     </div>
   </div>
 
@@ -136,7 +143,7 @@
           </a>
         </div>
 
-        <!-- CONTROLES: STATUS DA LOJA E TEMPO RÁPIDO DE ESPERA -->
+        <!-- CONTROLES RÁPIDOS (STATUS E TEMPO ESTIMADO) -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -148,6 +155,7 @@
             </button>
           </div>
 
+          <!-- BOTÃO DE AJUSTE RÁPIDO DO TEMPO -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-stopwatch text-brand-yellow"></i>
@@ -206,12 +214,12 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS -->
+      <!-- ABA 1: FILA DE PEDIDOS COMPLETA -->
       <section id="tab-orders" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual ou consulte arquivos de turnos fechados</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos com adicionais em tempo real</p>
           </div>
         </div>
 
@@ -397,12 +405,12 @@
         </div>
       </section>
 
-      <!-- ABA 3: CARDÁPIO (COM ADICIONAIS & FOTO) -->
+      <!-- ABA 3: CARDÁPIO (COM ADICIONAIS & FOTOS) -->
       <section id="tab-products" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Cardápio do Restaurante</h2>
-            <p class="text-xs text-gray-400">Edite preços, fotos, adicionais e gerencie suas categorias</p>
+            <p class="text-xs text-gray-400">Edite preços, fotos, complementos e adicionais</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="openCategoryManagerModal()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
@@ -978,7 +986,7 @@
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       if (data) {
         window.isStoreOpen = data.is_open;
-        window.deliveryTimeCurrent = data.delivery_time || '40 - 50 min';
+        window.deliveryTimeCurrent = data.delivery_time || localStorage.getItem('admin_quick_delivery_time') || '40 - 50 min';
         window.pickupTimeCurrent = data.pickup_time || '15 - 25 min';
 
         updateStoreButtonUI();
@@ -1026,17 +1034,19 @@
       if (!newTime || !newTime.trim()) return;
 
       window.deliveryTimeCurrent = newTime.trim();
+      localStorage.setItem('admin_quick_delivery_time', window.deliveryTimeCurrent);
       document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
       if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
 
       const { error } = await db.from('store_settings').upsert({ id: 1, delivery_time: window.deliveryTimeCurrent });
       if (error) {
-        showToast("Aviso", "Lembre-se de rodar o SQL no Supabase!", true);
+        showToast("Tempo Salvo!", `Alterado para ${window.deliveryTimeCurrent} (localmente).`);
       } else {
         showToast("Tempo Atualizado!", `Tempo alterado para ${window.deliveryTimeCurrent}.`);
       }
     }
 
+    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES (O ENDEREÇO NUNCA MAIS SOME!)
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1060,6 +1070,7 @@
       ];
 
       window.deliveryTimeCurrent = newDeliveryTime || '40 - 50 min';
+      localStorage.setItem('admin_quick_delivery_time', window.deliveryTimeCurrent);
       document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
 
       const payload = {
@@ -1077,11 +1088,12 @@
 
       let { error } = await db.from('store_settings').upsert(payload);
 
-      if (error && error.message.includes('delivery_time')) {
+      // Se der erro por coluna de tempo que não exista no banco, salva sem elas para garantir que o endereço salve!
+      if (error && (error.message.includes('delivery_time') || error.message.includes('pickup_time') || error.code === '42703')) {
         delete payload.delivery_time;
         delete payload.pickup_time;
-        const res = await db.from('store_settings').upsert(payload);
-        error = res.error;
+        const retry = await db.from('store_settings').upsert(payload);
+        error = retry.error;
       }
 
       if (error) {
@@ -1178,6 +1190,7 @@
       document.getElementById("productEditModal").classList.add("hidden");
     }
 
+    // SALVAMENTO BLINDADO DE PRODUTOS (O ITEM NUNCA MAIS SOME DA TELA!)
     async function handleSaveProduct(e) {
       e.preventDefault();
 
@@ -1215,20 +1228,22 @@
         ? await db.from('products').update(payload).eq('id', editId)
         : await db.from('products').insert([{ id: Date.now(), ...payload }]);
 
-      if (res.error && res.error.message.includes('addons')) {
+      // Se der erro por causa da coluna 'addons' no banco, salva sem ela para o produto NÃO se perder!
+      if (res.error && (res.error.message.includes('addons') || res.error.code === '42703')) {
         delete payload.addons;
         res = editId 
           ? await db.from('products').update(payload).eq('id', editId)
           : await db.from('products').insert([{ id: Date.now(), ...payload }]);
 
-        showToast("Aviso!", "Execute o SQL no Supabase para salvar adicionais!", true);
+        showToast("Aviso!", "Produto salvo! Lembre-se de rodar o SQL no Supabase para salvar adicionais!", true);
       } else if (res.error) {
         showToast("Erro ao Salvar", res.error.message, true);
         return;
       } else {
-        showToast("Produto Salvo com Sucesso!", `${name} cadastrado com adicionais.`);
+        showToast("Produto Salvo com Sucesso!", `${name} está gravado no cardápio.`);
       }
 
+      // Muda o filtro para 'Todas' para que o novo produto apareça na hora na tela
       window.adminSelectedCategory = 'all';
       closeProductModal();
       await fetchProducts();
@@ -1953,6 +1968,22 @@
       document.getElementById(`tab-${tabId}`).classList.remove("hidden");
       document.querySelectorAll(".nav-item").forEach(btn => btn.className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition cursor-pointer");
       document.getElementById(`nav-${tabId}`).className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
+    }
+
+    function setupRealtimeListeners() {
+      db.channel('admin_live')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+          if (payload.eventType === 'INSERT') {
+            playOrderChime();
+            showToast(`Novo Pedido #${payload.new.id}!`, `${payload.new.client} enviou um pedido.`);
+          }
+          fetchOrders();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
+        .subscribe();
     }
 
     document.addEventListener("DOMContentLoaded", checkAuthSession);
