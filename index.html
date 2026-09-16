@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <!-- AVISO DE MESA -->
+  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
     <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
@@ -153,7 +153,7 @@
     </div>
   </header>
 
-  <!-- BANNER HERO (SOMENTE NOME E AVALIAÇÃO) -->
+  <!-- BANNER HERO LIMPO (SOMENTE NOME E AVALIAÇÃO) -->
   <main class="max-w-full overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-8 sm:py-12 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -214,7 +214,7 @@
     </section>
   </main>
 
-  <!-- FOOTER COMPLETO COM REDES SOCIAIS, WHATSAPP E GOOGLE -->
+  <!-- FOOTER COMPLETO COM REDES SOCIAIS, WHATSAPP E GOOGLE DINÂMICOS -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -235,8 +235,8 @@
             <span id="footerStoreWhatsapp">(21) 98614-7221</span>
           </p>
 
-          <!-- BOTÕES DE REDES SOCIAIS, WHATSAPP E AVALIAÇÃO NO GOOGLE -->
-          <div class="flex flex-wrap items-center gap-2 pt-1">
+          <!-- BOTÕES DE REDES SOCIAIS DINÂMICOS -->
+          <div class="flex flex-wrap items-center gap-2 pt-1" id="footerSocialButtonsContainer">
             <a id="footerBtnWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-sm">
               <i class="fa-brands fa-whatsapp text-base"></i>
               <span>Falar no WhatsApp</span>
@@ -298,7 +298,7 @@
     </div>
   </footer>
 
-  <!-- NOVO MODAL MODERNO: LOJA FECHADA / PAUSADA -->
+  <!-- MODAL: LOJA FECHADA / PAUSADA -->
   <div id="storeClosedModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       <div class="w-16 h-16 bg-rose-50 text-brand-red rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
@@ -452,7 +452,14 @@
           <div>
             <label class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-500 mb-1.5">Insira o CEP do Endereço</label>
             <div class="relative">
-              <input type="text" id="cepInput" maxlength="9" placeholder="00000-000" oninput="formatCepInput(this)" class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition" />
+              <input 
+                type="text" 
+                id="cepInput" 
+                maxlength="9" 
+                placeholder="00000-000" 
+                oninput="formatCepInput(this)" 
+                class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition" 
+              />
               <button type="button" onclick="searchCepManual()" id="btnSearchCep" class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black text-white font-black text-xs px-4 rounded-lg transition cursor-pointer">
                 BUSCAR CEP
               </button>
@@ -867,6 +874,12 @@
       pickupTime: "15 - 25 min",
       isOpen: true,
       paymentMethods: { pix: true, money: true, credit: true, debit: true },
+      socialLinks: {
+        whatsapp: { active: true, url: "https://wa.me/5521986147221" },
+        instagram: { active: true, url: "https://instagram.com" },
+        facebook: { active: true, url: "https://facebook.com" },
+        google: { active: true, url: "https://search.google.com/local/writereview" }
+      },
       deliveryTiers: [
         { km: 3, price: 5.00 },
         { km: 6, price: 8.00 },
@@ -1165,9 +1178,7 @@
       document.getElementById('storeClosedModal').classList.add('hidden');
     }
 
-    // ==============================================
     // LOCALIZAÇÃO E ENDEREÇO
-    // ==============================================
     function openAddressModal() {
       document.getElementById('addressModal').classList.remove('hidden');
       if (appState.savedAddress) {
@@ -1404,6 +1415,10 @@
         storeConfig.pickupTime = data.pickup_time || "15 - 25 min";
         storeConfig.isOpen = data.is_open !== false;
 
+        if (data.social_links) {
+          storeConfig.socialLinks = data.social_links;
+        }
+
         if (data.payment_methods) {
           storeConfig.paymentMethods = data.payment_methods;
         }
@@ -1438,6 +1453,37 @@
           }
         }
 
+        // ATUALIZAÇÃO DINÂMICA DAS REDES SOCIAIS NO RODAPÉ
+        const soc = storeConfig.socialLinks || {};
+        const btnWa = document.getElementById('footerBtnWhatsapp');
+        const btnInsta = document.getElementById('footerBtnInstagram');
+        const btnFb = document.getElementById('footerBtnFacebook');
+        const btnGoogle = document.getElementById('footerBtnGoogle');
+
+        if (btnWa) {
+          const waConfig = soc.whatsapp || { active: true, url: `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}` };
+          btnWa.style.display = waConfig.active !== false ? 'inline-flex' : 'none';
+          if (waConfig.url) btnWa.href = waConfig.url;
+        }
+
+        if (btnInsta) {
+          const instaConfig = soc.instagram || { active: true, url: 'https://instagram.com' };
+          btnInsta.style.display = (instaConfig.active !== false && instaConfig.url) ? 'inline-flex' : 'none';
+          if (instaConfig.url) btnInsta.href = instaConfig.url;
+        }
+
+        if (btnFb) {
+          const fbConfig = soc.facebook || { active: true, url: 'https://facebook.com' };
+          btnFb.style.display = (fbConfig.active !== false && fbConfig.url) ? 'inline-flex' : 'none';
+          if (fbConfig.url) btnFb.href = fbConfig.url;
+        }
+
+        if (btnGoogle) {
+          const googleConfig = soc.google || { active: true, url: 'https://search.google.com/local/writereview' };
+          btnGoogle.style.display = (googleConfig.active !== false && googleConfig.url) ? 'inline-flex' : 'none';
+          if (googleConfig.url) btnGoogle.href = googleConfig.url;
+        }
+
         // FORMAS DE PAGAMENTO NO RODAPÉ
         const pms = storeConfig.paymentMethods || { pix: true, money: true, credit: true, debit: true };
         const bPix = document.getElementById('footerBadgePix');
@@ -1453,10 +1499,7 @@
         const feeBadge = document.getElementById('chkDeliveryFeeText');
         if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
-        const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
-        if (document.getElementById('footerBtnWhatsapp')) document.getElementById('footerBtnWhatsapp').href = waLink;
-
-        // ATUALIZAÇÃO DO STATUS DA LOJA
+        // STATUS DE LOJA ABERTA / FECHADA
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -1690,7 +1733,6 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchReviews())
         .subscribe();
 
-      // Polling a cada 5 segundos para garantir atualização imediata no celular
       setInterval(fetchSettings, 5000);
     }
 
@@ -1790,7 +1832,6 @@
       `).join("");
     }
 
-    // MODAL DO PRODUTO (COM ADICIONAIS)
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
