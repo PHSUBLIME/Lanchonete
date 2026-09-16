@@ -5,26 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>PHSUBLIME FOOD | Cardápio Digital</title>
 
-  <!-- ÍCONE DA ABA (FAVICON) -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
-
-  <!-- META TAGS DE COMPARTILHAMENTO -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/" />
   <meta property="og:title" content="PHSUBLIME FOOD | Cardápio Online" />
-  <meta property="og:description" content="Faça seu pedido online de forma rápida! Lanches artesanais, porções e bebidas." />
+  <meta property="og:description" content="Lanches artesanais, porções e bebidas." />
   <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
 
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -79,17 +72,15 @@
     </div>
   </div>
 
-  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
+  <!-- AVISO DE MESA -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
-    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
+    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos à vontade!</span>
   </div>
 
-  <!-- HEADER PRINCIPAL COM ENDEREÇO E LOGIN NA MESMA BARRA -->
+  <!-- HEADER -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-3">
-      
-      <!-- LADO ESQUERDO: LOGO E NOME -->
       <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-xl shadow-sm">
           <i class="fa-solid fa-burger"></i>
@@ -100,9 +91,9 @@
         </div>
       </div>
 
-      <!-- CENTRO: SELETOR DE ENDEREÇO / CEP AO LADO DO NOME -->
+      <!-- SELETOR DE ENDEREÇO / CEP -->
       <div class="flex-1 max-w-xs sm:max-w-md mx-1 sm:mx-3">
-        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group shadow-xs">
+        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group">
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
             <i class="fa-solid fa-location-dot text-xs sm:text-sm"></i>
           </div>
@@ -116,7 +107,6 @@
         </div>
       </div>
 
-      <!-- LADO DIREITO: BOTÕES DE LOGIN, CARDÁPIO E PEDIDO -->
       <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
         <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
           <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
@@ -133,7 +123,6 @@
           <span id="cartHeaderCount" class="bg-brand-red text-white text-[11px] font-black w-5 h-5 rounded-full inline-flex items-center justify-center">0</span>
         </button>
       </div>
-
     </div>
   </header>
 
@@ -196,7 +185,7 @@
       </div>
     </section>
 
-    <!-- BARRA HORIZONTAL DE CATEGORIAS -->
+    <!-- BARRA DE CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
       <div class="max-w-7xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -226,7 +215,7 @@
     </section>
   </main>
 
-  <!-- FOOTER COMPLETO -->
+  <!-- FOOTER -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -240,7 +229,7 @@
           <p class="text-xs text-neutral-400 mb-3">Deliciosos pratos preparados com carinho para deixar seu dia ainda melhor.</p>
           <p class="text-xs text-neutral-300 flex items-center gap-2 mb-1">
             <i class="fa-solid fa-location-dot text-brand-yellow"></i>
-            <span id="footerStoreAddress">Rua das Delícias, 100 - Rio de Janeiro - RJ</span>
+            <span id="footerStoreAddress">Rua Marcílio Dias, 24, Campo Lindo, Seropédica - RJ</span>
           </p>
           <p class="text-xs text-neutral-300 flex items-center gap-2">
             <i class="fa-brands fa-whatsapp text-emerald-400"></i>
@@ -259,11 +248,11 @@
 
         <div>
           <h4 class="font-extrabold text-white uppercase tracking-wider text-xs mb-3">Formas de Pagamento</h4>
-          <div class="flex flex-wrap gap-2 text-xs">
-            <span class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-brands fa-pix text-emerald-400"></i> Pix</span>
-            <span class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-credit-card text-blue-400"></i> Crédito</span>
-            <span class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-credit-card text-purple-400"></i> Débito</span>
-            <span class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Dinheiro</span>
+          <div id="footerPaymentBadgesContainer" class="flex flex-wrap gap-2 text-xs">
+            <span id="footerBadgePix" class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-brands fa-pix text-emerald-400"></i> Pix</span>
+            <span id="footerBadgeCredit" class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-credit-card text-blue-400"></i> Crédito</span>
+            <span id="footerBadgeDebit" class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-credit-card text-purple-400"></i> Débito</span>
+            <span id="footerBadgeMoney" class="bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Dinheiro</span>
           </div>
         </div>
       </div>
@@ -631,7 +620,7 @@
 
           <div id="pickupAlert" class="hidden mt-3 p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-neutral-700 text-xs">
             <i class="fa-solid fa-location-dot text-brand-red mr-1.5"></i>
-            Retirada no balcão: <strong id="pickupAddressText">Rua das Delícias, 100 - Rio de Janeiro - RJ</strong>
+            Retirada no balcão: <strong id="pickupAddressText">Rua Marcílio Dias, 24, Campo Lindo, Seropédica - RJ</strong>
           </div>
 
           <div id="dineInArea" class="hidden mt-3 p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs space-y-2">
@@ -802,7 +791,7 @@
       searchQuery: "",
       modalItem: null,
       modalQty: 1,
-      modalSelectedAddons: {}, // { "Carne": 1, "Ovo": 2 }
+      modalSelectedAddons: {},
       currentUser: null,
       savedAddress: null
     };
@@ -813,9 +802,7 @@
 
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
-      if (clean.length === 10 || clean.length === 11) {
-        clean = '55' + clean;
-      }
+      if (clean.length === 10 || clean.length === 11) clean = '55' + clean;
       return clean;
     }
 
@@ -823,21 +810,15 @@
       let v = input.value.replace(/\D/g, '');
       if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
       input.value = v;
-      if (v.replace(/\D/g, '').length === 8) {
-        searchCepManual();
-      }
+      if (v.replace(/\D/g, '').length === 8) searchCepManual();
     }
 
     function formatPhoneInput(input) {
       let v = input.value.replace(/\D/g, '');
       if (v.length > 11) v = v.substring(0, 11);
-      if (v.length > 10) {
-        v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7,11)}`;
-      } else if (v.length > 6) {
-        v = `(${v.substring(0,2)}) ${v.substring(2,6)}-${v.substring(6,10)}`;
-      } else if (v.length > 2) {
-        v = `(${v.substring(0,2)}) ${v.substring(2)}`;
-      }
+      if (v.length > 10) v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7,11)}`;
+      else if (v.length > 6) v = `(${v.substring(0,2)}) ${v.substring(2,6)}-${v.substring(6,10)}`;
+      else if (v.length > 2) v = `(${v.substring(0,2)}) ${v.substring(2)}`;
       input.value = v;
     }
 
@@ -1096,6 +1077,18 @@
             </li>
           `).join("");
         }
+
+        // ATUALIZA VISIBILIDADE DAS FORMAS DE PAGAMENTO NO RODAPÉ
+        const pms = storeConfig.paymentMethods || { pix: true, money: true, credit: true, debit: true };
+        const bPix = document.getElementById('footerBadgePix');
+        const bCredit = document.getElementById('footerBadgeCredit');
+        const bDebit = document.getElementById('footerBadgeDebit');
+        const bMoney = document.getElementById('footerBadgeMoney');
+
+        if (bPix) bPix.style.display = pms.pix !== false ? 'flex' : 'none';
+        if (bCredit) bCredit.style.display = pms.credit !== false ? 'flex' : 'none';
+        if (bDebit) bDebit.style.display = pms.debit !== false ? 'flex' : 'none';
+        if (bMoney) bMoney.style.display = pms.money !== false ? 'flex' : 'none';
 
         const feeBadge = document.getElementById('chkDeliveryFeeText');
         if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
@@ -1442,9 +1435,7 @@
       `).join("");
     }
 
-    // ==============================================
-    // FLUXO DO MODAL DO PRODUTO & ADICIONAIS
-    // ==============================================
+    // MODAL DE PRODUTO COM ADICIONAIS
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
@@ -1460,7 +1451,6 @@
       document.getElementById("modalQtyDisplay").innerText = "1";
       document.getElementById("modalProductNotes").value = "";
 
-      // RENDERIZA OS ADICIONAIS (SE HOUVER)
       const addonsSection = document.getElementById("modalAddonsSection");
       const addonsContainer = document.getElementById("modalAddonsList");
       const headerTitle = document.getElementById("addonGroupDisplayTitle");
@@ -1508,11 +1498,8 @@
       }
 
       const newQty = Math.max(0, currentQty + delta);
-      if (newQty === 0) {
-        delete appState.modalSelectedAddons[item.name];
-      } else {
-        appState.modalSelectedAddons[item.name] = newQty;
-      }
+      if (newQty === 0) delete appState.modalSelectedAddons[item.name];
+      else appState.modalSelectedAddons[item.name] = newQty;
 
       document.getElementById(`addonQty-${itemIndex}`).innerText = newQty;
       updateModalPrice();
@@ -1854,7 +1841,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // 1. Grava no banco e valida se foi com sucesso antes de abrir o WhatsApp
+      // 1. Grava no Supabase
       const submitBtn = document.getElementById("btnSubmitOrder");
       submitBtn.disabled = true;
       submitBtn.innerText = "ENVIANDO PEDIDO...";
