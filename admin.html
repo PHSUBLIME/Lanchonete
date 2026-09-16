@@ -5,24 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Painel do Lojista | PHSUBLIME FOOD</title>
 
-  <!-- ÍCONE DA ABA (FAVICON) E PREVIEW DO PAINEL -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://lanchonete.phsublime.com.br/admin" />
-  <meta property="og:title" content="Painel de Gestão | PHSUBLIME FOOD" />
-  <meta property="og:description" content="Acesso administrativo e fila de pedidos." />
-  <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -50,32 +39,16 @@
       body * { visibility: hidden; }
       #printableReceipt, #printableReceipt * { visibility: visible; }
       #printableReceipt {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 80mm;
-        margin: 0;
-        padding: 8px;
-        background: #fff;
-        color: #000;
-        font-family: monospace;
-        font-size: 12px;
+        position: absolute; left: 0; top: 0; width: 80mm; margin: 0; padding: 8px;
+        background: #fff; color: #000; font-family: monospace; font-size: 12px;
       }
       #printAreaTables, #printAreaTables * { visibility: visible; }
-      #printAreaTables {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: #fff;
-        color: #000;
-      }
+      #printAreaTables { position: absolute; left: 0; top: 0; width: 100%; background: #fff; color: #000; }
     }
   </style>
 </head>
 <body class="bg-[#0F0F0F] text-gray-100 antialiased min-h-screen font-sans flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-black">
 
-  <!-- NOTIFICAÇÃO FLUTUANTE -->
   <div id="toastNotification" class="fixed top-5 right-5 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-neutral-900 border border-emerald-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl">
     <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
       <i class="fa-solid fa-check"></i>
@@ -86,7 +59,7 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN -->
+  <!-- LOGIN -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -94,20 +67,19 @@
           <img src="capa.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<i class=\'fa-solid fa-shield-halved text-2xl text-brand-black\'></i>'" />
         </div>
         <h2 class="text-2xl font-black tracking-tight text-white">Acesso Restrito</h2>
-        <p class="text-xs text-gray-400 mt-1">Autenticação oficial do restaurante via Supabase</p>
+        <p class="text-xs text-gray-400 mt-1">Autenticação oficial do restaurante</p>
       </div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
         <div>
           <label class="block font-bold text-gray-300 mb-1">Usuário / Login</label>
-          <input type="text" id="loginUser" value="adimim" placeholder="Ex: adimim" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
+          <input type="text" id="loginUser" value="adimim" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white font-medium focus:outline-none focus:border-brand-yellow" required />
         </div>
         <div>
           <label class="block font-bold text-gray-300 mb-1">Sua Senha</label>
           <input type="password" id="loginPass" placeholder="••••••••" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
-
-        <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg active:scale-95">
+        <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95">
           <span>ENTRAR NO PAINEL</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -115,10 +87,9 @@
     </div>
   </div>
 
-  <!-- DASHBOARD PRINCIPAL -->
+  <!-- DASHBOARD -->
   <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
 
-    <!-- MENU LATERAL -->
     <aside class="w-full lg:w-64 bg-brand-dark border-b lg:border-b-0 lg:border-r border-neutral-800 flex flex-col justify-between shrink-0">
       <div>
         <div class="p-5 border-b border-neutral-800 flex items-center justify-between">
@@ -136,7 +107,6 @@
           </a>
         </div>
 
-        <!-- CONTROLES RÁPIDOS (STATUS E TEMPO ESTIMADO) -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -148,7 +118,6 @@
             </button>
           </div>
 
-          <!-- BOTÃO DE AJUSTE RÁPIDO DO TEMPO -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-stopwatch text-brand-yellow"></i>
@@ -190,13 +159,6 @@
       </div>
 
       <div class="p-4 border-t border-neutral-800">
-        <div class="bg-neutral-900/80 p-3 rounded-xl border border-neutral-800 mb-3">
-          <p class="text-[10px] font-bold text-gray-400 uppercase">Desenvolvido por</p>
-          <p class="text-xs font-extrabold text-white mt-0.5">PHSUBLIME</p>
-          <a href="https://wa.me/5521986147221" target="_blank" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1 mt-1">
-            <i class="fa-brands fa-whatsapp"></i> (21) 98614-7221
-          </a>
-        </div>
         <button onclick="handleLogout()" class="w-full text-xs font-bold text-rose-400 hover:text-rose-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer">
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>Encerrar Sessão</span>
@@ -207,9 +169,9 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS COMPLETA -->
+      <!-- ABA 1: FILA DE PEDIDOS -->
       <section id="tab-orders" class="tab-content">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex justify-between items-center mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
             <p class="text-xs text-gray-400">Acompanhe pedidos com adicionais em tempo real</p>
@@ -307,22 +269,18 @@
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-1"></i> Dinheiro na Gaveta</span>
               <p class="text-lg font-black text-white" id="dashCashTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir na gaveta física</span>
             </div>
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-brands fa-pix text-emerald-400 mr-1"></i> Pix</span>
               <p class="text-lg font-black text-white" id="dashPixTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir extrato bancário</span>
             </div>
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-blue-400 mr-1"></i> Cartão Crédito</span>
               <p class="text-lg font-black text-white" id="dashCreditTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir maquininha</span>
             </div>
             <div class="bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
               <span class="text-[11px] text-gray-400 block mb-0.5"><i class="fa-solid fa-credit-card text-purple-400 mr-1"></i> Cartão Débito</span>
               <p class="text-lg font-black text-white" id="dashDebitTotal">R$ 0,00</p>
-              <span class="text-[10px] text-gray-500">Conferir maquininha</span>
             </div>
           </div>
         </div>
@@ -351,7 +309,7 @@
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
               <h4 class="text-sm font-black text-white">Histórico de Fechamentos & Consulta Mensal</h4>
-              <p class="text-[11px] text-gray-400">Todos os fechamentos consolidados ficam registrados permanentemente</p>
+              <p class="text-[11px] text-gray-400">Todos os fechamentos consolidados</p>
             </div>
             <div class="flex items-center space-x-2">
               <select id="selectMonthFilter" onchange="filterClosuresByMonth(this.value)" class="text-xs font-extrabold p-2 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none"></select>
@@ -428,7 +386,6 @@
               class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
             />
           </div>
-
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
@@ -489,7 +446,7 @@
               <div>
                 <label class="block font-bold text-amber-400 mb-1">Endereço Completo (com Bairro, Cidade e UF) *</label>
                 <input type="text" id="cfgAddress" placeholder="Ex: Rua Marcílio Dias, 24, Campo Lindo, Seropédica - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-amber-400/60 text-white focus:outline-none font-bold" required />
-                <span class="text-[10px] text-gray-400 mt-1 block leading-tight">⚠️ Sempre coloque o Bairro, Cidade e UF para o GPS não calcular a distância em outro estado!</span>
+                <span class="text-[10px] text-gray-400 mt-1 block leading-tight">⚠️ Sempre coloque o Bairro, Cidade e UF para o GPS calcular com exatidão!</span>
               </div>
             </div>
           </div>
@@ -499,7 +456,7 @@
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-credit-card"></i> Formas de Pagamento Aceitas no Cardápio
             </h3>
-            <p class="text-[11px] text-gray-400">Marque apenas as formas que seu restaurante aceita no momento:</p>
+            <p class="text-[11px] text-gray-400">Marque apenas as formas que seu restaurante aceita:</p>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
@@ -658,6 +615,28 @@
     </main>
   </div>
 
+  <!-- NOVO MODAL MODERNO: CANCELAR / REMOVER PEDIDO DA FILA (SEM CAIXA CINZA FEIA) -->
+  <div id="cancelOrderModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl mb-3">
+        <i class="fa-solid fa-ban"></i>
+      </div>
+      <h3 class="text-base font-black text-white mb-1" id="cancelOrderModalTitle">Cancelar Pedido?</h3>
+      <p class="text-gray-300 text-[11px] mb-4" id="cancelOrderModalDesc">
+        O pedido sairá da fila de abertos e será movido com segurança para a aba de <strong>Cancelados</strong>.
+      </p>
+
+      <div class="flex gap-2">
+        <button type="button" onclick="closeCancelOrderModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">
+          Voltar
+        </button>
+        <button type="button" id="btnConfirmCancelAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">
+          Sim, Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: BAIXAR COM FORMA DE PAGAMENTO REAL -->
   <div id="paymentSettlementModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border-2 border-brand-yellow shadow-2xl text-xs">
@@ -684,17 +663,14 @@
           <i class="fa-brands fa-pix text-lg"></i>
           <span>PIX</span>
         </button>
-
         <button onclick="confirmOrderPayment('Dinheiro')" class="p-3 bg-neutral-900 hover:bg-neutral-800 border border-emerald-500/60 text-emerald-400 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
           <i class="fa-solid fa-money-bill-wave text-lg"></i>
           <span>DINHEIRO</span>
         </button>
-
         <button onclick="confirmOrderPayment('Cartão de Crédito')" class="p-3 bg-blue-950/80 hover:bg-blue-900 border border-blue-600/80 text-blue-300 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
           <i class="fa-solid fa-credit-card text-lg"></i>
           <span>CRÉDITO</span>
         </button>
-
         <button onclick="confirmOrderPayment('Cartão de Débito')" class="p-3 bg-purple-950/80 hover:bg-purple-900 border border-purple-600/80 text-purple-300 font-black rounded-xl text-xs flex flex-col items-center gap-1 transition cursor-pointer active:scale-95 shadow-md">
           <i class="fa-solid fa-credit-card text-lg"></i>
           <span>DÉBITO</span>
@@ -717,9 +693,7 @@
           </h3>
           <p class="text-[11px] text-gray-400" id="closeShiftDateText">Data de hoje</p>
         </div>
-        <button onclick="closeCloseShiftModal()" class="text-gray-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closeCloseShiftModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <div class="space-y-2 p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4">
@@ -743,9 +717,7 @@
       </div>
 
       <div class="flex gap-2">
-        <button onclick="closeCloseShiftModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-3 rounded-xl transition cursor-pointer">
-          Voltar
-        </button>
+        <button onclick="closeCloseShiftModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-3 rounded-xl transition cursor-pointer">Voltar</button>
         <button onclick="confirmCloseShift()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-3 rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-check"></i>
           <span>Confirmar e Salvar</span>
@@ -754,20 +726,17 @@
     </div>
   </div>
 
-  <!-- MODAL: CADASTRAR / EDITAR PRODUTO (COM FOTO + CÂMERA + ADICIONAIS) -->
+  <!-- MODAL: CADASTRAR / EDITAR PRODUTO -->
   <div id="productEditModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 sm:p-7 rounded-3xl max-w-xl w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[92vh]">
       <div class="flex justify-between items-center mb-4">
         <h3 id="productModalTitle" class="text-base font-black text-white">Cadastrar / Editar Produto</h3>
-        <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closeProductModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <form onsubmit="handleSaveProduct(event)" class="space-y-4">
         <input type="hidden" id="prodEditId" value="" />
 
-        <!-- FOTO DO PRODUTO (ARQUIVO / CÂMERA OU URL) -->
         <div class="p-4 bg-neutral-900/90 rounded-2xl border border-neutral-800">
           <label class="block font-bold text-gray-300 mb-2">Foto do Produto</label>
           <div class="flex items-center space-x-4 mb-3">
@@ -775,7 +744,6 @@
               <img id="imagePreview" src="" class="w-full h-full object-cover hidden" />
               <i id="imagePlaceholder" class="fa-solid fa-image text-2xl text-neutral-600"></i>
             </div>
-
             <div class="flex-1">
               <label class="cursor-pointer inline-flex items-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold px-3.5 py-2.5 rounded-xl border border-neutral-700 transition text-xs mb-1">
                 <i class="fa-solid fa-camera"></i>
@@ -785,7 +753,6 @@
               <p class="text-[10px] text-gray-400">Tire uma foto ou escolha da galeria</p>
             </div>
           </div>
-
           <div>
             <label class="block text-[11px] font-semibold text-gray-400 mb-1">Ou cole o link direto da imagem (URL):</label>
             <input type="url" id="prodImageUrl" oninput="updatePreviewFromUrl(this.value)" placeholder="https://exemplo.com/foto.jpg" class="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white" />
@@ -857,13 +824,8 @@
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
-        <div>
-          <h3 class="text-base font-black text-white">Gerenciar Categorias</h3>
-          <p class="text-[11px] text-gray-400">Adicione, edite nomes e escolha o desenho da categoria</p>
-        </div>
-        <button onclick="closeCategoryManagerModal()" class="text-gray-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <h3 class="text-base font-black text-white">Gerenciar Categorias</h3>
+        <button onclick="closeCategoryManagerModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <form onsubmit="handleAddCategory(event)" class="space-y-3 mb-5 p-3.5 bg-neutral-900/90 rounded-2xl border border-neutral-800">
@@ -893,7 +855,7 @@
     </div>
   </div>
 
-  <!-- NOVO MODAL MODERNO: AJUSTE RÁPIDO DO TEMPO DE ESPERA (SEM PROMPT CINZA) -->
+  <!-- MODAL: TEMPO DE ESPERA (SEM PROMPT CINZA) -->
   <div id="deliveryTimeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-brand-yellow flex items-center justify-center mx-auto text-xl mb-3">
@@ -922,11 +884,10 @@
     </div>
   </div>
 
-  <!-- ÁREA DE IMPRESSÃO TÉRMICA -->
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
 
-  <!-- SCRIPT DO PAINEL -->
+  <!-- JAVASCRIPT DO PAINEL -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -942,6 +903,7 @@
     window.deliveryTimeCurrent = '40 - 50 min';
     window.pickupTimeCurrent = '15 - 25 min';
     window.currentSettleOrderId = null;
+    window.orderIdToCancel = null;
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
     let audioContextInstance = null;
@@ -961,7 +923,6 @@
       { icon: 'fa-solid fa-tag', label: 'Geral' }
     ];
 
-    // DESBLOQUEIO DE ÁUDIO NO PRIMEIRO TOQUE
     function initUserAudio() {
       if (!audioContextInstance) {
         audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
@@ -976,13 +937,11 @@
       try {
         initUserAudio();
         const ctx = audioContextInstance || new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Toca dois tons nítidos em sequência (Ding-Dong)
         const now = ctx.currentTime;
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = "sine";
-        osc1.frequency.setValueAtTime(587.33, now); // Ré
+        osc1.frequency.setValueAtTime(587.33, now);
         gain1.gain.setValueAtTime(0.4, now);
         gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
         osc1.connect(gain1);
@@ -993,7 +952,7 @@
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = "sine";
-        osc2.frequency.setValueAtTime(880, now + 0.2); // Lá
+        osc2.frequency.setValueAtTime(880, now + 0.2);
         gain2.gain.setValueAtTime(0.5, now + 0.2);
         gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
         osc2.connect(gain2);
@@ -1081,7 +1040,7 @@
     async function fetchSettings() {
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       if (data) {
-        window.isStoreOpen = data.is_open;
+        window.isStoreOpen = data.is_open !== false;
         window.deliveryTimeCurrent = data.delivery_time || localStorage.getItem('admin_quick_delivery_time') || '40 - 50 min';
         window.pickupTimeCurrent = data.pickup_time || '15 - 25 min';
 
@@ -1133,7 +1092,6 @@
       }
     }
 
-    // MODAL ELEGANTE DE TEMPO DE ESPERA
     function quickEditDeliveryTime() {
       document.getElementById('modalQuickTimeInput').value = window.deliveryTimeCurrent;
       document.getElementById('deliveryTimeModal').classList.remove('hidden');
@@ -1158,12 +1116,11 @@
       if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
 
       closeDeliveryTimeModal();
-
-      const { error } = await db.from('store_settings').upsert({ id: 1, delivery_time: window.deliveryTimeCurrent });
+      await db.from('store_settings').upsert({ id: 1, delivery_time: window.deliveryTimeCurrent });
       showToast("Tempo Atualizado!", `Previsão alterada para ${window.deliveryTimeCurrent}.`);
     }
 
-    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES
+    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES E FORMAS DE PAGAMENTO
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1213,7 +1170,7 @@
 
       let { error } = await db.from('store_settings').upsert(payload);
 
-      // Fallback seguro se colunas extras não existirem no banco
+      // Fallback seguro caso as novas colunas ainda não tenham sido criadas
       if (error && (error.message.includes('delivery_time') || error.message.includes('payment_methods') || error.code === '42703')) {
         delete payload.delivery_time;
         delete payload.pickup_time;
@@ -1227,28 +1184,47 @@
       } else {
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
-        showToast("Configurações Salvas!", "Endereço, horários e formas de pagamento salvos.");
+        showToast("Configurações Salvas!", "Endereço, horários e pagamentos gravados com sucesso.");
         fetchSettings();
       }
     }
 
-    // EXCLUIR PEDIDO DA FILA
-    async function deleteOrder(orderId) {
-      if (confirm(`Deseja realmente excluir o pedido #${orderId}?`)) {
-        const { error } = await db.from('orders').delete().eq('id', orderId);
-        if (error) {
-          showToast("Erro ao Excluir", error.message, true);
-        } else {
-          // Atualiza lista local na hora
-          window.storeOrders = window.storeOrders.filter(o => o.id !== orderId);
-          renderOrders();
-          updateDashboardMetrics();
-          showToast("Pedido Excluído", `Pedido #${orderId} removido do sistema.`);
-        }
+    // MODAL MODERNO DE CANCELAR PEDIDO (ENVIA PARA A ABA CANCELADOS EM VEZ DE APAGAR)
+    function openCancelOrderModal(orderId) {
+      window.orderIdToCancel = orderId;
+      document.getElementById('cancelOrderModalTitle').innerText = `Cancelar Pedido #${orderId}?`;
+      document.getElementById('btnConfirmCancelAction').onclick = executeCancelOrderAction;
+      document.getElementById('cancelOrderModal').classList.remove('hidden');
+    }
+
+    function closeCancelOrderModal() {
+      document.getElementById('cancelOrderModal').classList.add('hidden');
+      window.orderIdToCancel = null;
+    }
+
+    async function executeCancelOrderAction() {
+      if (!window.orderIdToCancel) return;
+      const orderId = window.orderIdToCancel;
+
+      // 1. Atualiza na hora na tela local
+      const ord = window.storeOrders.find(o => o.id === orderId);
+      if (ord) ord.status = 'Cancelado';
+
+      closeCancelOrderModal();
+      renderOrders();
+      updateDashboardMetrics();
+
+      // 2. Grava no banco como Cancelado para ir à aba 'Cancelados'
+      const { error } = await db.from('orders').update({ status: 'Cancelado' }).eq('id', orderId);
+      if (error) {
+        showToast("Erro ao Cancelar", error.message, true);
+        await fetchOrders();
+      } else {
+        showToast("Pedido Cancelado!", `Pedido #${orderId} foi movido para a aba de Cancelados.`);
       }
     }
 
-    // BAIXA NO PEDIDO (INSTANTÂNEA E GARANTIDA)
+    // BAIXA NO PEDIDO (INSTANTÂNEA E DIRETO PARA O CAIXA)
     function openPaymentSettlementModal(orderId) {
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (!ord) return;
@@ -1270,7 +1246,6 @@
       if (!window.currentSettleOrderId) return;
       const orderId = window.currentSettleOrderId;
 
-      // 1. Atualiza imediatamente no estado local da tela para sumir da visão de abertos
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (ord) {
         ord.status = 'Entregue';
@@ -1281,7 +1256,6 @@
       renderOrders();
       updateDashboardMetrics();
 
-      // 2. Grava no banco de dados Supabase
       const { error } = await db.from('orders').update({
         status: 'Entregue',
         payment: chosenMethod
@@ -1295,7 +1269,6 @@
       }
     }
 
-    // ADICIONAIS NO MODAL DE PRODUTO
     function addAddonRow(name = '', price = '') {
       const container = document.getElementById('addonRowsContainer');
       const warning = document.getElementById('noAddonsWarning');
@@ -1379,7 +1352,6 @@
       document.getElementById("productEditModal").classList.add("hidden");
     }
 
-    // SALVAMENTO BLINDADO DE PRODUTOS
     async function handleSaveProduct(e) {
       e.preventDefault();
 
@@ -1417,19 +1389,18 @@
         ? await db.from('products').update(payload).eq('id', editId)
         : await db.from('products').insert([{ id: Date.now(), ...payload }]);
 
-      // Fallback seguro caso addons não exista na tabela do banco
       if (res.error && (res.error.message.includes('addons') || res.error.code === '42703')) {
         delete payload.addons;
         res = editId 
           ? await db.from('products').update(payload).eq('id', editId)
           : await db.from('products').insert([{ id: Date.now(), ...payload }]);
 
-        showToast("Aviso!", "Produto salvo! Lembre-se de rodar o SQL no Supabase para salvar adicionais!", true);
+        showToast("Aviso!", "Execute o comando SQL no Supabase para gravar adicionais!", true);
       } else if (res.error) {
         showToast("Erro ao Salvar", res.error.message, true);
         return;
       } else {
-        showToast("Produto Salvo com Sucesso!", `${name} está gravado no cardápio.`);
+        showToast("Produto Salvo com Sucesso!", `${name} cadastrado com adicionais.`);
       }
 
       window.adminSelectedCategory = 'all';
@@ -1442,7 +1413,6 @@
       const typeStr = (ord.type || '').toLowerCase();
       const addrStr = (ord.address || '').toLowerCase();
       const notesStr = (ord.notes || '').toLowerCase();
-
       return typeStr.includes('mesa') || typeStr.includes('salão') || typeStr.includes('dine_in') || addrStr.includes('mesa') || addrStr.includes('salão') || notesStr.includes('mesa') || /^\d+$/.test(typeStr.trim());
     }
 
@@ -1585,9 +1555,9 @@
                   <i class="fa-solid fa-check"></i>
                   <span>Baixar</span>
                 </button>
-                <button onclick="deleteOrder('${ord.id}')" title="Excluir este pedido" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-800/80 text-rose-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
-                  <i class="fa-solid fa-trash"></i>
-                  <span class="hidden sm:inline">Excluir</span>
+                <button onclick="openCancelOrderModal('${ord.id}')" title="Cancelar este pedido" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-800/80 text-rose-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                  <i class="fa-solid fa-ban"></i>
+                  <span class="hidden sm:inline">Cancelar</span>
                 </button>
               </div>
             </div>
@@ -2148,7 +2118,6 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .subscribe();
 
-      // Checagem automática periódica a cada 8 segundos para nunca perder pedidos
       setInterval(fetchOrders, 8000);
     }
 
