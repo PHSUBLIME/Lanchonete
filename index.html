@@ -67,81 +67,76 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12">
 
-  <!-- BARRA SUPERIOR DE HORÁRIO E USUÁRIO -->
-  <div class="bg-brand-black text-white text-xs py-2 px-4 border-b border-neutral-800">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all">
-          <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
-          <span id="storeStatusText">ABERTO AGORA</span>
-        </span>
-        <span class="text-neutral-500 hidden sm:inline">|</span>
-        <span class="text-neutral-300 hidden sm:inline" id="storeScheduleText">Atendimento Disponível</span>
-      </div>
-
-      <!-- BOTÃO DE LOGIN / CONTA NO TOPO -->
-      <div id="topUserBar" class="flex items-center space-x-2">
-        <button onclick="openAuthModal()" class="flex items-center space-x-1.5 text-neutral-300 hover:text-brand-yellow transition font-semibold cursor-pointer">
-          <i class="fa-regular fa-user text-brand-yellow"></i>
-          <span id="topUserLabel">Entre ou Cadastre-se</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BARRA DE ENDEREÇO SELECIONADO / DEFINIR CEP -->
-  <div class="bg-white border-b border-gray-200 px-4 py-2.5">
-    <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
-      <div class="flex items-center space-x-2.5 overflow-hidden cursor-pointer group" onclick="openAddressModal()">
-        <div class="w-7 h-7 rounded-lg bg-amber-50 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
-          <i class="fa-solid fa-location-dot"></i>
-        </div>
-        <div class="truncate">
-          <p class="font-bold text-gray-800 flex items-center gap-1 leading-tight group-hover:text-amber-600 transition">
-            <span id="topAddressStreet">Informe seu endereço para entrega</span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
-          </p>
-          <p id="topDeliveryFeeTag" class="text-[11px] text-gray-500 font-medium leading-tight">Clique para calcular taxa e tempo de entrega</p>
-        </div>
-      </div>
-
-      <button onclick="openAddressModal()" class="bg-neutral-100 hover:bg-neutral-200 text-brand-black px-3 py-1.5 rounded-lg font-bold text-[11px] transition hidden sm:inline-flex items-center gap-1 cursor-pointer">
-        <i class="fa-solid fa-map-pin text-brand-yellow"></i>
-        <span>Alterar Endereço</span>
-      </button>
+  <!-- BARRA SUPERIOR DE HORÁRIO -->
+  <div class="bg-brand-black text-white text-xs py-1.5 px-4 border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex justify-center sm:justify-start items-center space-x-2">
+      <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all">
+        <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
+        <span id="storeStatusText">ABERTO AGORA</span>
+      </span>
+      <span class="text-neutral-600">|</span>
+      <span class="text-neutral-300 text-[11px]" id="storeScheduleText">Atendimento Disponível</span>
     </div>
   </div>
 
   <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
-  <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2.5 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
+  <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
     <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER PRINCIPAL COM ENDEREÇO E LOGIN NA MESMA BARRA -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
-    <div class="max-w-6xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToSection('inicio')">
+    <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-3">
+      
+      <!-- LADO ESQUERDO: LOGO E NOME -->
+      <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-xl shadow-sm">
           <i class="fa-solid fa-burger"></i>
         </div>
         <div>
-          <h1 id="brandNameHeader" class="text-lg sm:text-xl font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
-          <p id="brandSloganHeader" class="text-xs text-gray-500 hidden sm:block">Sabor que combina com você!</p>
+          <h1 id="brandNameHeader" class="text-sm sm:text-lg font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
+          <p id="brandSloganHeader" class="text-[11px] text-gray-500 hidden sm:block">Sabor que combina com você!</p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <button onclick="scrollToSection('cardapio')" class="hidden md:inline-flex text-xs font-bold uppercase tracking-wider text-brand-black hover:text-brand-yellow transition px-4 py-2 cursor-pointer">
+      <!-- CENTRO: SELETOR DE ENDEREÇO / CEP AO LADO DO NOME -->
+      <div class="flex-1 max-w-xs sm:max-w-md mx-1 sm:mx-3">
+        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group shadow-xs">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
+            <i class="fa-solid fa-location-dot text-xs sm:text-sm"></i>
+          </div>
+          <div class="truncate text-left">
+            <p class="font-extrabold text-gray-800 text-[11px] sm:text-xs flex items-center gap-1 leading-tight group-hover:text-amber-600 transition">
+              <span id="topAddressStreet" class="truncate">Informe seu endereço para entrega</span>
+              <i class="fa-solid fa-chevron-down text-[9px] text-gray-400 shrink-0"></i>
+            </p>
+            <p id="topDeliveryFeeTag" class="text-[10px] text-gray-500 truncate leading-tight mt-0.5">Clique para calcular taxa e tempo de entrega</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- LADO DIREITO: BOTÕES DE LOGIN, CARDÁPIO E PEDIDO -->
+      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+        
+        <!-- ENTRE OU CADASTRE-SE -->
+        <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
+          <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
+          <span id="topUserLabel" class="hidden md:inline">Entre ou Cadastre-se</span>
+        </button>
+
+        <button onclick="scrollToSection('cardapio')" class="hidden lg:inline-flex text-xs font-bold uppercase tracking-wider text-brand-black hover:text-brand-yellow transition px-3 py-2 cursor-pointer">
           Ver Cardápio
         </button>
 
-        <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-4 py-2.5 rounded-xl font-bold text-sm flex items-center space-x-2 transition shadow-soft cursor-pointer">
+        <!-- MEU PEDIDO -->
+        <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center space-x-2 transition shadow-soft cursor-pointer">
           <i class="fa-solid fa-bag-shopping text-brand-yellow"></i>
           <span class="hidden sm:inline">Meu Pedido</span>
           <span id="cartHeaderCount" class="bg-brand-red text-white text-[11px] font-black w-5 h-5 rounded-full inline-flex items-center justify-center">0</span>
         </button>
       </div>
+
     </div>
   </header>
 
@@ -206,13 +201,13 @@
 
     <!-- BARRA HORIZONTAL DE CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
-      <div class="max-w-6xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
       </div>
     </section>
 
     <!-- GRID DE PRODUTOS -->
-    <section class="max-w-6xl mx-auto px-4 py-8">
+    <section class="max-w-7xl mx-auto px-4 py-8">
       <div class="flex items-center justify-between mb-6">
         <div>
           <h3 id="currentCategoryTitle" class="text-xl sm:text-2xl font-black text-brand-black">Todos os Itens</h3>
@@ -236,7 +231,7 @@
 
   <!-- FOOTER -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
         <div>
           <div class="flex items-center space-x-2 mb-3">
@@ -298,11 +293,9 @@
     </div>
   </footer>
 
-  <!-- ============================================== -->
-  <!-- NOVO MODAL 1: INFORME SEU ENDEREÇO / CEP      -->
-  <!-- ============================================== -->
+  <!-- MODAL: INFORME SEU ENDEREÇO / CEP -->
   <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
       <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
@@ -343,7 +336,6 @@
             </div>
           </div>
 
-          <!-- CAMPOS REVELADOS APÓS CEP -->
           <div id="addressDetailFields" class="space-y-3 pt-2 border-t border-gray-100 hidden">
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
@@ -384,11 +376,9 @@
     </div>
   </div>
 
-  <!-- ============================================== -->
-  <!-- NOVO MODAL 2: IDENTIFICAÇÃO / LOGIN SEM CUSTO -->
-  <!-- ============================================== -->
+  <!-- MODAL: IDENTIFICAÇÃO / LOGIN SEM CUSTO -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
@@ -399,7 +389,7 @@
         </div>
         <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
         <p class="text-xs text-gray-500 mb-6 leading-relaxed">
-          Para salvar seus endereços, agilizar pedidos e consultar seu histórico com nosso restaurante.
+          Para salvar seus endereços, agilizar pedidos e consultar seu histórico.
         </p>
 
         <form id="authForm" onsubmit="handleCustomerLogin(event)" class="space-y-3 text-left">
@@ -770,9 +760,7 @@
     </div>
   </div>
 
-  <!-- ============================================== -->
-  <!-- JAVASCRIPT DO SISTEMA                          -->
-  <!-- ============================================== -->
+  <!-- JAVASCRIPT DO SISTEMA -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -804,8 +792,8 @@
       searchQuery: "",
       modalItem: null,
       modalQty: 1,
-      currentUser: null, // { name, phone }
-      savedAddress: null  // { cep, street, number, neighborhood, complement }
+      currentUser: null,
+      savedAddress: null
     };
 
     function getCleanWaNumber(phone) {
@@ -838,9 +826,6 @@
       input.value = v;
     }
 
-    // ==============================================
-    // FLUXO DE LOCALIZAÇÃO / VIA CEP
-    // ==============================================
     function openAddressModal() {
       document.getElementById('addressModal').classList.remove('hidden');
       if (appState.savedAddress) {
@@ -911,13 +896,11 @@
       appState.savedAddress = { cep, street, number, neighborhood, complement };
       localStorage.setItem('food_saved_address', JSON.stringify(appState.savedAddress));
 
-      // Sincroniza campos do checkout
       if (document.getElementById('custStreet')) document.getElementById('custStreet').value = street;
       if (document.getElementById('custNumber')) document.getElementById('custNumber').value = number;
       if (document.getElementById('custNeighborhood')) document.getElementById('custNeighborhood').value = neighborhood;
       if (document.getElementById('custComplement')) document.getElementById('custComplement').value = complement;
 
-      // Atualiza etiqueta do topo
       const shortAddr = `${street}${number ? ', ' + number : ''} - ${neighborhood}`;
       document.getElementById('topAddressStreet').innerText = shortAddr;
 
@@ -940,14 +923,10 @@
           autoCalculateRouteDelivery();
         } catch(e) {}
       } else if (!identifiedTable) {
-        // Se ainda não tem endereço e não está na mesa, abre sugestão de CEP após 800ms
         setTimeout(() => { openAddressModal(); }, 800);
       }
     }
 
-    // ==============================================
-    // FLUXO DE LOGIN/CADASTRO DO CLIENTE (SEM CUSTO)
-    // ==============================================
     function openAuthModal() {
       document.getElementById('authModal').classList.remove('hidden');
       if (appState.currentUser) {
@@ -975,11 +954,9 @@
       updateUserInterface();
       closeAuthModal();
 
-      // Preenche os campos do checkout
       document.getElementById('custName').value = name;
       document.getElementById('custPhone').value = phone;
 
-      // Se tiver carrinho e veio de "Finalizar", abre o checkout
       if (appState.cart.length > 0 && document.getElementById('checkoutModal').classList.contains('hidden')) {
         openCheckoutAfterLogin();
       }
@@ -1016,9 +993,6 @@
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
 
-    // ==============================================
-    // CONFIGURAÇÕES, PRODUTOS E BANCO
-    // ==============================================
     function detectTableUrlParam() {
       const urlParams = new URLSearchParams(window.location.search);
       const mesa = urlParams.get('mesa');
@@ -1112,11 +1086,11 @@
         const text = document.getElementById("storeStatusText");
 
         if (data.is_open) {
-          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all";
+          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all";
           dot.className = "w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse";
           text.innerText = "ABERTO AGORA";
         } else {
-          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-closed transition-all";
+          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-closed transition-all";
           dot.className = "w-2 h-2 rounded-full mr-1.5 bg-rose-500";
           text.innerText = "FECHADO NO MOMENTO";
         }
@@ -1293,8 +1267,7 @@
           if (noticeTitle) noticeTitle.innerText = `Frete calculado: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
           if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
 
-          // Atualiza etiqueta no topo
-          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • Entrega estimada: 40-50 min`;
+          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • 40-50 min`;
 
           updateCheckoutTotals();
         }
@@ -1565,7 +1538,6 @@
       if (appState.cart.length === 0) return;
       closeCartDrawer();
 
-      // FORÇA IDENTIFICAÇÃO DO CLIENTE SE NÃO ESTIVER LOGADO
       if (!appState.currentUser) {
         openAuthModal();
         return;
@@ -1710,7 +1682,6 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // Insere pedido no Supabase
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
