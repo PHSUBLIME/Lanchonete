@@ -125,7 +125,7 @@
           </a>
         </div>
 
-        <!-- CONTROLES RÁPIDOS (STATUS, ESPERA E TESTE DE ALARME) -->
+        <!-- CONTROLES RÁPIDOS -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -137,19 +137,19 @@
             </button>
           </div>
 
-          <!-- BOTÃO RÁPIDO DE ESPERA DELIVERY EXCLUSIVO -->
+          <!-- ESPERA DELIVERY -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-stopwatch text-brand-yellow"></i>
               <span>Espera Delivery:</span>
             </span>
-            <button onclick="quickEditDeliveryTime()" id="btnQuickDeliveryTime" title="Clique para alterar rapidamente o tempo de entrega" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-black rounded-lg transition cursor-pointer">
+            <button onclick="quickEditDeliveryTime()" id="btnQuickDeliveryTime" title="Clique para alterar" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-black rounded-lg transition cursor-pointer">
               40 - 50 min
             </button>
           </div>
 
-          <!-- BOTÃO DE TESTAR ALARME -->
-          <button onclick="playOrderChime()" title="Clique para testar o som de aviso de novos pedidos" class="w-full py-1.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] text-gray-300 font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
+          <!-- TESTAR ALARME -->
+          <button onclick="playOrderChime()" title="Clique para testar o som do alarme" class="w-full py-1.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] text-gray-300 font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
             <i class="fa-solid fa-volume-high text-brand-yellow"></i>
             <span>Testar Alarme Sonoro</span>
           </button>
@@ -473,7 +473,7 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 6: CONFIGURAÇÕES DA LOJA (LIMPA, SEM O BLOCO DUPLICADO DE TEMPO) -->
+      <!-- ABA 6: CONFIGURAÇÕES DA LOJA -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
@@ -1017,7 +1017,7 @@
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
 
-  <!-- JAVASCRIPT DO PAINEL COM ALARME ESCANDALOSO E GERADOR QR LOCAL -->
+  <!-- JAVASCRIPT DO PAINEL COM BLINDAGEM DUPLA (TEMPO REAL + POLLING) -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -1041,6 +1041,8 @@
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
     let audioContextInstance = null;
+    let isInitialOrdersLoad = true;
+    let lastChimeTriggerTimestamp = 0;
 
     const PRESET_CATEGORY_ICONS = [
       { icon: 'fa-solid fa-mug-hot', label: 'Café' },
@@ -1057,7 +1059,6 @@
       { icon: 'fa-solid fa-tag', label: 'Geral' }
     ];
 
-    // INICIALIZA E DESTAVA O ÁUDIO DO NAVEGADOR
     function initUserAudio() {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1073,29 +1074,32 @@
     window.addEventListener('keydown', initUserAudio);
     window.addEventListener('touchstart', initUserAudio);
 
-    // BIP ALARME ESCANDALOSO (SOM ESTRIDENTE DE COZINHA / IFOOD COM 6 TOQUES AGUDOS)
     function playOrderChime() {
+      const nowMs = Date.now();
+      // Evita repetição duplicada se o evento Realtime e o Polling chegarem juntos
+      if (nowMs - lastChimeTriggerTimestamp < 2000) return;
+      lastChimeTriggerTimestamp = nowMs;
+
       try {
         initUserAudio();
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const ctx = audioContextInstance || new AudioContext();
         const now = ctx.currentTime;
 
-        // Sequência rápida de 6 toques agudos penetrantes em onda triangular (volume alto)
         const alarmPattern = [
-          { freq: 1046.50, start: 0.00, dur: 0.10 }, // Dó agudo
-          { freq: 1318.51, start: 0.12, dur: 0.15 }, // Mi agudo
-          { freq: 1046.50, start: 0.35, dur: 0.10 }, 
-          { freq: 1318.51, start: 0.47, dur: 0.15 }, 
-          { freq: 1567.98, start: 0.70, dur: 0.12 }, // Sol bem agudo
-          { freq: 2093.00, start: 0.84, dur: 0.35 }  // Dó estridente no final
+          { freq: 1046.50, start: 0.00, dur: 0.10 },
+          { freq: 1318.51, start: 0.12, dur: 0.15 },
+          { freq: 1046.50, start: 0.35, dur: 0.10 },
+          { freq: 1318.51, start: 0.47, dur: 0.15 },
+          { freq: 1567.98, start: 0.70, dur: 0.12 },
+          { freq: 2093.00, start: 0.84, dur: 0.35 }
         ];
 
         alarmPattern.forEach(t => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
-          osc.type = 'triangle'; // Som bem mais cortante e penetrante que o seno
+          osc.type = 'triangle';
           osc.frequency.setValueAtTime(t.freq, now + t.start);
 
           gain.gain.setValueAtTime(0.001, now + t.start);
@@ -1168,9 +1172,25 @@
       }
     }
 
+    // BUSCA DE PEDIDOS COM BLINDAGEM DE ALARME AUTOMÁTICA
     async function fetchOrders() {
       const { data } = await db.from('orders').select('*').order('created_at', { ascending: false });
       if (data) {
+        if (!isInitialOrdersLoad && window.storeOrders.length > 0) {
+          const knownIds = new Set(window.storeOrders.map(o => String(o.id)));
+          const incomingNewOrders = data.filter(o => 
+            !knownIds.has(String(o.id)) && 
+            !isOrderFromPastShift(o) && 
+            (o.status === 'Novo' || !o.status)
+          );
+
+          if (incomingNewOrders.length > 0) {
+            playOrderChime();
+            showToast(`Novo Pedido #${incomingNewOrders[0].id}!`, `${incomingNewOrders[0].client} enviou um pedido.`);
+          }
+        }
+
+        isInitialOrdersLoad = false;
         window.storeOrders = data;
         renderOrders();
         updateDashboardMetrics();
@@ -1207,7 +1227,6 @@
         if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
         if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
 
-        // REDES SOCIAIS
         if (data.social_links) {
           const s = data.social_links;
           if (s.whatsapp) {
@@ -1228,7 +1247,6 @@
           }
         }
 
-        // FORMAS DE PAGAMENTO
         if (data.payment_methods) {
           document.getElementById('cfgPayPix').checked = data.payment_methods.pix !== false;
           document.getElementById('cfgPayMoney').checked = data.payment_methods.money !== false;
@@ -1265,7 +1283,6 @@
       }
     }
 
-    // GESTÃO E MODERAÇÃO DE AVALIAÇÕES
     async function fetchAdminReviews() {
       const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -1403,7 +1420,6 @@
       showToast("Configuração da Loja", show ? "Card de avaliações ativado na loja." : "Card de avaliações ocultado da loja.");
     }
 
-    // AJUSTE RÁPIDO DO TEMPO DE ESPERA DELIVERY
     function quickEditDeliveryTime() {
       document.getElementById('modalQuickTimeInput').value = window.deliveryTimeCurrent;
       document.getElementById('deliveryTimeModal').classList.remove('hidden');
@@ -1431,7 +1447,6 @@
       showToast("Tempo Atualizado!", `Previsão de entrega alterada para ${window.deliveryTimeCurrent}.`);
     }
 
-    // SALVAMENTO DE CONFIGURAÇÕES (SEM CAMPOS DUPLICADOS)
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -2145,7 +2160,6 @@
       renderOrders();
     }
 
-    // CAIXA DIÁRIO + REGISTRO MENSAL CONSOLIDADO
     function calculateShiftMetrics() {
       const currentShiftOrders = window.storeOrders.filter(o => !isOrderFromPastShift(o));
 
@@ -2542,7 +2556,6 @@
       }
     }
 
-    // GERAÇÃO DE QR CODE DIRETO NO NAVEGADOR
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       const container = document.getElementById('tableCardsGrid');
@@ -2631,6 +2644,7 @@
       document.getElementById(`nav-${tabId}`).className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
     }
 
+    // SINCRONIZAÇÃO EM TEMPO REAL COM DISPARO INSTANTÂNEO
     function setupRealtimeListeners() {
       db.channel('admin_live')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
@@ -2655,9 +2669,14 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchAdminReviews())
-        .subscribe();
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log("Supabase Realtime conectado com sucesso!");
+          }
+        });
 
-      setInterval(fetchOrders, 6000);
+      // Polling contínuo a cada 5 segundos (garante disparo do som mesmo se o WebSocket dormir)
+      setInterval(fetchOrders, 5000);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
