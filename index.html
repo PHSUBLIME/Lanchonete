@@ -8,7 +8,7 @@
   <!-- ÍCONE DA ABA (FAVICON) -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
 
-  <!-- META TAGS DE COMPARTILHAMENTO (WHATSAPP, INSTAGRAM, FACEBOOK) -->
+  <!-- META TAGS DE COMPARTILHAMENTO -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/" />
   <meta property="og:title" content="PHSUBLIME FOOD | Cardápio Online" />
@@ -67,15 +67,48 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12">
 
-  <!-- BARRA SUPERIOR DE HORÁRIO -->
+  <!-- BARRA SUPERIOR DE HORÁRIO E USUÁRIO -->
   <div class="bg-brand-black text-white text-xs py-2 px-4 border-b border-neutral-800">
-    <div class="max-w-6xl mx-auto flex justify-center sm:justify-start items-center space-x-2">
-      <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all">
-        <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
-        <span id="storeStatusText">ABERTO AGORA</span>
-      </span>
-      <span class="text-neutral-500">|</span>
-      <span class="text-neutral-300" id="storeScheduleText">Atendimento Disponível</span>
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold badge-open transition-all">
+          <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
+          <span id="storeStatusText">ABERTO AGORA</span>
+        </span>
+        <span class="text-neutral-500 hidden sm:inline">|</span>
+        <span class="text-neutral-300 hidden sm:inline" id="storeScheduleText">Atendimento Disponível</span>
+      </div>
+
+      <!-- BOTÃO DE LOGIN / CONTA NO TOPO -->
+      <div id="topUserBar" class="flex items-center space-x-2">
+        <button onclick="openAuthModal()" class="flex items-center space-x-1.5 text-neutral-300 hover:text-brand-yellow transition font-semibold cursor-pointer">
+          <i class="fa-regular fa-user text-brand-yellow"></i>
+          <span id="topUserLabel">Entre ou Cadastre-se</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE ENDEREÇO SELECIONADO / DEFINIR CEP -->
+  <div class="bg-white border-b border-gray-200 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
+      <div class="flex items-center space-x-2.5 overflow-hidden cursor-pointer group" onclick="openAddressModal()">
+        <div class="w-7 h-7 rounded-lg bg-amber-50 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div class="truncate">
+          <p class="font-bold text-gray-800 flex items-center gap-1 leading-tight group-hover:text-amber-600 transition">
+            <span id="topAddressStreet">Informe seu endereço para entrega</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+          </p>
+          <p id="topDeliveryFeeTag" class="text-[11px] text-gray-500 font-medium leading-tight">Clique para calcular taxa e tempo de entrega</p>
+        </div>
+      </div>
+
+      <button onclick="openAddressModal()" class="bg-neutral-100 hover:bg-neutral-200 text-brand-black px-3 py-1.5 rounded-lg font-bold text-[11px] transition hidden sm:inline-flex items-center gap-1 cursor-pointer">
+        <i class="fa-solid fa-map-pin text-brand-yellow"></i>
+        <span>Alterar Endereço</span>
+      </button>
     </div>
   </div>
 
@@ -265,6 +298,149 @@
     </div>
   </footer>
 
+  <!-- ============================================== -->
+  <!-- NOVO MODAL 1: INFORME SEU ENDEREÇO / CEP      -->
+  <!-- ============================================== -->
+  <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+
+      <div class="p-6 sm:p-7">
+        <div class="text-center mb-6">
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2.5">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <h3 class="text-xl font-extrabold text-brand-black">Informe seu endereço</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Calculamos a entrega e tempo estimado para você</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-500 mb-1.5">Insira o CEP do Endereço</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="cepInput" 
+                maxlength="9" 
+                placeholder="00000-000" 
+                oninput="formatCepInput(this)"
+                onkeydown="if(event.key==='Enter') searchCepManual()"
+                class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition"
+              />
+              <button 
+                type="button" 
+                onclick="searchCepManual()" 
+                id="btnSearchCep"
+                class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black hover:bg-neutral-800 text-white font-black text-xs px-4 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                <span>BUSCAR CEP</span>
+              </button>
+            </div>
+            <div class="flex justify-between items-center mt-1.5 text-[11px]">
+              <span id="cepFeedback" class="text-brand-red font-medium"></span>
+              <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" class="text-gray-400 hover:text-brand-yellow underline transition ml-auto">Não sabe seu CEP?</a>
+            </div>
+          </div>
+
+          <!-- CAMPOS REVELADOS APÓS CEP -->
+          <div id="addressDetailFields" class="space-y-3 pt-2 border-t border-gray-100 hidden">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-gray-600 mb-1">Rua / Logradouro *</label>
+                <input type="text" id="modalStreet" placeholder="Ex: Rua Barata Ribeiro" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 mb-1">Número *</label>
+                <input type="text" id="modalNumber" placeholder="Ex: 100" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 mb-1">Bairro *</label>
+                <input type="text" id="modalNeighborhood" placeholder="Ex: Centro" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 mb-1">Complemento</label>
+                <input type="text" id="modalComplement" placeholder="Ex: Apt 201" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              </div>
+            </div>
+
+            <button onclick="confirmModalAddress()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-2">
+              <i class="fa-solid fa-check"></i>
+              <span>CONFIRMAR ESTE ENDEREÇO</span>
+            </button>
+          </div>
+
+          <div class="pt-3 border-t border-gray-100 text-center">
+            <p class="text-xs text-gray-400 mb-2">Vai retirar na loja ou comer no salão?</p>
+            <button onclick="skipAddressSelection()" class="text-xs font-black text-brand-black hover:text-brand-yellow transition underline cursor-pointer">
+              Continuar para retirar ou salão →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- NOVO MODAL 2: IDENTIFICAÇÃO / LOGIN SEM CUSTO -->
+  <!-- ============================================== -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+
+      <div class="p-6 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-3">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
+        <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+          Para salvar seus endereços, agilizar pedidos e consultar seu histórico com nosso restaurante.
+        </p>
+
+        <form id="authForm" onsubmit="handleCustomerLogin(event)" class="space-y-3 text-left">
+          <div>
+            <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">WhatsApp / Celular *</label>
+            <input 
+              type="tel" 
+              id="authPhone" 
+              placeholder="(21) 99999-9999" 
+              required
+              oninput="formatPhoneInput(this)"
+              class="w-full text-sm font-bold p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">Seu Nome *</label>
+            <input 
+              type="text" 
+              id="authName" 
+              placeholder="Ex: Carlos Oliveira" 
+              required 
+              class="w-full text-sm p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
+            />
+          </div>
+
+          <button type="submit" id="btnSubmitAuth" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3.5 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-3">
+            <span>CONTINUAR</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-t border-gray-100">
+          <button onclick="closeAuthModal()" class="text-xs text-gray-400 hover:text-gray-600 transition cursor-pointer">
+            Continuar sem entrar agora →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DO PRODUTO -->
   <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
@@ -287,7 +463,7 @@
           <input 
             type="text" 
             id="modalProductNotes" 
-            placeholder="Ex: Sem açúcar, ponto da carne..." 
+            placeholder="Ex: Sem cebola, ponto da carne bem passado..." 
             class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
           />
         </div>
@@ -331,7 +507,7 @@
         </div>
         <div class="flex justify-between text-gray-500">
           <span>Taxa de Entrega</span>
-          <span id="cartDeliveryFeeIndicator" class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Calculada na finalização</span>
+          <span id="cartDeliveryFeeIndicator" class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded cursor-pointer" onclick="openAddressModal()">Calculada pelo endereço</span>
         </div>
         <div class="flex justify-between text-base font-black text-brand-black pt-2 border-t border-gray-200">
           <span>SUBTOTAL</span>
@@ -362,7 +538,7 @@
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
         <div>
           <h3 class="font-extrabold text-base">Finalize seu Pedido</h3>
-          <p class="text-xs text-gray-400">Preencha seus dados para entrega ou mesa</p>
+          <p class="text-xs text-gray-400">Confirme seus dados para envio</p>
         </div>
         <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-gray-300 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -371,9 +547,12 @@
 
       <form id="checkoutForm" onsubmit="processOrderSubmission(event)" class="p-6 overflow-y-auto space-y-5 text-xs">
         <div>
-          <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">1</span>
-            Seus Dados de Contato
+          <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">1</span>
+              Seus Dados de Contato
+            </span>
+            <button type="button" onclick="openAuthModal()" class="text-brand-yellow hover:underline text-[11px] font-bold">Trocar Conta</button>
           </h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -381,8 +560,8 @@
               <input type="text" id="custName" placeholder="Ex: Roberto Silva" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
             <div>
-              <label class="block font-bold text-gray-700 mb-1">WhatsApp / Telefone <span id="phoneRequiredMark">*</span></label>
-              <input type="tel" id="custPhone" placeholder="Ex: 21 98888-7777" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              <label class="block font-bold text-gray-700 mb-1">WhatsApp / Telefone *</label>
+              <input type="tel" id="custPhone" placeholder="Ex: 21 98888-7777" required oninput="formatPhoneInput(this)" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
           </div>
         </div>
@@ -447,7 +626,7 @@
                 <i class="fa-solid fa-motorcycle text-brand-yellow text-base"></i>
                 <div>
                   <p class="font-bold text-gray-800" id="deliveryNoticeTitle">Frete de Entrega</p>
-                  <p class="text-[10px] text-gray-500" id="deliveryNoticeSubtitle">Digite seu endereço para calcular</p>
+                  <p class="text-[10px] text-gray-500" id="deliveryNoticeSubtitle">Calculando endereço...</p>
                 </div>
               </div>
               <span class="font-black text-sm text-brand-red" id="chkDeliveryFeeText">R$ 5,00</span>
@@ -503,7 +682,7 @@
 
         <div class="pt-3 border-t border-gray-100">
           <label class="block font-bold text-gray-700 mb-1">Observações do Pedido</label>
-          <input type="text" id="orderNotes" placeholder="Ex: Sem açúcar, sem gelo..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+          <input type="text" id="orderNotes" placeholder="Ex: Tirar cebola, caprichar no molho..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
         <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
@@ -563,7 +742,7 @@
     </div>
   </div>
 
-  <!-- BARRA MOBILE -->
+  <!-- BARRA MOBILE INFERIOR -->
   <div class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-floating px-2 py-1.5">
     <div class="grid grid-cols-4 items-center text-center text-[10px] font-bold">
       <button onclick="scrollToSection('inicio')" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
@@ -571,9 +750,9 @@
         <span>Início</span>
       </button>
 
-      <button onclick="scrollToSection('cardapio')" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
-        <i class="fa-solid fa-utensils text-base mb-0.5"></i>
-        <span>Cardápio</span>
+      <button onclick="openAddressModal()" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
+        <i class="fa-solid fa-location-dot text-base mb-0.5"></i>
+        <span>Endereço</span>
       </button>
 
       <button onclick="openCartDrawer()" class="flex flex-col items-center py-1 text-brand-black relative cursor-pointer">
@@ -584,14 +763,16 @@
         <span id="mobileCartTotal">R$ 0,00</span>
       </button>
 
-      <a id="mobileWhatsappLink" href="https://wa.me/5521986147221" target="_blank" class="flex flex-col items-center py-1 text-gray-600 hover:text-emerald-500">
-        <i class="fa-brands fa-whatsapp text-base mb-0.5 text-emerald-500"></i>
-        <span>Contato</span>
-      </a>
+      <button onclick="openAuthModal()" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
+        <i class="fa-solid fa-user text-base mb-0.5"></i>
+        <span id="mobileUserBtnLabel">Perfil</span>
+      </button>
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO CLIENTE -->
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT DO SISTEMA                          -->
+  <!-- ============================================== -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -622,7 +803,9 @@
       selectedCategory: "all",
       searchQuery: "",
       modalItem: null,
-      modalQty: 1
+      modalQty: 1,
+      currentUser: null, // { name, phone }
+      savedAddress: null  // { cep, street, number, neighborhood, complement }
     };
 
     function getCleanWaNumber(phone) {
@@ -633,6 +816,209 @@
       return clean;
     }
 
+    function formatCepInput(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
+      input.value = v;
+      if (v.replace(/\D/g, '').length === 8) {
+        searchCepManual();
+      }
+    }
+
+    function formatPhoneInput(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.substring(0, 11);
+      if (v.length > 10) {
+        v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7,11)}`;
+      } else if (v.length > 6) {
+        v = `(${v.substring(0,2)}) ${v.substring(2,6)}-${v.substring(6,10)}`;
+      } else if (v.length > 2) {
+        v = `(${v.substring(0,2)}) ${v.substring(2)}`;
+      }
+      input.value = v;
+    }
+
+    // ==============================================
+    // FLUXO DE LOCALIZAÇÃO / VIA CEP
+    // ==============================================
+    function openAddressModal() {
+      document.getElementById('addressModal').classList.remove('hidden');
+      if (appState.savedAddress) {
+        document.getElementById('cepInput').value = appState.savedAddress.cep || '';
+        document.getElementById('modalStreet').value = appState.savedAddress.street || '';
+        document.getElementById('modalNumber').value = appState.savedAddress.number || '';
+        document.getElementById('modalNeighborhood').value = appState.savedAddress.neighborhood || '';
+        document.getElementById('modalComplement').value = appState.savedAddress.complement || '';
+        document.getElementById('addressDetailFields').classList.remove('hidden');
+      }
+    }
+
+    function closeAddressModal() {
+      document.getElementById('addressModal').classList.add('hidden');
+    }
+
+    function skipAddressSelection() {
+      closeAddressModal();
+    }
+
+    async function searchCepManual() {
+      const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
+      const feedback = document.getElementById('cepFeedback');
+      const btn = document.getElementById('btnSearchCep');
+
+      if (cep.length !== 8) {
+        feedback.innerText = 'Digite um CEP válido com 8 dígitos';
+        return;
+      }
+
+      feedback.innerText = '';
+      btn.innerText = 'Buscando...';
+
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+
+        if (data.erro) {
+          feedback.innerText = 'CEP não encontrado!';
+          btn.innerText = 'BUSCAR CEP';
+          return;
+        }
+
+        document.getElementById('modalStreet').value = data.logradouro || '';
+        document.getElementById('modalNeighborhood').value = data.bairro || '';
+        document.getElementById('addressDetailFields').classList.remove('hidden');
+        document.getElementById('modalNumber').focus();
+        btn.innerText = 'ENCONTRADO!';
+        setTimeout(() => { btn.innerText = 'BUSCAR CEP'; }, 2000);
+      } catch (err) {
+        feedback.innerText = 'Erro ao consultar CEP.';
+        btn.innerText = 'BUSCAR CEP';
+      }
+    }
+
+    async function confirmModalAddress() {
+      const cep = document.getElementById('cepInput').value.trim();
+      const street = document.getElementById('modalStreet').value.trim();
+      const number = document.getElementById('modalNumber').value.trim();
+      const neighborhood = document.getElementById('modalNeighborhood').value.trim();
+      const complement = document.getElementById('modalComplement').value.trim();
+
+      if (!street || !neighborhood) {
+        alert('Por favor, informe a rua e o bairro.');
+        return;
+      }
+
+      appState.savedAddress = { cep, street, number, neighborhood, complement };
+      localStorage.setItem('food_saved_address', JSON.stringify(appState.savedAddress));
+
+      // Sincroniza campos do checkout
+      if (document.getElementById('custStreet')) document.getElementById('custStreet').value = street;
+      if (document.getElementById('custNumber')) document.getElementById('custNumber').value = number;
+      if (document.getElementById('custNeighborhood')) document.getElementById('custNeighborhood').value = neighborhood;
+      if (document.getElementById('custComplement')) document.getElementById('custComplement').value = complement;
+
+      // Atualiza etiqueta do topo
+      const shortAddr = `${street}${number ? ', ' + number : ''} - ${neighborhood}`;
+      document.getElementById('topAddressStreet').innerText = shortAddr;
+
+      closeAddressModal();
+      await autoCalculateRouteDelivery();
+      renderCartDrawer();
+    }
+
+    function checkInitialLocationPrompt() {
+      const savedAddr = localStorage.getItem('food_saved_address');
+      if (savedAddr) {
+        try {
+          appState.savedAddress = JSON.parse(savedAddr);
+          const shortAddr = `${appState.savedAddress.street}${appState.savedAddress.number ? ', ' + appState.savedAddress.number : ''} - ${appState.savedAddress.neighborhood}`;
+          document.getElementById('topAddressStreet').innerText = shortAddr;
+          document.getElementById('custStreet').value = appState.savedAddress.street || '';
+          document.getElementById('custNumber').value = appState.savedAddress.number || '';
+          document.getElementById('custNeighborhood').value = appState.savedAddress.neighborhood || '';
+          document.getElementById('custComplement').value = appState.savedAddress.complement || '';
+          autoCalculateRouteDelivery();
+        } catch(e) {}
+      } else if (!identifiedTable) {
+        // Se ainda não tem endereço e não está na mesa, abre sugestão de CEP após 800ms
+        setTimeout(() => { openAddressModal(); }, 800);
+      }
+    }
+
+    // ==============================================
+    // FLUXO DE LOGIN/CADASTRO DO CLIENTE (SEM CUSTO)
+    // ==============================================
+    function openAuthModal() {
+      document.getElementById('authModal').classList.remove('hidden');
+      if (appState.currentUser) {
+        document.getElementById('authPhone').value = appState.currentUser.phone || '';
+        document.getElementById('authName').value = appState.currentUser.name || '';
+      }
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    async function handleCustomerLogin(e) {
+      e.preventDefault();
+      const phone = document.getElementById('authPhone').value.trim();
+      const name = document.getElementById('authName').value.trim();
+
+      if (!phone || !name) {
+        alert('Preencha seu número e nome!');
+        return;
+      }
+
+      appState.currentUser = { name, phone };
+      localStorage.setItem('food_logged_user', JSON.stringify(appState.currentUser));
+      updateUserInterface();
+      closeAuthModal();
+
+      // Preenche os campos do checkout
+      document.getElementById('custName').value = name;
+      document.getElementById('custPhone').value = phone;
+
+      // Se tiver carrinho e veio de "Finalizar", abre o checkout
+      if (appState.cart.length > 0 && document.getElementById('checkoutModal').classList.contains('hidden')) {
+        openCheckoutAfterLogin();
+      }
+    }
+
+    function updateUserInterface() {
+      const topLabel = document.getElementById('topUserLabel');
+      const mobLabel = document.getElementById('mobileUserBtnLabel');
+
+      if (appState.currentUser) {
+        const firstName = appState.currentUser.name.split(' ')[0];
+        topLabel.innerText = `Olá, ${firstName}`;
+        if (mobLabel) mobLabel.innerText = firstName;
+        document.getElementById('custName').value = appState.currentUser.name;
+        document.getElementById('custPhone').value = appState.currentUser.phone;
+      } else {
+        topLabel.innerText = "Entre ou Cadastre-se";
+        if (mobLabel) mobLabel.innerText = "Perfil";
+      }
+    }
+
+    function checkSavedUserSession() {
+      const savedUser = localStorage.getItem('food_logged_user');
+      if (savedUser) {
+        try {
+          appState.currentUser = JSON.parse(savedUser);
+          updateUserInterface();
+        } catch(e) {}
+      }
+    }
+
+    function openCheckoutAfterLogin() {
+      handleOrderTypeChange();
+      document.getElementById("checkoutModal").classList.remove("hidden");
+    }
+
+    // ==============================================
+    // CONFIGURAÇÕES, PRODUTOS E BANCO
+    // ==============================================
     function detectTableUrlParam() {
       const urlParams = new URLSearchParams(window.location.search);
       const mesa = urlParams.get('mesa');
@@ -655,6 +1041,9 @@
 
     async function loadStoreData() {
       detectTableUrlParam();
+      checkSavedUserSession();
+      checkInitialLocationPrompt();
+
       await Promise.all([
         fetchCategories(),
         fetchProducts(),
@@ -717,7 +1106,6 @@
 
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
         if (document.getElementById('btnHeroWhatsapp')) document.getElementById('btnHeroWhatsapp').href = waLink;
-        if (document.getElementById('mobileWhatsappLink')) document.getElementById('mobileWhatsappLink').href = waLink;
 
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
@@ -749,9 +1137,7 @@
       if (orderType === 'dine_in') {
         paymentSectionBlock.classList.add('hidden');
         cashArea.classList.add('hidden');
-        container.innerHTML = `
-          <input type="radio" name="paymentMethod" value="Acerto ao Fechar a Conta" checked class="sr-only" />
-        `;
+        container.innerHTML = `<input type="radio" name="paymentMethod" value="Acerto ao Fechar a Conta" checked class="sr-only" />`;
       } else if (orderType === 'pickup') {
         paymentSectionBlock.classList.remove('hidden');
         cashArea.classList.add('hidden');
@@ -760,12 +1146,12 @@
             <input type="radio" name="paymentMethod" value="Pagar na Retirada (Balcão)" checked onchange="toggleCashChangeField()" class="sr-only" />
             <i class="fa-solid fa-store text-emerald-600 text-lg block mb-1"></i>
             <span class="font-extrabold text-brand-black block text-xs">Pagar no Balcão ao Retirar</span>
-            <span class="text-[10px] text-gray-500 font-medium">Dinheiro, Cartão ou Pix no Caixa</span>
+            <span class="text-[10px] text-gray-500 font-medium">Dinheiro, Cartão ou Pix</span>
           </label>
           <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
             <input type="radio" name="paymentMethod" value="Pix" onchange="toggleCashChangeField()" class="sr-only" />
             <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
-            <span class="font-bold">Pix Agora</span>
+            <span class="font-bold">Pix</span>
           </label>
           <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
             <input type="radio" name="paymentMethod" value="Cartão" onchange="toggleCashChangeField()" class="sr-only" />
@@ -904,8 +1290,11 @@
 
           const noticeTitle = document.getElementById('deliveryNoticeTitle');
           const noticeSub = document.getElementById('deliveryNoticeSubtitle');
-          if (noticeTitle) noticeTitle.innerText = `Frete para seu endereço: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
-          if (noticeSub) noticeSub.innerText = `Distância calculada: ~${km.toFixed(1)} km da loja`;
+          if (noticeTitle) noticeTitle.innerText = `Frete calculado: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
+          if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
+
+          // Atualiza etiqueta no topo
+          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • Entrega estimada: 40-50 min`;
 
           updateCheckoutTotals();
         }
@@ -1141,8 +1530,10 @@
       if (feeIndicator) {
         if (identifiedTable) {
           feeIndicator.innerText = "Grátis (Mesa " + identifiedTable + ")";
+        } else if (appState.savedAddress) {
+          feeIndicator.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)} (Calculado)`;
         } else {
-          feeIndicator.innerText = "Calculada na finalização";
+          feeIndicator.innerText = "Informe CEP para calcular";
         }
       }
     }
@@ -1173,6 +1564,13 @@
     function startCheckout() {
       if (appState.cart.length === 0) return;
       closeCartDrawer();
+
+      // FORÇA IDENTIFICAÇÃO DO CLIENTE SE NÃO ESTIVER LOGADO
+      if (!appState.currentUser) {
+        openAuthModal();
+        return;
+      }
+
       handleOrderTypeChange();
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
@@ -1312,6 +1710,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
+      // Insere pedido no Supabase
       await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
