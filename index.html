@@ -69,7 +69,7 @@
 
   <!-- BARRA SUPERIOR DE HORÁRIO -->
   <div class="bg-brand-black text-white text-xs py-1.5 px-4 border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto flex justify-center sm:justify-start items-center space-x-2">
+    <div class="max-w-7xl mx-auto flex justify-between sm:justify-start items-center space-x-2">
       <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all">
         <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
         <span id="storeStatusText">ABERTO AGORA</span>
@@ -137,7 +137,7 @@
     </div>
   </header>
 
-  <!-- BANNER / HERO COMPLETO -->
+  <!-- BANNER / HERO -->
   <main>
     <section id="inicio" class="relative bg-brand-black text-white py-10 sm:py-16 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -153,7 +153,7 @@
           <p class="text-sm text-gray-400 mb-6">Peça online no salão ou receba com agilidade na sua casa sem complicação.</p>
           
           <div class="flex flex-wrap gap-3">
-            <button onclick="scrollToSection('cardapio')" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition shadow-lg flex items-center space-x-2 text-sm cursor-pointer">
+            <button id="btnHeroOrderAction" onclick="scrollToSection('cardapio')" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold px-6 py-3 rounded-xl transition shadow-lg flex items-center space-x-2 text-sm cursor-pointer">
               <span>FAZER PEDIDO</span>
               <i class="fa-solid fa-arrow-down"></i>
             </button>
@@ -226,7 +226,7 @@
     </section>
   </main>
 
-  <!-- FOOTER COMPLETO (INTACTO) -->
+  <!-- FOOTER COMPLETO -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -528,7 +528,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT COMPLETO (INTACTO) -->
+  <!-- MODAL DE CHECKOUT COMPLETO -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -777,6 +777,8 @@
       whatsapp: "5521986147221",
       deliveryTime: "40 - 50 min",
       pickupTime: "15 - 25 min",
+      isOpen: true,
+      paymentMethods: { pix: true, money: true, credit: true, debit: true },
       deliveryTiers: [
         { km: 3, price: 5.00 },
         { km: 6, price: 8.00 },
@@ -785,7 +787,7 @@
       ],
       currentAutoFee: 5.00,
       currentCalculatedKm: null,
-      address: "Rua das Delícias, 100 - Rio de Janeiro - RJ"
+      address: "Rua Marcílio Dias, Campo Lindo, Seropédica - RJ"
     };
 
     let storeCategories = [];
@@ -1066,6 +1068,11 @@
         storeConfig.address = data.address || storeConfig.address;
         storeConfig.deliveryTime = data.delivery_time || "40 - 50 min";
         storeConfig.pickupTime = data.pickup_time || "15 - 25 min";
+        storeConfig.isOpen = data.is_open !== false;
+
+        if (data.payment_methods) {
+          storeConfig.paymentMethods = data.payment_methods;
+        }
 
         if (Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4) {
           storeConfig.deliveryTiers = data.delivery_tiers;
@@ -1099,15 +1106,24 @@
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
+        const heroOrderBtn = document.getElementById("btnHeroOrderAction");
 
-        if (data.is_open) {
+        if (storeConfig.isOpen) {
           badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all";
           dot.className = "w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse";
           text.innerText = "ABERTO AGORA";
+          if (heroOrderBtn) {
+            heroOrderBtn.classList.remove("opacity-50", "cursor-not-allowed");
+            heroOrderBtn.innerHTML = `<span>FAZER PEDIDO</span><i class="fa-solid fa-arrow-down"></i>`;
+          }
         } else {
           badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-closed transition-all";
           dot.className = "w-2 h-2 rounded-full mr-1.5 bg-rose-500";
           text.innerText = "FECHADO NO MOMENTO";
+          if (heroOrderBtn) {
+            heroOrderBtn.classList.add("opacity-50");
+            heroOrderBtn.innerHTML = `<span>LOJA FECHADA NO MOMENTO</span>`;
+          }
         }
 
         renderPaymentOptions();
@@ -1116,12 +1132,15 @@
       }
     }
 
+    // FORMAS DE PAGAMENTO FILTRADAS PELAS CONFIGURAÇÕES DO ADMIN
     function renderPaymentOptions() {
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const paymentSectionBlock = document.getElementById('paymentSectionBlock');
       const container = document.getElementById('paymentOptionsContainer');
       const cashArea = document.getElementById('cashChangeArea');
       if (!container || !paymentSectionBlock) return;
+
+      const pms = storeConfig.paymentMethods || { pix: true, money: true, credit: true, debit: true };
 
       if (orderType === 'dine_in') {
         paymentSectionBlock.classList.add('hidden');
@@ -1137,41 +1156,71 @@
             <span class="font-extrabold text-brand-black block text-xs">Pagar no Balcão ao Retirar</span>
             <span class="text-[10px] text-gray-500 font-medium">Dinheiro, Cartão ou Pix</span>
           </label>
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Pix" onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
-            <span class="font-bold">Pix</span>
-          </label>
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Cartão" onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
-            <span class="font-bold">Cartão</span>
-          </label>
+          ${pms.pix !== false ? `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Pix" onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
+              <span class="font-bold">Pix</span>
+            </label>
+          ` : ''}
+          ${pms.credit !== false || pms.debit !== false ? `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Cartão" onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
+              <span class="font-bold">Cartão</span>
+            </label>
+          ` : ''}
         `;
       } else {
         paymentSectionBlock.classList.remove('hidden');
-        container.innerHTML = `
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Pix" checked onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
-            <span class="font-bold">Pix</span>
-          </label>
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Cartão de Crédito" onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
-            <span class="font-bold">Crédito</span>
-          </label>
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Cartão de Débito" onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-solid fa-credit-card text-purple-500 text-base block mb-1"></i>
-            <span class="font-bold">Débito</span>
-          </label>
-          <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
-            <input type="radio" name="paymentMethod" value="Dinheiro" onchange="toggleCashChangeField()" class="sr-only" />
-            <i class="fa-solid fa-money-bill-wave text-emerald-600 text-base block mb-1"></i>
-            <span class="font-bold">Dinheiro</span>
-          </label>
-        `;
+        let html = '';
+        let firstChecked = false;
+
+        if (pms.pix !== false) {
+          html += `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Pix" ${!firstChecked ? 'checked' : ''} onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-brands fa-pix text-emerald-500 text-base block mb-1"></i>
+              <span class="font-bold">Pix</span>
+            </label>
+          `;
+          firstChecked = true;
+        }
+
+        if (pms.credit !== false) {
+          html += `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Cartão de Crédito" ${!firstChecked ? 'checked' : ''} onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-solid fa-credit-card text-blue-500 text-base block mb-1"></i>
+              <span class="font-bold">Crédito</span>
+            </label>
+          `;
+          firstChecked = true;
+        }
+
+        if (pms.debit !== false) {
+          html += `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Cartão de Débito" ${!firstChecked ? 'checked' : ''} onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-solid fa-credit-card text-purple-500 text-base block mb-1"></i>
+              <span class="font-bold">Débito</span>
+            </label>
+          `;
+          firstChecked = true;
+        }
+
+        if (pms.money !== false) {
+          html += `
+            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+              <input type="radio" name="paymentMethod" value="Dinheiro" ${!firstChecked ? 'checked' : ''} onchange="toggleCashChangeField()" class="sr-only" />
+              <i class="fa-solid fa-money-bill-wave text-emerald-600 text-base block mb-1"></i>
+              <span class="font-bold">Dinheiro</span>
+            </label>
+          `;
+          firstChecked = true;
+        }
+
+        container.innerHTML = html;
       }
     }
 
@@ -1233,13 +1282,13 @@
     }
 
     async function autoCalculateRouteDelivery() {
-      const street = document.getElementById('custStreet')?.value.trim();
-      const number = document.getElementById('custNumber')?.value.trim();
-      const neighborhood = document.getElementById('custNeighborhood')?.value.trim();
+      const street = document.getElementById('custStreet')?.value.trim() || appState.savedAddress?.street;
+      const number = document.getElementById('custNumber')?.value.trim() || appState.savedAddress?.number;
+      const neighborhood = document.getElementById('custNeighborhood')?.value.trim() || appState.savedAddress?.neighborhood;
 
       if (!street || !neighborhood) return;
 
-      const customerAddressFull = `${street}, ${number || ''}, ${neighborhood}`;
+      const customerAddressFull = `${street}, ${number || ''}, ${neighborhood}, Rio de Janeiro`;
 
       try {
         if (!cachedStoreCoords) {
@@ -1643,6 +1692,11 @@
     }
 
     function startCheckout() {
+      if (!storeConfig.isOpen) {
+        alert("A loja está fechada no momento. Não estamos recebendo pedidos!");
+        return;
+      }
+
       if (appState.cart.length === 0) return;
       closeCartDrawer();
 
@@ -1692,6 +1746,11 @@
 
     async function processOrderSubmission(e) {
       e.preventDefault();
+
+      if (!storeConfig.isOpen) {
+        alert("A loja está pausada no momento. Pedido não pode ser enviado!");
+        return;
+      }
 
       if (appState.cart.length === 0) {
         alert("Adicione produtos ao carrinho antes de continuar!");
@@ -1795,7 +1854,12 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      await db.from('orders').insert([{
+      // 1. Grava no banco e valida se foi com sucesso antes de abrir o WhatsApp
+      const submitBtn = document.getElementById("btnSubmitOrder");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "ENVIANDO PEDIDO...";
+
+      const { error: dbError } = await db.from('orders').insert([{
         id: orderNumber.toString(),
         client: name,
         phone: phone,
@@ -1809,6 +1873,15 @@ Obrigado pelo pedido!`;
         status: "Novo"
       }]);
 
+      submitBtn.disabled = false;
+      submitBtn.innerText = "CONFIRMAR E ENVIAR NO WHATSAPP";
+
+      if (dbError) {
+        alert("Erro ao registrar pedido no sistema: " + dbError.message);
+        return;
+      }
+
+      // 2. Comprovada a gravação no painel, abre o WhatsApp
       const waNumber = getCleanWaNumber(storeConfig.whatsapp);
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
