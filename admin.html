@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Painel do Lojista | PHSUBLIME FOOD</title>
 
-  <!-- ÍCONE DA ABA (FAVICON) E PREVIEW DO PAINEL -->
+  <!-- FAVICON E META -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/admin" />
   <meta property="og:title" content="Painel de Gestão | PHSUBLIME FOOD" />
-  <meta property="og:description" content="Acesso administrativo e fila de pedidos." />
   <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
 
   <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -156,6 +153,13 @@
             <span class="flex-1 text-left">Financeiro / Caixa</span>
           </button>
 
+          <!-- NOVA ABA DE AVALIAÇÕES -->
+          <button onclick="navigateTab('reviews')" id="nav-reviews" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
+            <i class="fa-solid fa-star text-sm text-brand-yellow"></i>
+            <span class="flex-1 text-left">Avaliações</span>
+            <span id="badgeReviewsCount" class="bg-neutral-800 text-brand-yellow text-[10px] font-black px-2 py-0.5 rounded-full border border-neutral-700">0</span>
+          </button>
+
           <button onclick="navigateTab('products')" id="nav-products" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
             <i class="fa-solid fa-utensils text-sm"></i>
             <span class="flex-1 text-left">Gerenciar Cardápio</span>
@@ -241,7 +245,7 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: FINANCEIRO COM REGISTRO MENSAL & SOMA DIÁRIA CONSOLIDADA -->
+      <!-- ABA 2: FINANCEIRO / CAIXA CONSOLIDADO -->
       <section id="tab-dashboard" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -249,7 +253,7 @@
               <h2 class="text-2xl font-black text-white">Controle Financeiro & Caixa</h2>
               <span id="shiftBadgeStatus" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">CAIXA DO TURNO ABERTO</span>
             </div>
-            <p class="text-xs text-gray-400">Acompanhe o caixa do dia de hoje e o faturamento bruto mensal acumulado em tempo real</p>
+            <p class="text-xs text-gray-400">Caixa do dia e faturamento bruto mensal acumulado em tempo real</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="printTodayClosingReceipt()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
@@ -263,7 +267,6 @@
           </div>
         </div>
 
-        <!-- 1. CARTÕES DO TURNO ATUAL (HOJE) -->
         <h4 class="text-xs font-black uppercase text-brand-yellow tracking-wider mb-2.5 flex items-center gap-1.5">
           <i class="fa-solid fa-sun text-sm"></i> Caixa do Turno Atual (Hoje)
         </h4>
@@ -311,7 +314,6 @@
           </div>
         </div>
 
-        <!-- 2. NOVO BLOCO: REGISTRO MENSAL ACUMULADO EM TEMPO REAL -->
         <div class="mb-6 pt-2">
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
@@ -342,7 +344,6 @@
             </div>
           </div>
 
-          <!-- TABELA COM SOMA DIÁRIA CONSOLIDADA (1 LINHA POR DATA + TOTAL GERAL) -->
           <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800 overflow-x-auto">
             <table class="w-full text-left text-xs text-gray-300">
               <thead class="bg-neutral-900 text-[10px] text-gray-400 uppercase tracking-wider">
@@ -364,10 +365,39 @@
             </table>
           </div>
         </div>
-
       </section>
 
-      <!-- ABA 3: CARDÁPIO (COM ADICIONAIS & FOTOS) -->
+      <!-- ABA 3: MODERAÇÃO DE AVALIAÇÕES (NOVA!) -->
+      <section id="tab-reviews" class="tab-content hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-white">Moderação de Avaliações</h2>
+            <p class="text-xs text-gray-400">Aprove, oculte ou exclua comentários e fotos enviados pelos clientes</p>
+          </div>
+          <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center space-x-3 text-xs">
+            <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer">
+              <input type="checkbox" id="cfgToggleShowReviews" onchange="toggleGlobalReviewsDisplay(this.checked)" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
+              <span>Exibir Bloco de Avaliações na Loja</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mb-6 border-b border-neutral-800 pb-3 text-xs">
+          <button onclick="setReviewsFilter('all')" id="revFilter-all" class="rev-filter-btn px-4 py-2 rounded-xl bg-brand-yellow text-brand-black font-bold transition cursor-pointer">
+            Todas (<span id="revCountAll">0</span>)
+          </button>
+          <button onclick="setReviewsFilter('visible')" id="revFilter-visible" class="rev-filter-btn px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 font-bold transition cursor-pointer">
+            Visíveis na Loja (<span id="revCountVisible">0</span>)
+          </button>
+          <button onclick="setReviewsFilter('hidden')" id="revFilter-hidden" class="rev-filter-btn px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 font-bold transition cursor-pointer">
+            Ocultas (<span id="revCountHidden">0</span>)
+          </button>
+        </div>
+
+        <div id="adminReviewsList" class="space-y-3"></div>
+      </section>
+
+      <!-- ABA 4: CARDÁPIO -->
       <section id="tab-products" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -397,14 +427,13 @@
               class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
             />
           </div>
-
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA 4: PLACAS DE MESA COM QR CODE -->
+      <!-- ABA 5: PLACAS DE MESA COM QR CODE -->
       <section id="tab-tables" class="tab-content hidden max-w-4xl">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -430,7 +459,7 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 5: CONFIGURAÇÕES DA LOJA (COM GESTÃO DE REDES SOCIAIS & LINKS) -->
+      <!-- ABA 6: CONFIGURAÇÕES DA LOJA -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
@@ -462,7 +491,7 @@
             </div>
           </div>
 
-          <!-- NOVO BLOCO: REDES SOCIAIS & LINKS DO RODAPÉ (COM ATIVAÇÃO E LINKS LIVRES) -->
+          <!-- REDES SOCIAIS & LINKS DO RODAPÉ -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-share-nodes"></i> Redes Sociais & Links do Rodapé
@@ -470,7 +499,6 @@
             <p class="text-[11px] text-gray-400">Marque as redes que deseja exibir no rodapé da loja e informe o link de cada uma:</p>
 
             <div class="space-y-3">
-              <!-- WHATSAPP RODAPÉ -->
               <div class="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
                 <div class="flex items-center justify-between">
                   <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer text-xs">
@@ -482,7 +510,6 @@
                 <input type="text" id="cfgSocialWaUrl" placeholder="Ex: https://wa.me/5521986147221" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white text-xs" />
               </div>
 
-              <!-- INSTAGRAM -->
               <div class="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
                 <div class="flex items-center justify-between">
                   <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer text-xs">
@@ -494,7 +521,6 @@
                 <input type="text" id="cfgSocialInstaUrl" placeholder="Ex: https://instagram.com/seurestaurante" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white text-xs" />
               </div>
 
-              <!-- FACEBOOK -->
               <div class="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
                 <div class="flex items-center justify-between">
                   <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer text-xs">
@@ -506,7 +532,6 @@
                 <input type="text" id="cfgSocialFbUrl" placeholder="Ex: https://facebook.com/seurestaurante" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white text-xs" />
               </div>
 
-              <!-- GOOGLE AVALIAÇÃO -->
               <div class="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
                 <div class="flex items-center justify-between">
                   <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer text-xs">
@@ -515,7 +540,7 @@
                   </label>
                   <span class="text-[10px] text-gray-500">Link Meu Negócio</span>
                 </div>
-                <input type="text" id="cfgSocialGoogleUrl" placeholder="Ex: https://g.page/r/seulink/review" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white text-xs" />
+                <input type="text" id="cfgSocialGoogleUrl" placeholder="Ex: https://search.google.com/local/writereview" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-white text-xs" />
               </div>
             </div>
           </div>
@@ -525,8 +550,6 @@
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-credit-card"></i> Formas de Pagamento Aceitas no Cardápio
             </h3>
-            <p class="text-[11px] text-gray-400">Marque apenas as formas que seu restaurante aceita:</p>
-
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
                 <input type="checkbox" id="cfgPayPix" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
@@ -697,6 +720,21 @@
       <div class="flex gap-2">
         <button type="button" onclick="closeCancelOrderModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
         <button type="button" id="btnConfirmCancelAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXCLUIR AVALIAÇÃO DEFINITIVAMENTE -->
+  <div id="deleteReviewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-xl mb-3">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+      <h3 class="text-base font-black text-white mb-1">Excluir Avaliação?</h3>
+      <p class="text-gray-400 text-[11px] mb-4">Esse comentário e sua foto serão removidos permanentemente do banco.</p>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeDeleteReviewModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
+        <button type="button" id="btnConfirmDeleteReview" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Excluir</button>
       </div>
     </div>
   </div>
@@ -995,13 +1033,17 @@
     window.storeCategories = [];
     window.storeProducts = [];
     window.storeOrders = [];
+    window.storeReviews = [];
     window.dailyClosures = [];
     window.isStoreOpen = true;
+    window.showReviewsGlobal = true;
+    window.reviewsActiveFilter = 'all';
     window.deliveryTimeCurrent = '40 - 50 min';
     window.pickupTimeCurrent = '15 - 25 min';
     window.currentSettleOrderId = null;
     window.orderIdToCancel = null;
     window.closureIdToDelete = null;
+    window.reviewIdToDelete = null;
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
     let audioContextInstance = null;
@@ -1091,7 +1133,8 @@
         fetchProducts(),
         fetchOrders(),
         fetchSettings(),
-        fetchClosures()
+        fetchClosures(),
+        fetchAdminReviews()
       ]);
       generateTableCards();
     }
@@ -1139,11 +1182,15 @@
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
       if (data) {
         window.isStoreOpen = data.is_open !== false;
+        window.showReviewsGlobal = data.show_reviews !== false;
         window.deliveryTimeCurrent = data.delivery_time || localStorage.getItem('admin_quick_delivery_time') || '40 - 50 min';
         window.pickupTimeCurrent = data.pickup_time || '15 - 25 min';
 
         updateStoreButtonUI();
         document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
+
+        const toggleReviewsEl = document.getElementById('cfgToggleShowReviews');
+        if (toggleReviewsEl) toggleReviewsEl.checked = window.showReviewsGlobal;
 
         if (document.getElementById('cfgName')) document.getElementById('cfgName').value = data.store_name || '';
         if (document.getElementById('cfgWhatsapp')) document.getElementById('cfgWhatsapp').value = data.whatsapp || '';
@@ -1153,7 +1200,7 @@
         if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
         if (document.getElementById('cfgPickupTime')) document.getElementById('cfgPickupTime').value = window.pickupTimeCurrent;
 
-        // REDES SOCIAIS CONFIGURÁVEIS
+        // REDES SOCIAIS
         if (data.social_links) {
           const s = data.social_links;
           if (s.whatsapp) {
@@ -1211,6 +1258,147 @@
       }
     }
 
+    // ==============================================
+    // GESTÃO E MODERAÇÃO DE AVALIAÇÕES (NOVO!)
+    // ==============================================
+    async function fetchAdminReviews() {
+      const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
+      if (data) {
+        window.storeReviews = data;
+        renderAdminReviews();
+      }
+    }
+
+    function renderAdminReviews() {
+      const container = document.getElementById('adminReviewsList');
+      const badge = document.getElementById('badgeReviewsCount');
+      if (!container) return;
+
+      const allCount = window.storeReviews.length;
+      const visibleCount = window.storeReviews.filter(r => r.visible !== false).length;
+      const hiddenCount = allCount - visibleCount;
+
+      document.getElementById('revCountAll').innerText = allCount;
+      document.getElementById('revCountVisible').innerText = visibleCount;
+      document.getElementById('revCountHidden').innerText = hiddenCount;
+      if (badge) badge.innerText = allCount;
+
+      let list = [...window.storeReviews];
+      if (window.reviewsActiveFilter === 'visible') list = list.filter(r => r.visible !== false);
+      else if (window.reviewsActiveFilter === 'hidden') list = list.filter(r => r.visible === false);
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-brand-dark rounded-2xl border border-neutral-800 text-gray-400">
+            <i class="fa-solid fa-star text-3xl text-neutral-700 mb-2"></i>
+            <p class="font-bold text-white text-xs">Nenhuma avaliação encontrada nesta categoria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(r => {
+        const isVis = r.visible !== false;
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+          stars += `<i class="fa-solid fa-star ${i <= (r.rating || 5) ? 'text-brand-yellow' : 'text-neutral-700'} text-xs"></i>`;
+        }
+        const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '';
+
+        return `
+          <div class="p-4 bg-brand-dark rounded-2xl border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-start space-x-3.5">
+              ${r.photo ? `
+                <img src="${r.photo}" class="w-14 h-14 rounded-xl object-cover border border-neutral-700 shrink-0" />
+              ` : `
+                <div class="w-14 h-14 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-brand-yellow shrink-0">
+                  <i class="fa-solid fa-user text-xl"></i>
+                </div>
+              `}
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-extrabold text-white text-sm">${r.client_name || 'Cliente'}</span>
+                  <span class="text-[10px] text-gray-400 font-semibold">(${r.client_phone || 'Sem tel'})</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isVis ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-neutral-800 text-gray-400 border border-neutral-700'}">
+                    ${isVis ? 'Visível na Loja' : 'Oculto'}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1 mb-1">${stars} <span class="text-[10px] text-gray-500 ml-1.5">${dateStr}</span></div>
+                <p class="text-xs text-gray-300 italic">"${r.comment || 'Sem comentário'}"</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+              <button onclick="toggleReviewVisibility(${r.id}, ${isVis})" class="px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${isVis ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800'}">
+                <i class="fa-solid ${isVis ? 'fa-eye-slash' : 'fa-eye'} mr-1"></i>
+                <span>${isVis ? 'Ocultar' : 'Tornar Visível'}</span>
+              </button>
+
+              <button onclick="openDeleteReviewModal(${r.id})" class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 transition cursor-pointer">
+                <i class="fa-solid fa-trash mr-1"></i>
+                <span>Excluir</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setReviewsFilter(filter) {
+      window.reviewsActiveFilter = filter;
+      document.querySelectorAll('.rev-filter-btn').forEach(b => {
+        b.className = 'rev-filter-btn px-4 py-2 rounded-xl bg-neutral-800 text-gray-300 font-bold transition cursor-pointer';
+      });
+      document.getElementById(`revFilter-${filter}`).className = 'rev-filter-btn px-4 py-2 rounded-xl bg-brand-yellow text-brand-black font-bold transition cursor-pointer';
+      renderAdminReviews();
+    }
+
+    async function toggleReviewVisibility(id, currentVisible) {
+      const newStatus = !currentVisible;
+      const { error } = await db.from('reviews').update({ visible: newStatus }).eq('id', id);
+      if (error) {
+        showToast("Erro ao Atualizar", error.message, true);
+      } else {
+        const item = window.storeReviews.find(r => r.id === id);
+        if (item) item.visible = newStatus;
+        renderAdminReviews();
+        showToast("Status da Avaliação", newStatus ? "Comentário agora está visível no cardápio." : "Comentário foi ocultado da loja.");
+      }
+    }
+
+    function openDeleteReviewModal(id) {
+      window.reviewIdToDelete = id;
+      document.getElementById('btnConfirmDeleteReview').onclick = executeDeleteReview;
+      document.getElementById('deleteReviewModal').classList.remove('hidden');
+    }
+
+    function closeDeleteReviewModal() {
+      document.getElementById('deleteReviewModal').classList.add('hidden');
+      window.reviewIdToDelete = null;
+    }
+
+    async function executeDeleteReview() {
+      if (!window.reviewIdToDelete) return;
+      const id = window.reviewIdToDelete;
+      closeDeleteReviewModal();
+
+      const { error } = await db.from('reviews').delete().eq('id', id);
+      if (error) {
+        showToast("Erro ao Excluir", error.message, true);
+      } else {
+        window.storeReviews = window.storeReviews.filter(r => r.id !== id);
+        renderAdminReviews();
+        showToast("Avaliação Excluída", "Comentário removido do sistema com sucesso.");
+      }
+    }
+
+    async function toggleGlobalReviewsDisplay(show) {
+      window.showReviewsGlobal = show;
+      await db.from('store_settings').upsert({ id: 1, show_reviews: show });
+      showToast("Configuração da Loja", show ? "Card de avaliações ativado na loja." : "Card de avaliações ocultado da loja.");
+    }
+
+    // CONTINUAÇÃO DAS DEMAIS FUNÇÕES
     function quickEditDeliveryTime() {
       document.getElementById('modalQuickTimeInput').value = window.deliveryTimeCurrent;
       document.getElementById('deliveryTimeModal').classList.remove('hidden');
@@ -1239,7 +1427,6 @@
       showToast("Tempo Atualizado!", `Previsão alterada para ${window.deliveryTimeCurrent}.`);
     }
 
-    // SALVAMENTO COMPLETO DE CONFIGURAÇÕES COM REDES SOCIAIS
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1304,7 +1491,8 @@
         business_hours: businessHours,
         delivery_tiers: tiers,
         delivery_fee: tiers[0].price,
-        is_open: window.isStoreOpen
+        is_open: window.isStoreOpen,
+        show_reviews: window.showReviewsGlobal
       };
 
       let { error } = await db.from('store_settings').upsert(payload);
@@ -1322,7 +1510,7 @@
       } else {
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
-        showToast("Configurações Salvas!", "Endereço, redes sociais e pagamentos salvos com sucesso.");
+        showToast("Configurações Salvas!", "Endereço, redes sociais e pagamentos salvos.");
         fetchSettings();
       }
     }
@@ -2014,7 +2202,6 @@
       document.getElementById("dashCreditTotal").innerText = `R$ ${m.credit.toFixed(2).replace('.', ',')}`;
       document.getElementById("dashDebitTotal").innerText = `R$ ${m.debit.toFixed(2).replace('.', ',')}`;
 
-      // Atualiza também os cálculos do Mês
       const selectMonth = document.getElementById('selectMonthFilter');
       if (selectMonth && selectMonth.value) {
         filterClosuresByMonth(selectMonth.value);
@@ -2162,14 +2349,12 @@
       const currentYear = parseInt(y);
       const currentMonth = parseInt(m);
 
-      // Fechamentos passados do mês
       const filteredClosures = window.dailyClosures.filter(c => {
         if (!c.closed_at) return false;
         const dt = new Date(c.closed_at);
         return dt.getFullYear() === currentYear && (dt.getMonth() + 1) === currentMonth;
       });
 
-      // Se for o mês atual, soma o turno que está aberto hoje em tempo real!
       const now = new Date();
       const isCurrentMonth = now.getFullYear() === currentYear && (now.getMonth() + 1) === currentMonth;
       const liveShift = isCurrentMonth ? calculateShiftMetrics() : { grossRevenue: 0, validCount: 0, cancelledLoss: 0 };
@@ -2442,6 +2627,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchAdminReviews())
         .subscribe();
 
       setInterval(fetchOrders, 6000);
