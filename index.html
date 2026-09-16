@@ -118,8 +118,6 @@
 
       <!-- LADO DIREITO: BOTÕES DE LOGIN, CARDÁPIO E PEDIDO -->
       <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
-        
-        <!-- ENTRE OU CADASTRE-SE -->
         <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
           <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
           <span id="topUserLabel" class="hidden md:inline">Entre ou Cadastre-se</span>
@@ -129,7 +127,6 @@
           Ver Cardápio
         </button>
 
-        <!-- MEU PEDIDO -->
         <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center space-x-2 transition shadow-soft cursor-pointer">
           <i class="fa-solid fa-bag-shopping text-brand-yellow"></i>
           <span class="hidden sm:inline">Meu Pedido</span>
@@ -140,7 +137,7 @@
     </div>
   </header>
 
-  <!-- BANNER / HERO -->
+  <!-- BANNER / HERO COMPLETO -->
   <main>
     <section id="inicio" class="relative bg-brand-black text-white py-10 sm:py-16 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -229,7 +226,7 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- FOOTER COMPLETO (INTACTO) -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -431,10 +428,10 @@
     </div>
   </div>
 
-  <!-- MODAL DO PRODUTO -->
+  <!-- MODAL DO PRODUTO (COM SEÇÃO DE ADICIONAIS) -->
   <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="relative h-56 sm:h-64 bg-neutral-100 overflow-hidden">
+      <div class="relative h-56 sm:h-64 bg-neutral-100 overflow-hidden shrink-0">
         <img id="modalProductImg" src="" alt="Produto" class="w-full h-full object-cover" />
         <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 bg-brand-black/70 hover:bg-brand-black text-white rounded-full flex items-center justify-center transition cursor-pointer">
           <i class="fa-solid fa-xmark text-sm"></i>
@@ -446,7 +443,16 @@
           <h3 id="modalProductName" class="text-xl font-extrabold text-brand-black"></h3>
           <span id="modalProductPrice" class="text-lg font-black text-brand-red"></span>
         </div>
-        <p id="modalProductDesc" class="text-sm text-gray-500 mb-6 leading-relaxed"></p>
+        <p id="modalProductDesc" class="text-sm text-gray-500 mb-5 leading-relaxed"></p>
+
+        <!-- SEÇÃO DINÂMICA DE ADICIONAIS -->
+        <div id="modalAddonsSection" class="hidden mb-6 pt-3 border-t border-gray-100">
+          <div class="flex justify-between items-center mb-2.5">
+            <h4 id="addonGroupDisplayTitle" class="text-xs font-black uppercase text-brand-black tracking-wider">ADICIONAIS</h4>
+            <span id="addonGroupSubtitle" class="text-[11px] text-gray-400 font-bold"></span>
+          </div>
+          <div id="modalAddonsList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+        </div>
 
         <div class="mb-6">
           <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Observação do Item</label>
@@ -467,7 +473,7 @@
 
           <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
             <i class="fa-solid fa-bag-shopping"></i>
-            <span>ADICIONAR AO CARRINHO</span>
+            <span id="btnModalAddToCartText">ADICIONAR AO CARRINHO</span>
           </button>
         </div>
       </div>
@@ -522,7 +528,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT -->
+  <!-- MODAL DE CHECKOUT COMPLETO (INTACTO) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -760,7 +766,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO SISTEMA -->
+  <!-- JAVASCRIPT DO CLIENTE -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -769,6 +775,8 @@
     let storeConfig = {
       name: "PHSUBLIME FOOD",
       whatsapp: "5521986147221",
+      deliveryTime: "40 - 50 min",
+      pickupTime: "15 - 25 min",
       deliveryTiers: [
         { km: 3, price: 5.00 },
         { km: 6, price: 8.00 },
@@ -792,9 +800,14 @@
       searchQuery: "",
       modalItem: null,
       modalQty: 1,
+      modalSelectedAddons: {}, // { "Carne": 1, "Ovo": 2 }
       currentUser: null,
       savedAddress: null
     };
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2).replace('.', ',');
+    }
 
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
@@ -1051,6 +1064,8 @@
         storeConfig.name = data.store_name || storeConfig.name;
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
         storeConfig.address = data.address || storeConfig.address;
+        storeConfig.deliveryTime = data.delivery_time || "40 - 50 min";
+        storeConfig.pickupTime = data.pickup_time || "15 - 25 min";
 
         if (Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4) {
           storeConfig.deliveryTiers = data.delivery_tiers;
@@ -1205,7 +1220,7 @@
 
     async function getCoordinates(addressText) {
       try {
-        const cleanQuery = encodeURIComponent(addressText.trim());
+        const cleanQuery = encodeURIComponent(addressText.trim() + ", Brasil");
         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${cleanQuery}&limit=1`, {
           headers: { 'Accept-Language': 'pt-BR' }
         });
@@ -1267,7 +1282,7 @@
           if (noticeTitle) noticeTitle.innerText = `Frete calculado: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
           if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
 
-          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • 40-50 min`;
+          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • ⏱️ ${storeConfig.deliveryTime}`;
 
           updateCheckoutTotals();
         }
@@ -1378,12 +1393,16 @@
       `).join("");
     }
 
+    // ==============================================
+    // FLUXO DO MODAL DO PRODUTO & ADICIONAIS
+    // ==============================================
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
 
       appState.modalItem = prod;
       appState.modalQty = 1;
+      appState.modalSelectedAddons = {};
 
       document.getElementById("modalProductImg").src = prod.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80';
       document.getElementById("modalProductName").innerText = prod.name;
@@ -1392,7 +1411,77 @@
       document.getElementById("modalQtyDisplay").innerText = "1";
       document.getElementById("modalProductNotes").value = "";
 
+      // RENDERIZA OS ADICIONAIS (SE HOUVER)
+      const addonsSection = document.getElementById("modalAddonsSection");
+      const addonsContainer = document.getElementById("modalAddonsList");
+      const headerTitle = document.getElementById("addonGroupDisplayTitle");
+      const headerSubtitle = document.getElementById("addonGroupSubtitle");
+
+      if (prod.addons && Array.isArray(prod.addons.items) && prod.addons.items.length > 0) {
+        addonsSection.classList.remove('hidden');
+        headerTitle.innerText = prod.addons.group_title || 'ADICIONAIS';
+        headerSubtitle.innerText = prod.addons.max_options > 0 ? `Escolha até ${prod.addons.max_options} opções` : 'Escolha suas opções';
+
+        addonsContainer.innerHTML = prod.addons.items.map((item, idx) => `
+          <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-200">
+            <div>
+              <span class="font-extrabold text-xs text-brand-black block uppercase">${item.name}</span>
+              <span class="text-[11px] font-bold text-gray-500">+ R$ ${formatMoney(item.price)}</span>
+            </div>
+            <div class="flex items-center space-x-2 bg-white rounded-lg p-1 border border-gray-200">
+              <button onclick="changeAddonQty(${idx}, -1)" class="w-7 h-7 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 font-black text-xs transition cursor-pointer">-</button>
+              <span id="addonQty-${idx}" class="w-5 text-center font-black text-xs text-brand-black">0</span>
+              <button onclick="changeAddonQty(${idx}, 1)" class="w-7 h-7 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 font-black text-xs transition cursor-pointer">+</button>
+            </div>
+          </div>
+        `).join("");
+      } else {
+        addonsSection.classList.add('hidden');
+        addonsContainer.innerHTML = "";
+      }
+
+      updateModalPrice();
       document.getElementById("productModal").classList.remove("hidden");
+    }
+
+    function changeAddonQty(itemIndex, delta) {
+      if (!appState.modalItem || !appState.modalItem.addons) return;
+      const item = appState.modalItem.addons.items[itemIndex];
+      if (!item) return;
+
+      const currentQty = appState.modalSelectedAddons[item.name] || 0;
+      const totalSelected = Object.values(appState.modalSelectedAddons).reduce((acc, q) => acc + q, 0);
+      const maxOptions = appState.modalItem.addons.max_options || 0;
+
+      if (delta > 0 && maxOptions > 0 && totalSelected >= maxOptions) {
+        alert(`Você pode escolher no máximo ${maxOptions} opções de adicionais!`);
+        return;
+      }
+
+      const newQty = Math.max(0, currentQty + delta);
+      if (newQty === 0) {
+        delete appState.modalSelectedAddons[item.name];
+      } else {
+        appState.modalSelectedAddons[item.name] = newQty;
+      }
+
+      document.getElementById(`addonQty-${itemIndex}`).innerText = newQty;
+      updateModalPrice();
+    }
+
+    function updateModalPrice() {
+      if (!appState.modalItem) return;
+      let unitPrice = Number(appState.modalItem.price);
+
+      if (appState.modalItem.addons && appState.modalItem.addons.items) {
+        appState.modalItem.addons.items.forEach(item => {
+          const qty = appState.modalSelectedAddons[item.name] || 0;
+          unitPrice += (Number(item.price) * qty);
+        });
+      }
+
+      const totalPrice = unitPrice * appState.modalQty;
+      document.getElementById("btnModalAddToCartText").innerText = `ADICIONAR • R$ ${formatMoney(totalPrice)}`;
     }
 
     function closeProductModal() {
@@ -1405,6 +1494,7 @@
       if (newQty >= 1) {
         appState.modalQty = newQty;
         document.getElementById("modalQtyDisplay").innerText = newQty;
+        updateModalPrice();
       }
     }
 
@@ -1412,16 +1502,27 @@
       if (!appState.modalItem) return;
       const notes = document.getElementById("modalProductNotes").value.trim();
 
-      const existing = appState.cart.find(item => item.product.id === appState.modalItem.id && item.notes === notes);
-      if (existing) {
-        existing.quantity += appState.modalQty;
-      } else {
-        appState.cart.push({
-          product: appState.modalItem,
-          quantity: appState.modalQty,
-          notes: notes
+      let chosenAddons = [];
+      let extraUnitCost = 0;
+      if (appState.modalItem.addons && appState.modalItem.addons.items) {
+        appState.modalItem.addons.items.forEach(item => {
+          const qty = appState.modalSelectedAddons[item.name] || 0;
+          if (qty > 0) {
+            chosenAddons.push({ name: item.name, price: Number(item.price), qty: qty });
+            extraUnitCost += (Number(item.price) * qty);
+          }
         });
       }
+
+      const unitPriceWithAddons = Number(appState.modalItem.price) + extraUnitCost;
+
+      appState.cart.push({
+        product: appState.modalItem,
+        quantity: appState.modalQty,
+        unitPrice: unitPriceWithAddons,
+        addons: chosenAddons,
+        notes: notes
+      });
 
       closeProductModal();
       updateCartBadge();
@@ -1443,7 +1544,7 @@
 
     function updateCartBadge() {
       const totalItems = appState.cart.reduce((acc, item) => acc + item.quantity, 0);
-      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
 
       document.getElementById("cartHeaderCount").innerText = totalItems;
       document.getElementById("mobileCartCount").innerText = totalItems;
@@ -1471,7 +1572,7 @@
       footer.classList.remove("hidden");
 
       list.innerHTML = appState.cart.map((item, index) => {
-        const itemSubtotal = Number(item.product.price) * item.quantity;
+        const itemSubtotal = item.unitPrice * item.quantity;
         return `
           <div class="py-3 flex items-start justify-between space-x-3">
             <img src="${item.product.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-14 h-14 rounded-xl object-cover" />
@@ -1482,6 +1583,13 @@
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
+
+              ${item.addons && item.addons.length > 0 ? `
+                <div class="text-[10px] text-gray-500 mt-0.5 space-y-0.5">
+                  ${item.addons.map(a => `<p>+ ${a.qty}x ${a.name} (R$ ${formatMoney(a.price * a.qty)})</p>`).join('')}
+                </div>
+              ` : ''}
+
               ${item.notes ? `<p class="text-[10px] text-amber-800 bg-amber-50 rounded px-1.5 py-0.5 mt-0.5 inline-block">Obs: ${item.notes}</p>` : ""}
               <p class="text-xs font-black text-brand-red mt-1">R$ ${formatMoney(itemSubtotal)}</p>
 
@@ -1495,7 +1603,7 @@
         `;
       }).join("");
 
-      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
       document.getElementById("cartSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
       document.getElementById("cartGrandTotalText").innerText = `R$ ${formatMoney(subtotal)}`;
 
@@ -1552,7 +1660,7 @@
     }
 
     function updateCheckoutTotals() {
-      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "delivery";
       
       const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
@@ -1617,7 +1725,7 @@
         const kmText = storeConfig.currentCalculatedKm ? `~${storeConfig.currentCalculatedKm.toFixed(1)} km` : "Calculado";
         destinationType = `Delivery (${kmText})`;
         deliveryAddressText = `${street}, nº ${number || 'S/N'} - ${neighborhood}${complement ? ` (${complement})` : ""}${reference ? ` | Ref: ${reference}` : ""}`;
-        deliveryDetailHeader = `🛵 *ENTREGA DELIVERY:*\n${deliveryAddressText}\n*Taxa:* R$ ${formatMoney(deliveryFeeApplied)} (${kmText})`;
+        deliveryDetailHeader = `🛵 *ENTREGA DELIVERY:*\n${deliveryAddressText}\n*Taxa:* R$ ${formatMoney(deliveryFeeApplied)} (${kmText})\n*Previsão:* ${storeConfig.deliveryTime}`;
 
         const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
         paymentDetails = paymentMethodRadio ? paymentMethodRadio.value : 'A Combinar';
@@ -1634,7 +1742,7 @@
       } else if (orderType === "pickup") {
         destinationType = "Retirada no Balcão";
         deliveryAddressText = "Balcão da Loja";
-        deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis`;
+        deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis\n*Previsão:* ${storeConfig.pickupTime}`;
 
         const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
         paymentDetails = paymentMethodRadio ? paymentMethodRadio.value : 'Pagar na Retirada';
@@ -1646,13 +1754,18 @@
         paymentDetails = "Acerto no Caixa ao Fechar a Conta";
       }
 
-      const subtotal = appState.cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+      const subtotal = appState.cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
       const grandTotal = subtotal + deliveryFeeApplied;
       const orderNumber = Math.floor(2000 + Math.random() * 8000);
 
       const itemsListFormatted = appState.cart.map(item => {
-        const itemTotal = Number(item.product.price) * item.quantity;
-        return `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}${item.notes ? `\n   Obs: ${item.notes}` : ""}`;
+        const itemTotal = item.unitPrice * item.quantity;
+        let txt = `• ${item.quantity}x ${item.product.name} - R$ ${formatMoney(itemTotal)}`;
+        if (item.addons && item.addons.length > 0) {
+          txt += `\n   └ Adicionais: ` + item.addons.map(a => `+${a.qty}x ${a.name}`).join(', ');
+        }
+        if (item.notes) txt += `\n   └ Obs: ${item.notes}`;
+        return txt;
       }).join("\n");
 
       const message = 
@@ -1686,7 +1799,7 @@ Obrigado pelo pedido!`;
         id: orderNumber.toString(),
         client: name,
         phone: phone,
-        items: appState.cart.map(i => `${i.quantity}x ${i.product.name}`).join(", "),
+        items: itemsListFormatted,
         total: grandTotal,
         payment: paymentDetails,
         type: destinationType,
@@ -1714,10 +1827,6 @@ Obrigado pelo pedido!`;
 
     function closeSuccessModal() {
       document.getElementById("orderSuccessModal").classList.add("hidden");
-    }
-
-    function formatMoney(value) {
-      return Number(value).toFixed(2).replace('.', ',');
     }
 
     function scrollToSection(id) {
