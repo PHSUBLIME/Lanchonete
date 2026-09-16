@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Painel do Lojista | PHSUBLIME FOOD</title>
 
+  <!-- ÍCONE DA ABA (FAVICON) E PREVIEW DO PAINEL -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lanchonete.phsublime.com.br/admin" />
+  <meta property="og:title" content="Painel de Gestão | PHSUBLIME FOOD" />
+  <meta property="og:description" content="Acesso administrativo e fila de pedidos." />
+  <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -39,16 +50,32 @@
       body * { visibility: hidden; }
       #printableReceipt, #printableReceipt * { visibility: visible; }
       #printableReceipt {
-        position: absolute; left: 0; top: 0; width: 80mm; margin: 0; padding: 8px;
-        background: #fff; color: #000; font-family: monospace; font-size: 12px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        margin: 0;
+        padding: 8px;
+        background: #fff;
+        color: #000;
+        font-family: monospace;
+        font-size: 12px;
       }
       #printAreaTables, #printAreaTables * { visibility: visible; }
-      #printAreaTables { position: absolute; left: 0; top: 0; width: 100%; background: #fff; color: #000; }
+      #printAreaTables {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff;
+        color: #000;
+      }
     }
   </style>
 </head>
 <body class="bg-[#0F0F0F] text-gray-100 antialiased min-h-screen font-sans flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-black">
 
+  <!-- NOTIFICAÇÃO FLUTUANTE -->
   <div id="toastNotification" class="fixed top-5 right-5 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-neutral-900 border border-emerald-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl">
     <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
       <i class="fa-solid fa-check"></i>
@@ -59,7 +86,7 @@
     </div>
   </div>
 
-  <!-- LOGIN -->
+  <!-- TELA DE LOGIN -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -67,19 +94,20 @@
           <img src="capa.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<i class=\'fa-solid fa-shield-halved text-2xl text-brand-black\'></i>'" />
         </div>
         <h2 class="text-2xl font-black tracking-tight text-white">Acesso Restrito</h2>
-        <p class="text-xs text-gray-400 mt-1">Autenticação oficial do restaurante</p>
+        <p class="text-xs text-gray-400 mt-1">Autenticação oficial do restaurante via Supabase</p>
       </div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
         <div>
           <label class="block font-bold text-gray-300 mb-1">Usuário / Login</label>
-          <input type="text" id="loginUser" value="adimim" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white font-medium focus:outline-none focus:border-brand-yellow" required />
+          <input type="text" id="loginUser" value="adimim" placeholder="Ex: adimim" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
         <div>
           <label class="block font-bold text-gray-300 mb-1">Sua Senha</label>
           <input type="password" id="loginPass" placeholder="••••••••" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
-        <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95">
+
+        <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg active:scale-95">
           <span>ENTRAR NO PAINEL</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -87,9 +115,10 @@
     </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- DASHBOARD PRINCIPAL -->
   <div id="mainDashboard" class="hidden flex-1 flex flex-col lg:flex-row">
 
+    <!-- MENU LATERAL -->
     <aside class="w-full lg:w-64 bg-brand-dark border-b lg:border-b-0 lg:border-r border-neutral-800 flex flex-col justify-between shrink-0">
       <div>
         <div class="p-5 border-b border-neutral-800 flex items-center justify-between">
@@ -107,6 +136,7 @@
           </a>
         </div>
 
+        <!-- CONTROLES RÁPIDOS (STATUS E TEMPO ESTIMADO) -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -118,6 +148,7 @@
             </button>
           </div>
 
+          <!-- BOTÃO DE AJUSTE RÁPIDO DO TEMPO -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-stopwatch text-brand-yellow"></i>
@@ -159,6 +190,13 @@
       </div>
 
       <div class="p-4 border-t border-neutral-800">
+        <div class="bg-neutral-900/80 p-3 rounded-xl border border-neutral-800 mb-3">
+          <p class="text-[10px] font-bold text-gray-400 uppercase">Desenvolvido por</p>
+          <p class="text-xs font-extrabold text-white mt-0.5">PHSUBLIME</p>
+          <a href="https://wa.me/5521986147221" target="_blank" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1 mt-1">
+            <i class="fa-brands fa-whatsapp"></i> (21) 98614-7221
+          </a>
+        </div>
         <button onclick="handleLogout()" class="w-full text-xs font-bold text-rose-400 hover:text-rose-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer">
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>Encerrar Sessão</span>
@@ -169,12 +207,12 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
 
-      <!-- ABA 1: FILA DE PEDIDOS -->
+      <!-- ABA 1: FILA DE PEDIDOS COMPLETA -->
       <section id="tab-orders" class="tab-content">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Fila de Pedidos</h2>
-            <p class="text-xs text-gray-400">Acompanhe pedidos com adicionais em tempo real</p>
+            <p class="text-xs text-gray-400">Acompanhe pedidos do turno atual em tempo real</p>
           </div>
         </div>
 
@@ -201,14 +239,15 @@
           </button>
         </div>
 
+        <!-- SELETOR DEDICADO A TURNOS FECHADOS (SÓ APARECE AO CLICAR EM 'TURNOS FECHADOS') -->
         <div id="closedShiftSelectorArea" class="hidden mb-6 p-4 bg-neutral-900/90 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md">
           <div class="flex items-center space-x-2.5">
             <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-brand-yellow flex items-center justify-center font-black text-sm">
               <i class="fa-solid fa-folder-open"></i>
             </div>
             <div>
-              <span class="font-black text-white text-xs block">Consultar Pedidos de Turnos Anteriores</span>
-              <p class="text-[11px] text-gray-400">Selecione um fechamento abaixo para ver os pedidos daquele dia</p>
+              <span class="font-black text-white text-xs block">Consultar Histórico de Turnos Fechados</span>
+              <p class="text-[11px] text-gray-400">Selecione uma data para carregar os pedidos correspondentes</p>
             </div>
           </div>
           <div class="w-full sm:w-auto">
@@ -219,7 +258,7 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: MÓDULO FINANCEIRO / CAIXA COMPLETO -->
+      <!-- ABA 2: MÓDULO FINANCEIRO / CAIXA CONSOLIDADO -->
       <section id="tab-dashboard" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -227,7 +266,7 @@
               <h2 class="text-2xl font-black text-white">Controle Financeiro & Caixa do Turno</h2>
               <span id="shiftBadgeStatus" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">CAIXA ABERTO</span>
             </div>
-            <p class="text-xs text-gray-400">Ao fechar o caixa, os cartões zeram para o próximo turno e o total vai para o Histórico</p>
+            <p class="text-xs text-gray-400">Ao fechar o caixa, os cartões zeram para o próximo turno e o total vai consolidado para o Histórico</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="printTodayClosingReceipt()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
@@ -308,29 +347,11 @@
         <div class="bg-brand-dark p-5 rounded-2xl border border-neutral-800">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
-              <h4 class="text-sm font-black text-white">Histórico de Fechamentos & Consulta Mensal</h4>
-              <p class="text-[11px] text-gray-400">Todos os fechamentos consolidados</p>
+              <h4 class="text-sm font-black text-white">Histórico de Fechamentos</h4>
+              <p class="text-[11px] text-gray-400">Todos os fechamentos consolidados por dia ou turno</p>
             </div>
             <div class="flex items-center space-x-2">
               <select id="selectMonthFilter" onchange="filterClosuresByMonth(this.value)" class="text-xs font-extrabold p-2 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none"></select>
-              <button onclick="printMonthlyReport()" class="bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold px-3 py-2 rounded-xl border border-neutral-700 transition cursor-pointer">
-                <i class="fa-solid fa-file-invoice mr-1"></i> Relatório Mês
-              </button>
-            </div>
-          </div>
-
-          <div class="p-3.5 bg-neutral-900/80 rounded-xl border border-neutral-800 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div>
-              <span class="text-gray-400 block text-[10px]">Faturamento Acumulado no Mês</span>
-              <p class="text-lg font-black text-emerald-400" id="monthTotalGross">R$ 0,00</p>
-            </div>
-            <div>
-              <span class="text-gray-400 block text-[10px]">Total de Pedidos no Mês</span>
-              <p class="text-lg font-black text-white" id="monthTotalOrders">0 pedidos</p>
-            </div>
-            <div>
-              <span class="text-gray-400 block text-[10px]">Perdas no Mês</span>
-              <p class="text-lg font-black text-rose-400" id="monthTotalLoss">R$ 0,00</p>
             </div>
           </div>
 
@@ -338,8 +359,8 @@
             <table class="w-full text-left text-xs text-gray-300">
               <thead class="bg-neutral-900 text-[10px] text-gray-400 uppercase tracking-wider">
                 <tr>
-                  <th class="p-3">Data</th>
-                  <th class="p-3">Faturamento Fechado</th>
+                  <th class="p-3">Data / Turno</th>
+                  <th class="p-3">Faturamento</th>
                   <th class="p-3">Pedidos</th>
                   <th class="p-3">Cancelados</th>
                   <th class="p-3">Operador</th>
@@ -386,6 +407,7 @@
               class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
             />
           </div>
+
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
@@ -427,7 +449,6 @@
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
           
-          <!-- IDENTIDADE E ENDEREÇO -->
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Endereço Completo
@@ -615,24 +636,34 @@
     </main>
   </div>
 
-  <!-- NOVO MODAL MODERNO: CANCELAR / REMOVER PEDIDO DA FILA (SEM CAIXA CINZA FEIA) -->
+  <!-- MODAL: CANCELAR PEDIDO -->
   <div id="cancelOrderModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
       <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl mb-3">
         <i class="fa-solid fa-ban"></i>
       </div>
       <h3 class="text-base font-black text-white mb-1" id="cancelOrderModalTitle">Cancelar Pedido?</h3>
-      <p class="text-gray-300 text-[11px] mb-4" id="cancelOrderModalDesc">
+      <p class="text-gray-300 text-[11px] mb-4">
         O pedido sairá da fila de abertos e será movido com segurança para a aba de <strong>Cancelados</strong>.
       </p>
-
       <div class="flex gap-2">
-        <button type="button" onclick="closeCancelOrderModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">
-          Voltar
-        </button>
-        <button type="button" id="btnConfirmCancelAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">
-          Sim, Cancelar
-        </button>
+        <button type="button" onclick="closeCancelOrderModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
+        <button type="button" id="btnConfirmCancelAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXCLUIR FECHAMENTO ANTIGO DO HISTÓRICO -->
+  <div id="deleteClosureModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-xl mb-3">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+      <h3 class="text-base font-black text-white mb-1">Excluir Registro de Fechamento?</h3>
+      <p class="text-gray-400 text-[11px] mb-4">Essa linha será removida permanentemente do histórico do caixa.</p>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeDeleteClosureModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
+        <button type="button" id="btnConfirmDeleteClosure" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Excluir</button>
       </div>
     </div>
   </div>
@@ -683,26 +714,31 @@
     </div>
   </div>
 
-  <!-- MODAL: FECHAR O DIA / CAIXA -->
+  <!-- MODAL: FECHAR O DIA / CAIXA (INTELIGENTE COM CONSOLIDAÇÃO) -->
   <div id="closeShiftModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border-2 border-rose-500 shadow-2xl text-xs">
       <div class="flex justify-between items-center mb-3">
         <div>
           <h3 class="text-base font-black text-white flex items-center gap-1.5">
-            <i class="fa-solid fa-lock text-rose-500"></i> Fechamento de Turno / Caixa
+            <i class="fa-solid fa-lock text-rose-500"></i> Fechamento de Caixa
           </h3>
           <p class="text-[11px] text-gray-400" id="closeShiftDateText">Data de hoje</p>
         </div>
         <button onclick="closeCloseShiftModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
+      <div id="closeShiftPendingWarning" class="hidden mb-3 p-3 bg-amber-950/70 border border-amber-500/60 rounded-xl text-amber-300 text-[11px] flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
+        <span>Atenção: Existem <strong id="closeShiftPendingCount">0</strong> pedidos em aberto. Ao fechar, eles serão arquivados neste turno.</span>
+      </div>
+
       <div class="space-y-2 p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4">
         <div class="flex justify-between text-gray-300">
-          <span>Faturamento do Turno a Fechar:</span>
+          <span>Faturamento a Consolidar:</span>
           <strong class="text-emerald-400 text-sm font-black" id="closeShiftGross">R$ 0,00</strong>
         </div>
         <div class="flex justify-between text-gray-300">
-          <span>Pedidos Concluídos:</span>
+          <span>Pedidos Válidos:</span>
           <strong class="text-white font-bold" id="closeShiftOrders">0</strong>
         </div>
         <div class="flex justify-between text-gray-300">
@@ -716,11 +752,25 @@
         <input type="text" id="closeShiftOperator" value="Gerente" class="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-bold" required />
       </div>
 
+      <div id="existingClosureNotice" class="hidden mb-4 p-3 bg-neutral-900/90 rounded-xl border border-brand-yellow/40 text-[11px] text-gray-300">
+        <p class="font-bold text-brand-yellow mb-1"><i class="fa-solid fa-info-circle mr-1"></i> Já existe um fechamento hoje:</p>
+        <div class="flex items-center space-x-4 mt-2">
+          <label class="inline-flex items-center space-x-1.5 cursor-pointer">
+            <input type="radio" name="closureModeRadio" value="consolidate" checked class="accent-brand-yellow" />
+            <span>Acumular no Caixa de Hoje (1 linha)</span>
+          </label>
+          <label class="inline-flex items-center space-x-1.5 cursor-pointer">
+            <input type="radio" name="closureModeRadio" value="new_shift" class="accent-brand-yellow" />
+            <span>Turno Extra (Separado)</span>
+          </label>
+        </div>
+      </div>
+
       <div class="flex gap-2">
         <button onclick="closeCloseShiftModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-3 rounded-xl transition cursor-pointer">Voltar</button>
         <button onclick="confirmCloseShift()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-3 rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-check"></i>
-          <span>Confirmar e Salvar</span>
+          <span>Confirmar Fechamento</span>
         </button>
       </div>
     </div>
@@ -855,7 +905,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TEMPO DE ESPERA (SEM PROMPT CINZA) -->
+  <!-- MODAL: TEMPO DE ESPERA -->
   <div id="deliveryTimeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-brand-yellow flex items-center justify-center mx-auto text-xl mb-3">
@@ -904,6 +954,7 @@
     window.pickupTimeCurrent = '15 - 25 min';
     window.currentSettleOrderId = null;
     window.orderIdToCancel = null;
+    window.closureIdToDelete = null;
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
     let audioContextInstance = null;
@@ -1055,7 +1106,6 @@
         if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
         if (document.getElementById('cfgPickupTime')) document.getElementById('cfgPickupTime').value = window.pickupTimeCurrent;
 
-        // FORMAS DE PAGAMENTO
         if (data.payment_methods) {
           document.getElementById('cfgPayPix').checked = data.payment_methods.pix !== false;
           document.getElementById('cfgPayMoney').checked = data.payment_methods.money !== false;
@@ -1120,7 +1170,6 @@
       showToast("Tempo Atualizado!", `Previsão alterada para ${window.deliveryTimeCurrent}.`);
     }
 
-    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES E FORMAS DE PAGAMENTO
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1170,7 +1219,6 @@
 
       let { error } = await db.from('store_settings').upsert(payload);
 
-      // Fallback seguro caso as novas colunas ainda não tenham sido criadas
       if (error && (error.message.includes('delivery_time') || error.message.includes('payment_methods') || error.code === '42703')) {
         delete payload.delivery_time;
         delete payload.pickup_time;
@@ -1189,7 +1237,20 @@
       }
     }
 
-    // MODAL MODERNO DE CANCELAR PEDIDO (ENVIA PARA A ABA CANCELADOS EM VEZ DE APAGAR)
+    // CORTE PRECISO DE TURNO (GARANTE QUE NENHUM PEDIDO ANTIGO FIQUE NA FILA ATIVA)
+    function getLastShiftCutoffTime() {
+      if (!window.dailyClosures || window.dailyClosures.length === 0) return 0;
+      const sorted = [...window.dailyClosures].sort((a, b) => new Date(b.closed_at).getTime() - new Date(a.closed_at).getTime());
+      return sorted[0] && sorted[0].closed_at ? new Date(sorted[0].closed_at).getTime() : 0;
+    }
+
+    function isOrderFromPastShift(ord) {
+      const cutoff = getLastShiftCutoffTime();
+      if (cutoff === 0) return false;
+      if (!ord.created_at) return false;
+      return new Date(ord.created_at).getTime() <= cutoff;
+    }
+
     function openCancelOrderModal(orderId) {
       window.orderIdToCancel = orderId;
       document.getElementById('cancelOrderModalTitle').innerText = `Cancelar Pedido #${orderId}?`;
@@ -1206,7 +1267,6 @@
       if (!window.orderIdToCancel) return;
       const orderId = window.orderIdToCancel;
 
-      // 1. Atualiza na hora na tela local
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (ord) ord.status = 'Cancelado';
 
@@ -1214,7 +1274,6 @@
       renderOrders();
       updateDashboardMetrics();
 
-      // 2. Grava no banco como Cancelado para ir à aba 'Cancelados'
       const { error } = await db.from('orders').update({ status: 'Cancelado' }).eq('id', orderId);
       if (error) {
         showToast("Erro ao Cancelar", error.message, true);
@@ -1224,7 +1283,6 @@
       }
     }
 
-    // BAIXA NO PEDIDO (INSTANTÂNEA E DIRETO PARA O CAIXA)
     function openPaymentSettlementModal(orderId) {
       const ord = window.storeOrders.find(o => o.id === orderId);
       if (!ord) return;
@@ -1456,17 +1514,8 @@
       const selectorArea = document.getElementById("closedShiftSelectorArea");
       if (!container) return;
 
-      const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 ? window.dailyClosures[0] : null;
-      const lastClosedTime = lastClosure && lastClosure.closed_at ? new Date(lastClosure.closed_at).getTime() : 0;
-
-      const isOrderFromClosedShift = (o) => {
-        if (lastClosedTime === 0) return false;
-        if (!o.created_at) return false;
-        return new Date(o.created_at).getTime() <= lastClosedTime && (o.status === "Entregue" || o.status === "Finalizado" || o.status === "Cancelado");
-      };
-
-      const shiftOrders = window.storeOrders.filter(o => !isOrderFromClosedShift(o));
-      const archivedOrders = window.storeOrders.filter(o => isOrderFromClosedShift(o));
+      const shiftOrders = window.storeOrders.filter(o => !isOrderFromPastShift(o));
+      const archivedOrders = window.storeOrders.filter(o => isOrderFromPastShift(o));
 
       const abertosCount = shiftOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado").length;
       document.getElementById("countFilterTodos").innerText = shiftOrders.length;
@@ -1477,12 +1526,33 @@
       document.getElementById("countFilterArquivados").innerText = archivedOrders.length;
       badge.innerText = abertosCount;
 
-      let list = [...shiftOrders];
+      let list = [];
+
       if (window.activeFilter === 'arquivados') {
         selectorArea.classList.remove('hidden');
-        list = [...archivedOrders];
+        const selectedClosureId = document.getElementById('selectClosedShiftArchive')?.value;
+        const closureObj = window.dailyClosures.find(c => String(c.id) === String(selectedClosureId));
+
+        if (closureObj && closureObj.closed_at) {
+          const closureTime = new Date(closureObj.closed_at).getTime();
+          // Pega o fechamento imediatamente anterior para isolar apenas este turno
+          const previousClosure = window.dailyClosures
+            .filter(c => new Date(c.closed_at).getTime() < closureTime)
+            .sort((a, b) => new Date(b.closed_at).getTime() - new Date(a.closed_at).getTime())[0];
+          const previousTime = previousClosure ? new Date(previousClosure.closed_at).getTime() : 0;
+
+          list = archivedOrders.filter(o => {
+            if (!o.created_at) return true;
+            const t = new Date(o.created_at).getTime();
+            return t <= closureTime && t > previousTime;
+          });
+        } else {
+          list = [...archivedOrders];
+        }
       } else {
         selectorArea.classList.add('hidden');
+        list = [...shiftOrders];
+
         if (window.activeFilter === 'abertos') list = list.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
         else if (window.activeFilter === 'mesas') list = list.filter(o => isTableOrder(o));
         else if (window.activeFilter === 'entregues') list = list.filter(o => o.status === "Entregue" || o.status === "Finalizado");
@@ -1493,7 +1563,7 @@
         container.innerHTML = `
           <div class="col-span-full py-16 text-center bg-brand-dark rounded-3xl border border-neutral-800">
             <i class="fa-solid fa-inbox text-4xl text-neutral-600 mb-3"></i>
-            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta fila</h3>
+            <h3 class="text-base font-extrabold text-white">Nenhum pedido nesta visualização</h3>
           </div>
         `;
         return;
@@ -1802,15 +1872,9 @@
       renderOrders();
     }
 
-    // CAIXA E FINANCEIRO
+    // CAIXA E FINANCEIRO CONSOLIDADO
     function calculateShiftMetrics() {
-      const lastClosure = window.dailyClosures && window.dailyClosures.length > 0 ? window.dailyClosures[0] : null;
-      const lastClosedTime = lastClosure && lastClosure.closed_at ? new Date(lastClosure.closed_at).getTime() : 0;
-
-      const currentShiftOrders = window.storeOrders.filter(o => {
-        if (!o.created_at) return lastClosedTime === 0;
-        return new Date(o.created_at).getTime() > lastClosedTime;
-      });
+      const currentShiftOrders = window.storeOrders.filter(o => !isOrderFromPastShift(o));
 
       const validOrders = currentShiftOrders.filter(o => o.status !== "Cancelado");
       const cancelledOrders = currentShiftOrders.filter(o => o.status === "Cancelado");
@@ -1836,6 +1900,8 @@
         else delivery += val;
       });
 
+      const pendingOrders = currentShiftOrders.filter(o => o.status !== "Entregue" && o.status !== "Finalizado" && o.status !== "Cancelado");
+
       return {
         grossRevenue,
         validCount: validOrders.length,
@@ -1843,6 +1909,7 @@
         cancelledLoss,
         cash, pix, credit, debit,
         table, delivery, pickup,
+        pendingCount: pendingOrders.length,
         hasOpenShift: currentShiftOrders.length > 0
       };
     }
@@ -1866,38 +1933,113 @@
 
     function openCloseShiftModal() {
       const m = calculateShiftMetrics();
-      document.getElementById('closeShiftDateText').innerText = `Turno atual • ${new Date().toLocaleDateString('pt-BR')}`;
+      const todayStr = new Date().toLocaleDateString('pt-BR');
+
+      document.getElementById('closeShiftDateText').innerText = `Turno atual • ${todayStr}`;
       document.getElementById('closeShiftGross').innerText = `R$ ${m.grossRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById('closeShiftOrders').innerText = `${m.validCount} pedidos válidos`;
       document.getElementById('closeShiftLoss').innerText = `R$ ${m.cancelledLoss.toFixed(2).replace('.', ',')} (${m.cancelledCount} cancelados)`;
+
+      const warningEl = document.getElementById('closeShiftPendingWarning');
+      if (m.pendingCount > 0) {
+        document.getElementById('closeShiftPendingCount').innerText = m.pendingCount;
+        warningEl.classList.remove('hidden');
+      } else {
+        warningEl.classList.add('hidden');
+      }
+
+      // Verifica se já existe um fechamento com a data de hoje
+      const existingToday = window.dailyClosures.find(c => {
+        if (!c.closed_at) return false;
+        return new Date(c.closed_at).toLocaleDateString('pt-BR') === todayStr;
+      });
+
+      const noticeArea = document.getElementById('existingClosureNotice');
+      if (existingToday) {
+        noticeArea.classList.remove('hidden');
+      } else {
+        noticeArea.classList.add('hidden');
+      }
+
       document.getElementById('closeShiftModal').classList.remove('hidden');
     }
 
-    function closeCloseShiftModal() { document.getElementById('closeShiftModal').classList.add('hidden'); }
+    function closeCloseShiftModal() {
+      document.getElementById('closeShiftModal').classList.add('hidden');
+    }
 
     async function confirmCloseShift() {
       const m = calculateShiftMetrics();
       const now = new Date();
+      const todayStr = now.toLocaleDateString('pt-BR');
       const operator = document.getElementById('closeShiftOperator').value.trim() || 'Gerente';
 
-      const closureData = {
-        id: `FC-${Date.now()}`,
-        date: `Turno de ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`,
-        gross_revenue: m.grossRevenue,
-        total_orders: m.validCount,
-        cancelled_orders: m.cancelledCount,
-        cancelled_amount: m.cancelledLoss,
-        payment_breakdown: { dinheiro: m.cash, pix: m.pix, credito: m.credit, debito: m.debit },
-        channel_breakdown: { salao: m.table, delivery: m.delivery, balcao: m.pickup },
-        operator: operator,
-        closed_at: now.toISOString()
-      };
+      const existingToday = window.dailyClosures.find(c => {
+        if (!c.closed_at) return false;
+        return new Date(c.closed_at).toLocaleDateString('pt-BR') === todayStr;
+      });
 
-      const { error } = await db.from('daily_closures').insert([closureData]);
-      if (!error) {
-        closeCloseShiftModal();
-        await fetchClosures();
-        showToast("Caixa Fechado!", "Turno arquivado com sucesso.");
+      const closureMode = document.querySelector('input[name="closureModeRadio"]:checked')?.value || 'new_shift';
+
+      if (existingToday && closureMode === 'consolidate') {
+        // Atualiza e consolida o fechamento de hoje em uma única linha limpa
+        const updatedGross = Number(existingToday.gross_revenue || 0) + m.grossRevenue;
+        const updatedOrders = Number(existingToday.total_orders || 0) + m.validCount;
+        const updatedCancelled = Number(existingToday.cancelled_orders || 0) + m.cancelledCount;
+        const updatedLoss = Number(existingToday.cancelled_amount || 0) + m.cancelledLoss;
+
+        const updatedPayments = {
+          dinheiro: (existingToday.payment_breakdown?.dinheiro || 0) + m.cash,
+          pix: (existingToday.payment_breakdown?.pix || 0) + m.pix,
+          credito: (existingToday.payment_breakdown?.credito || 0) + m.credit,
+          debito: (existingToday.payment_breakdown?.debito || 0) + m.debit
+        };
+
+        const updatedChannels = {
+          salao: (existingToday.channel_breakdown?.salao || 0) + m.table,
+          delivery: (existingToday.channel_breakdown?.delivery || 0) + m.delivery,
+          balcao: (existingToday.channel_breakdown?.balcao || 0) + m.pickup
+        };
+
+        const { error } = await db.from('daily_closures').update({
+          date: `Consolidado • ${todayStr} (Atualizado às ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+          gross_revenue: updatedGross,
+          total_orders: updatedOrders,
+          cancelled_orders: updatedCancelled,
+          cancelled_amount: updatedLoss,
+          payment_breakdown: updatedPayments,
+          channel_breakdown: updatedChannels,
+          operator: operator,
+          closed_at: now.toISOString()
+        }).eq('id', existingToday.id);
+
+        if (!error) {
+          closeCloseShiftModal();
+          await fetchClosures();
+          showToast("Caixa Consolidado!", `Vendas somadas ao fechamento de ${todayStr}.`);
+        }
+      } else {
+        // Cria um novo registro de fechamento
+        const isExtra = existingToday ? "Turno Extra" : "Turno";
+        const closureData = {
+          id: `FC-${Date.now()}`,
+          date: `${isExtra} • ${todayStr} às ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          gross_revenue: m.grossRevenue,
+          total_orders: m.validCount,
+          cancelled_orders: m.cancelledCount,
+          cancelled_amount: m.cancelledLoss,
+          payment_breakdown: { dinheiro: m.cash, pix: m.pix, credito: m.credit, debito: m.debit },
+          channel_breakdown: { salao: m.table, delivery: m.delivery, balcao: m.pickup },
+          operator: operator,
+          closed_at: now.toISOString()
+        };
+
+        const { error } = await db.from('daily_closures').insert([closureData]);
+        if (!error) {
+          closeCloseShiftModal();
+          await fetchClosures();
+          showToast("Caixa Fechado!", "Turno arquivado com sucesso.");
+        }
       }
     }
 
@@ -1916,12 +2058,6 @@
         const dt = new Date(c.closed_at);
         return dt.getFullYear() === parseInt(y) && (dt.getMonth() + 1) === parseInt(m);
       });
-
-      const totalGross = filtered.reduce((acc, c) => acc + Number(c.gross_revenue || 0), 0);
-      document.getElementById('monthTotalGross').innerText = `R$ ${totalGross.toFixed(2).replace('.', ',')}`;
-      document.getElementById('monthTotalOrders').innerText = `${filtered.reduce((acc, c) => acc + Number(c.total_orders || 0), 0)} pedidos`;
-      document.getElementById('monthTotalLoss').innerText = `R$ ${filtered.reduce((acc, c) => acc + Number(c.cancelled_amount || 0), 0).toFixed(2).replace('.', ',')}`;
-
       renderClosuresTable(filtered);
     }
 
@@ -1940,13 +2076,46 @@
           <td class="p-3 font-bold text-gray-300">${c.total_orders}</td>
           <td class="p-3 font-semibold text-rose-400">${c.cancelled_orders} (R$ ${Number(c.cancelled_amount).toFixed(2).replace('.', ',')})</td>
           <td class="p-3 text-gray-400">${c.operator || 'Gerente'}</td>
-          <td class="p-3 text-right">
-            <button onclick='printClosureReportObject(${JSON.stringify(c)})' class="px-2.5 py-1 rounded-lg bg-neutral-800 text-brand-yellow font-bold text-[11px] cursor-pointer">
+          <td class="p-3 text-right space-x-1">
+            <button onclick='printClosureReportObject(${JSON.stringify(c)})' class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold text-[11px] cursor-pointer">
               <i class="fa-solid fa-print mr-1"></i> Reimprimir
+            </button>
+            <button onclick="openDeleteClosureModal('${c.id}')" title="Excluir este fechamento de teste" class="px-2 py-1 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 font-bold text-[11px] cursor-pointer">
+              <i class="fa-solid fa-trash"></i>
             </button>
           </td>
         </tr>
       `).join("");
+    }
+
+    function openDeleteClosureModal(closureId) {
+      window.closureIdToDelete = closureId;
+      document.getElementById('btnConfirmDeleteClosure').onclick = executeDeleteClosure;
+      document.getElementById('deleteClosureModal').classList.remove('hidden');
+    }
+
+    function closeDeleteClosureModal() {
+      document.getElementById('deleteClosureModal').classList.add('hidden');
+      window.closureIdToDelete = null;
+    }
+
+    async function executeDeleteClosure() {
+      if (!window.closureIdToDelete) return;
+      const cid = window.closureIdToDelete;
+
+      closeDeleteClosureModal();
+
+      const { error } = await db.from('daily_closures').delete().eq('id', cid);
+      if (error) {
+        showToast("Erro ao Excluir", error.message, true);
+      } else {
+        window.dailyClosures = window.dailyClosures.filter(c => String(c.id) !== String(cid));
+        renderClosuresTable();
+        populateClosedShiftDropdown();
+        renderOrders();
+        updateDashboardMetrics();
+        showToast("Fechamento Excluído", "Registro removido do histórico.");
+      }
     }
 
     function printTodayClosingReceipt() {
@@ -1975,6 +2144,7 @@
         <div style="font-size: 12px; margin-bottom: 8px;">
           <p style="margin: 3px 0; display:flex; justify-content:space-between;"><span>FATURAMENTO:</span><strong>R$ ${Number(data.gross_revenue).toFixed(2).replace('.', ',')}</strong></p>
           <p style="margin: 3px 0; display:flex; justify-content:space-between;"><span>PEDIDOS:</span><strong>${data.total_orders}</strong></p>
+          <p style="margin: 3px 0; display:flex; justify-content:space-between;"><span>CANCELADOS:</span><strong>${data.cancelled_orders}</strong></p>
         </div>
       `;
       receiptArea.classList.remove("hidden");
@@ -1985,10 +2155,14 @@
     function populateClosedShiftDropdown() {
       const select = document.getElementById('selectClosedShiftArchive');
       if (!select) return;
+      if (window.dailyClosures.length === 0) {
+        select.innerHTML = `<option value="">Nenhum turno fechado</option>`;
+        return;
+      }
       select.innerHTML = window.dailyClosures.map(c => `<option value="${c.id}">${c.date}</option>`).join("");
     }
 
-    function handleClosedShiftSelect(val) {
+    function handleClosedShiftSelect() {
       renderOrders();
     }
 
@@ -2103,14 +2277,25 @@
       document.getElementById(`nav-${tabId}`).className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
     }
 
+    // SINCRONIZAÇÃO EM TEMPO REAL BLINDADA (ESLEUTA INSERÇÕES, MUDANÇAS E EXCLUSÕES)
     function setupRealtimeListeners() {
       db.channel('admin_live')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
-          if (payload.eventType === 'INSERT') {
-            playOrderChime();
-            showToast(`Novo Pedido #${payload.new.id}!`, `${payload.new.client} enviou um pedido.`);
-          }
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
+          playOrderChime();
+          showToast(`Novo Pedido #${payload.new.id}!`, `${payload.new.client} enviou um pedido.`);
           fetchOrders();
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+          const idx = window.storeOrders.findIndex(o => String(o.id) === String(payload.new.id));
+          if (idx !== -1) window.storeOrders[idx] = payload.new;
+          else window.storeOrders.unshift(payload.new);
+          renderOrders();
+          updateDashboardMetrics();
+        })
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'orders' }, payload => {
+          window.storeOrders = window.storeOrders.filter(o => String(o.id) !== String(payload.old.id));
+          renderOrders();
+          updateDashboardMetrics();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
@@ -2118,7 +2303,8 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .subscribe();
 
-      setInterval(fetchOrders, 8000);
+      // Polling a cada 6 segundos para garantir atualização sem depender de rede
+      setInterval(fetchOrders, 6000);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
