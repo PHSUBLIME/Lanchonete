@@ -19,6 +19,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- GERADOR DE QR CODE LOCAL (OFFLINE) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -43,6 +46,10 @@
   </script>
 
   <style>
+    .qrcode-box img, .qrcode-box canvas {
+      margin: 0 auto;
+      border-radius: 8px;
+    }
     @media print {
       body * { visibility: hidden; }
       #printableReceipt, #printableReceipt * { visibility: visible; }
@@ -118,7 +125,7 @@
           </a>
         </div>
 
-        <!-- CONTROLES RÁPIDOS -->
+        <!-- CONTROLES RÁPIDOS (STATUS, ESPERA E TESTE DE ALARME) -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -130,15 +137,22 @@
             </button>
           </div>
 
+          <!-- BOTÃO RÁPIDO DE ESPERA DELIVERY EXCLUSIVO -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-stopwatch text-brand-yellow"></i>
               <span>Espera Delivery:</span>
             </span>
-            <button onclick="quickEditDeliveryTime()" id="btnQuickDeliveryTime" title="Clique para alterar rapidamente" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-black rounded-lg transition cursor-pointer">
+            <button onclick="quickEditDeliveryTime()" id="btnQuickDeliveryTime" title="Clique para alterar rapidamente o tempo de entrega" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-black rounded-lg transition cursor-pointer">
               40 - 50 min
             </button>
           </div>
+
+          <!-- BOTÃO DE TESTAR ALARME -->
+          <button onclick="playOrderChime()" title="Clique para testar o som de aviso de novos pedidos" class="w-full py-1.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] text-gray-300 font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
+            <i class="fa-solid fa-volume-high text-brand-yellow"></i>
+            <span>Testar Alarme Sonoro</span>
+          </button>
         </div>
 
         <nav class="p-3 space-y-1 text-xs font-bold">
@@ -153,7 +167,6 @@
             <span class="flex-1 text-left">Financeiro / Caixa</span>
           </button>
 
-          <!-- NOVA ABA DE AVALIAÇÕES -->
           <button onclick="navigateTab('reviews')" id="nav-reviews" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-neutral-800/60 transition cursor-pointer">
             <i class="fa-solid fa-star text-sm text-brand-yellow"></i>
             <span class="flex-1 text-left">Avaliações</span>
@@ -367,7 +380,7 @@
         </div>
       </section>
 
-      <!-- ABA 3: MODERAÇÃO DE AVALIAÇÕES (NOVA!) -->
+      <!-- ABA 3: MODERAÇÃO DE AVALIAÇÕES -->
       <section id="tab-reviews" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -427,6 +440,7 @@
               class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
             />
           </div>
+
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
@@ -438,7 +452,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Placas de Mesa com QR Code</h2>
-            <p class="text-xs text-gray-400">Gere e imprima displays de mesa</p>
+            <p class="text-xs text-gray-400">Gere e imprima displays de mesa direto no navegador</p>
           </div>
           <button onclick="printTableCards()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black text-xs font-black px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg cursor-pointer">
             <i class="fa-solid fa-print text-sm"></i>
@@ -459,7 +473,7 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 6: CONFIGURAÇÕES DA LOJA -->
+      <!-- ABA 6: CONFIGURAÇÕES DA LOJA (LIMPA, SEM O BLOCO DUPLICADO DE TEMPO) -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
@@ -570,23 +584,6 @@
                 <input type="checkbox" id="cfgPayDebit" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
                 <span class="font-bold text-gray-200 text-xs">Débito</span>
               </label>
-            </div>
-          </div>
-
-          <!-- TEMPO ESTIMADO DE ESPERA -->
-          <div class="pt-4 border-t border-neutral-800 space-y-3">
-            <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-stopwatch"></i> Tempo Estimado de Espera
-            </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="p-3.5 bg-neutral-900 rounded-xl border border-neutral-800">
-                <label class="font-bold text-white block mb-1 text-xs">🛵 Tempo para Delivery</label>
-                <input type="text" id="cfgDeliveryTime" value="40 - 50 min" placeholder="Ex: 40 - 50 min" class="w-full p-2.5 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black text-sm" required />
-              </div>
-              <div class="p-3.5 bg-neutral-900 rounded-xl border border-neutral-800">
-                <label class="font-bold text-white block mb-1 text-xs">🏪 Tempo para Retirada</label>
-                <input type="text" id="cfgPickupTime" value="15 - 25 min" placeholder="Ex: 15 - 25 min" class="w-full p-2.5 rounded-lg bg-neutral-950 border border-neutral-700 text-emerald-400 font-black text-sm" required />
-              </div>
             </div>
           </div>
 
@@ -762,9 +759,7 @@
           <h3 class="text-base font-black text-white">Baixar / Receber Pedido</h3>
           <p class="text-[11px] text-gray-400" id="settleOrderSubtitle">Pedido #----</p>
         </div>
-        <button onclick="closePaymentSettlementModal()" class="text-gray-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closePaymentSettlementModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <div class="p-3 bg-neutral-900 rounded-2xl border border-neutral-800 mb-4 text-center">
@@ -990,13 +985,13 @@
     </div>
   </div>
 
-  <!-- MODAL: TEMPO DE ESPERA -->
+  <!-- MODAL: TEMPO DE ESPERA DELIVERY -->
   <div id="deliveryTimeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-brand-yellow flex items-center justify-center mx-auto text-xl mb-3">
         <i class="fa-solid fa-stopwatch"></i>
       </div>
-      <h3 class="text-base font-black text-white mb-1">Previsão de Entrega</h3>
+      <h3 class="text-base font-black text-white mb-1">Previsão de Entrega Delivery</h3>
       <p class="text-gray-400 text-[11px] mb-4">Selecione uma opção rápida ou digite um tempo:</p>
 
       <div class="grid grid-cols-2 gap-2 mb-3">
@@ -1022,7 +1017,7 @@
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
 
-  <!-- JAVASCRIPT DO PAINEL -->
+  <!-- JAVASCRIPT DO PAINEL COM ALARME ESCANDALOSO E GERADOR QR LOCAL -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -1039,7 +1034,6 @@
     window.showReviewsGlobal = true;
     window.reviewsActiveFilter = 'all';
     window.deliveryTimeCurrent = '40 - 50 min';
-    window.pickupTimeCurrent = '15 - 25 min';
     window.currentSettleOrderId = null;
     window.orderIdToCancel = null;
     window.closureIdToDelete = null;
@@ -1063,43 +1057,60 @@
       { icon: 'fa-solid fa-tag', label: 'Geral' }
     ];
 
+    // INICIALIZA E DESTAVA O ÁUDIO DO NAVEGADOR
     function initUserAudio() {
-      if (!audioContextInstance) {
-        audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioContextInstance.state === 'suspended') {
-        audioContextInstance.resume();
-      }
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!audioContextInstance) {
+          audioContextInstance = new AudioContext();
+        }
+        if (audioContextInstance.state === 'suspended') {
+          audioContextInstance.resume();
+        }
+      } catch (e) {}
     }
-    window.addEventListener('click', initUserAudio, { once: true });
+    window.addEventListener('click', initUserAudio);
+    window.addEventListener('keydown', initUserAudio);
+    window.addEventListener('touchstart', initUserAudio);
 
+    // BIP ALARME ESCANDALOSO (SOM ESTRIDENTE DE COZINHA / IFOOD COM 6 TOQUES AGUDOS)
     function playOrderChime() {
       try {
         initUserAudio();
-        const ctx = audioContextInstance || new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = audioContextInstance || new AudioContext();
         const now = ctx.currentTime;
-        const osc1 = ctx.createOscillator();
-        const gain1 = ctx.createGain();
-        osc1.type = "sine";
-        osc1.frequency.setValueAtTime(587.33, now);
-        gain1.gain.setValueAtTime(0.4, now);
-        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-        osc1.connect(gain1);
-        gain1.connect(ctx.destination);
-        osc1.start(now);
-        osc1.stop(now + 0.35);
 
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = "sine";
-        osc2.frequency.setValueAtTime(880, now + 0.2);
-        gain2.gain.setValueAtTime(0.5, now + 0.2);
-        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.start(now + 0.2);
-        osc2.stop(now + 0.65);
-      } catch (e) {}
+        // Sequência rápida de 6 toques agudos penetrantes em onda triangular (volume alto)
+        const alarmPattern = [
+          { freq: 1046.50, start: 0.00, dur: 0.10 }, // Dó agudo
+          { freq: 1318.51, start: 0.12, dur: 0.15 }, // Mi agudo
+          { freq: 1046.50, start: 0.35, dur: 0.10 }, 
+          { freq: 1318.51, start: 0.47, dur: 0.15 }, 
+          { freq: 1567.98, start: 0.70, dur: 0.12 }, // Sol bem agudo
+          { freq: 2093.00, start: 0.84, dur: 0.35 }  // Dó estridente no final
+        ];
+
+        alarmPattern.forEach(t => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'triangle'; // Som bem mais cortante e penetrante que o seno
+          osc.frequency.setValueAtTime(t.freq, now + t.start);
+
+          gain.gain.setValueAtTime(0.001, now + t.start);
+          gain.gain.exponentialRampToValueAtTime(0.85, now + t.start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + t.start + t.dur);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now + t.start);
+          osc.stop(now + t.start + t.dur + 0.05);
+        });
+      } catch (e) {
+        console.error("Erro ao emitir alerta sonoro:", e);
+      }
     }
 
     function showToast(title, message, isError = false) {
@@ -1184,7 +1195,6 @@
         window.isStoreOpen = data.is_open !== false;
         window.showReviewsGlobal = data.show_reviews !== false;
         window.deliveryTimeCurrent = data.delivery_time || localStorage.getItem('admin_quick_delivery_time') || '40 - 50 min';
-        window.pickupTimeCurrent = data.pickup_time || '15 - 25 min';
 
         updateStoreButtonUI();
         document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
@@ -1196,9 +1206,6 @@
         if (document.getElementById('cfgWhatsapp')) document.getElementById('cfgWhatsapp').value = data.whatsapp || '';
         if (document.getElementById('cfgAddress')) document.getElementById('cfgAddress').value = data.address || '';
         if (document.getElementById('adminBrandName')) document.getElementById('adminBrandName').innerText = data.store_name || 'PHSUBLIME FOOD';
-
-        if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
-        if (document.getElementById('cfgPickupTime')) document.getElementById('cfgPickupTime').value = window.pickupTimeCurrent;
 
         // REDES SOCIAIS
         if (data.social_links) {
@@ -1258,9 +1265,7 @@
       }
     }
 
-    // ==============================================
-    // GESTÃO E MODERAÇÃO DE AVALIAÇÕES (NOVO!)
-    // ==============================================
+    // GESTÃO E MODERAÇÃO DE AVALIAÇÕES
     async function fetchAdminReviews() {
       const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -1388,7 +1393,7 @@
       } else {
         window.storeReviews = window.storeReviews.filter(r => r.id !== id);
         renderAdminReviews();
-        showToast("Avaliação Excluída", "Comentário removido do sistema com sucesso.");
+        showToast("Avaliação Excluída", "Comentário removido do sistema.");
       }
     }
 
@@ -1398,7 +1403,7 @@
       showToast("Configuração da Loja", show ? "Card de avaliações ativado na loja." : "Card de avaliações ocultado da loja.");
     }
 
-    // CONTINUAÇÃO DAS DEMAIS FUNÇÕES
+    // AJUSTE RÁPIDO DO TEMPO DE ESPERA DELIVERY
     function quickEditDeliveryTime() {
       document.getElementById('modalQuickTimeInput').value = window.deliveryTimeCurrent;
       document.getElementById('deliveryTimeModal').classList.remove('hidden');
@@ -1420,21 +1425,19 @@
       window.deliveryTimeCurrent = newTime;
       localStorage.setItem('admin_quick_delivery_time', window.deliveryTimeCurrent);
       document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
-      if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
 
       closeDeliveryTimeModal();
       await db.from('store_settings').upsert({ id: 1, delivery_time: window.deliveryTimeCurrent });
-      showToast("Tempo Atualizado!", `Previsão alterada para ${window.deliveryTimeCurrent}.`);
+      showToast("Tempo Atualizado!", `Previsão de entrega alterada para ${window.deliveryTimeCurrent}.`);
     }
 
+    // SALVAMENTO DE CONFIGURAÇÕES (SEM CAMPOS DUPLICADOS)
     async function saveStoreSettings(e) {
       e.preventDefault();
 
       const newName = document.getElementById('cfgName').value.trim();
       const newWhatsapp = document.getElementById('cfgWhatsapp').value.trim();
       const newAddress = document.getElementById('cfgAddress').value.trim();
-      const newDeliveryTime = document.getElementById('cfgDeliveryTime').value.trim();
-      const newPickupTime = document.getElementById('cfgPickupTime').value.trim();
 
       const socialLinks = {
         whatsapp: {
@@ -1475,17 +1478,12 @@
         { km: parseFloat(document.getElementById('cfgKm4').value) || 15, price: parseFloat(document.getElementById('cfgPrice4').value) || 15.00 }
       ];
 
-      window.deliveryTimeCurrent = newDeliveryTime || '40 - 50 min';
-      localStorage.setItem('admin_quick_delivery_time', window.deliveryTimeCurrent);
-      document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
-
       const payload = {
         id: 1,
         store_name: newName,
         whatsapp: newWhatsapp,
         address: newAddress,
         delivery_time: window.deliveryTimeCurrent,
-        pickup_time: newPickupTime || '15 - 25 min',
         social_links: socialLinks,
         payment_methods: paymentMethods,
         business_hours: businessHours,
@@ -1500,7 +1498,6 @@
       if (error && (error.message.includes('social_links') || error.message.includes('delivery_time') || error.code === '42703')) {
         delete payload.social_links;
         delete payload.delivery_time;
-        delete payload.pickup_time;
         const retry = await db.from('store_settings').upsert(payload);
         error = retry.error;
       }
@@ -2545,28 +2542,58 @@
       }
     }
 
+    // GERAÇÃO DE QR CODE DIRETO NO NAVEGADOR
     function generateTableCards() {
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
-      let html = '';
-      for (let i = 1; i <= numTables; i++) {
-        const tableUrl = `${window.location.origin}/index.html?mesa=${i}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tableUrl)}`;
-        html += `
-          <div class="bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg">
-            <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
-            <img src="${qrUrl}" alt="QR Code Mesa ${i}" class="w-36 h-36 mx-auto object-contain mb-2" />
-            <p class="text-[11px] font-extrabold text-gray-800">Aponte a câmera para pedir!</p>
-          </div>
-        `;
+      const container = document.getElementById('tableCardsGrid');
+      const storeName = document.getElementById('cfgName')?.value || 'PHSUBLIME FOOD';
+
+      let origin = window.location.origin;
+      if (!origin || origin === 'null' || origin.startsWith('file')) {
+        origin = 'https://lanchonete.phsublime.com.br';
       }
-      document.getElementById('tableCardsGrid').innerHTML = html;
+      origin = origin.replace(/\/+$/, '');
+
+      container.innerHTML = '';
+
+      for (let i = 1; i <= numTables; i++) {
+        const tableUrl = `${origin}/index.html?mesa=${i}`;
+        const card = document.createElement('div');
+        card.className = "bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg";
+        card.innerHTML = `
+          <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider mb-1">${storeName}</span>
+          <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
+          <div id="qrcode-box-${i}" class="qrcode-box w-36 h-36 mx-auto mb-2 flex items-center justify-center p-1 bg-white"></div>
+          <p class="text-[11px] font-extrabold text-gray-800">Aponte a câmera para pedir!</p>
+        `;
+        container.appendChild(card);
+
+        const qrBox = document.getElementById(`qrcode-box-${i}`);
+        if (window.QRCode) {
+          new QRCode(qrBox, {
+            text: tableUrl,
+            width: 136,
+            height: 136,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          const fallbackUrl = `https://quickchart.io/qr?text=${encodeURIComponent(tableUrl)}&size=180`;
+          qrBox.innerHTML = `<img src="${fallbackUrl}" alt="QR Code Mesa ${i}" class="w-36 h-36 mx-auto object-contain" />`;
+        }
+      }
     }
 
     function printTableCards() {
       generateTableCards();
-      const p = document.getElementById('printAreaTables');
-      p.innerHTML = document.getElementById('tableCardsGrid').innerHTML;
-      p.classList.remove('hidden'); window.print(); p.classList.add('hidden');
+      setTimeout(() => {
+        const p = document.getElementById('printAreaTables');
+        p.innerHTML = document.getElementById('tableCardsGrid').innerHTML;
+        p.classList.remove('hidden');
+        window.print();
+        p.classList.add('hidden');
+      }, 250);
     }
 
     window.handleLogin = async function(e) {
