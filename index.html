@@ -153,7 +153,7 @@
     </div>
   </header>
 
-  <!-- BANNER HERO LIMPO (SOMENTE NOME E AVALIAÇÃO) -->
+  <!-- BANNER HERO LIMPO (SOMENTE NOME E AVALIAÇÃO DINÂMICA) -->
   <main class="max-w-full overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-8 sm:py-12 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -164,8 +164,8 @@
           <h2 id="bannerTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">PHSUBLIME FOOD</h2>
         </div>
 
-        <!-- AVALIAÇÃO EM DESTAQUE -->
-        <div class="flex items-center">
+        <!-- AVALIAÇÃO EM DESTAQUE (MOSTRA OU ESCONDE VIA ADMIN) -->
+        <div id="heroReviewsCardWrapper" class="flex items-center">
           <button onclick="openReviewsModal()" class="flex items-center space-x-3.5 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700/80 px-4 py-3 rounded-2xl transition cursor-pointer group shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-brand-yellow flex items-center justify-center text-lg group-hover:scale-110 transition">
               <i class="fa-solid fa-star"></i>
@@ -873,6 +873,7 @@
       deliveryTime: "40 - 50 min",
       pickupTime: "15 - 25 min",
       isOpen: true,
+      showReviews: true,
       paymentMethods: { pix: true, money: true, credit: true, debit: true },
       socialLinks: {
         whatsapp: { active: true, url: "https://wa.me/5521986147221" },
@@ -944,16 +945,21 @@
       input.value = v;
     }
 
-    // AVALIAÇÕES EM TEMPO REAL
+    // AVALIAÇÕES EM TEMPO REAL (CONSIDERA APENAS AS VISÍVEIS)
     async function fetchReviews() {
       const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
       if (data) {
-        storeReviews = data;
+        storeReviews = data.filter(r => r.visible !== false);
         updateReviewsStats();
       }
     }
 
     function updateReviewsStats() {
+      const cardWrapper = document.getElementById('heroReviewsCardWrapper');
+      if (cardWrapper) {
+        cardWrapper.style.display = storeConfig.showReviews !== false ? 'flex' : 'none';
+      }
+
       const heroAvg = document.getElementById('heroAvgRating');
       const heroCount = document.getElementById('heroReviewCount');
       const heroStars = document.getElementById('heroStarsIcons');
@@ -1042,7 +1048,7 @@
       }).join('');
     }
 
-    // TRAVAS: LOGIN + PEDIDO FEITO NO BANCO
+    // TRAVAS: LOGIN + PEDIDO REGISTRADO NO BANCO
     async function checkEligibilityToReview() {
       if (!appState.currentUser) {
         alert("Por favor, informe seu WhatsApp para poder avaliar.");
@@ -1145,7 +1151,8 @@
         client_phone: appState.currentUser.phone,
         rating: rating,
         comment: comment,
-        photo: currentReviewPhotoBase64 || null
+        photo: currentReviewPhotoBase64 || null,
+        visible: true
       }]);
 
       btn.disabled = false;
@@ -1414,6 +1421,7 @@
         storeConfig.deliveryTime = data.delivery_time || "40 - 50 min";
         storeConfig.pickupTime = data.pickup_time || "15 - 25 min";
         storeConfig.isOpen = data.is_open !== false;
+        storeConfig.showReviews = data.show_reviews !== false;
 
         if (data.social_links) {
           storeConfig.socialLinks = data.social_links;
@@ -1453,7 +1461,7 @@
           }
         }
 
-        // ATUALIZAÇÃO DINÂMICA DAS REDES SOCIAIS NO RODAPÉ
+        // REDES SOCIAIS DINÂMICAS NO RODAPÉ
         const soc = storeConfig.socialLinks || {};
         const btnWa = document.getElementById('footerBtnWhatsapp');
         const btnInsta = document.getElementById('footerBtnInstagram');
@@ -1499,7 +1507,7 @@
         const feeBadge = document.getElementById('chkDeliveryFeeText');
         if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
-        // STATUS DE LOJA ABERTA / FECHADA
+        // STATUS DA LOJA
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -1514,6 +1522,7 @@
           text.innerText = "FECHADO NO MOMENTO";
         }
 
+        updateReviewsStats();
         renderPaymentOptions();
         updateCheckoutTotals();
         if (appState.cart.length > 0) renderCartDrawer();
@@ -1719,6 +1728,9 @@
           if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
 
           document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • ⏱️ ${storeConfig.deliveryTime}`;
+          if (document.getElementById('topDeliveryFeeTagMobile')) {
+            document.getElementById('topDeliveryFeeTagMobile').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • ⏱️ ${storeConfig.deliveryTime}`;
+          }
 
           updateCheckoutTotals();
         }
@@ -1832,6 +1844,7 @@
       `).join("");
     }
 
+    // MODAL DO PRODUTO (COM ADICIONAIS)
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
