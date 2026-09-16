@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
+  <!-- AVISO DE MESA -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
     <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
@@ -137,7 +137,7 @@
     </div>
   </header>
 
-  <!-- BANNER / HERO (APENAS COM AVALIAÇÃO DINÂMICA) -->
+  <!-- BANNER / HERO -->
   <main>
     <section id="inicio" class="relative bg-brand-black text-white py-10 sm:py-16 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -368,6 +368,22 @@
     </div>
   </div>
 
+  <!-- NOVO MODAL: SUCESSO DA AVALIAÇÃO (MODERNO COM ESTRELA DOURADA) -->
+  <div id="reviewSuccessModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 text-center shadow-2xl">
+      <div class="w-16 h-16 bg-amber-50 text-brand-yellow rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
+        <i class="fa-solid fa-star"></i>
+      </div>
+      <h3 class="text-xl font-black text-brand-black mb-1">MUITO OBRIGADO!</h3>
+      <p class="text-xs text-gray-500 mb-5 leading-relaxed">
+        Sua avaliação foi publicada com sucesso e já está visível para todos os clientes!
+      </p>
+      <button onclick="closeReviewSuccessModal()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs transition shadow-soft cursor-pointer">
+        VER AVALIAÇÃO NO MURAL
+      </button>
+    </div>
+  </div>
+
   <!-- MODAL: INFORME SEU ENDEREÇO / CEP -->
   <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
@@ -480,7 +496,12 @@
 
         <div class="mb-6">
           <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Observação do Item</label>
-          <input type="text" id="modalProductNotes" placeholder="Ex: Sem cebola, ponto da carne..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+          <input 
+            type="text" 
+            id="modalProductNotes" 
+            placeholder="Ex: Sem cebola, ponto da carne..." 
+            class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
+          />
         </div>
 
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -490,7 +511,7 @@
             <button onclick="adjustModalQty(1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">+</button>
           </div>
 
-          <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition cursor-pointer">
+          <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
             <i class="fa-solid fa-bag-shopping"></i>
             <span id="btnModalAddToCartText">ADICIONAR AO CARRINHO</span>
           </button>
@@ -531,7 +552,7 @@
       </div>
 
       <div class="space-y-2">
-        <button onclick="startCheckout()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-sm transition cursor-pointer">
+        <button onclick="startCheckout()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <span>FINALIZAR PEDIDO</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -723,7 +744,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE SUCESSO -->
+  <!-- MODAL DE SUCESSO DO PEDIDO -->
   <div id="orderSuccessModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl">
       <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
@@ -962,7 +983,7 @@
       }).join('');
     }
 
-    // TRAVAS ANTI-ENGRAÇADINHOS (TRAVA 1: LOGIN / TRAVA 2: PEDIDO FEITO)
+    // TRAVA: VERIFICA SE TEM PEDIDO FEITO NO BANCO
     async function checkEligibilityToReview() {
       if (!appState.currentUser) {
         alert("Por favor, informe seu WhatsApp para poder avaliar.");
@@ -973,7 +994,6 @@
 
       const phoneClean = getCleanWaNumber(appState.currentUser.phone);
 
-      // Trava 2: Verifica se existe pelo menos um pedido feito com esse telefone
       const { data: orders } = await db.from('orders').select('id, phone');
       const userOrders = (orders || []).filter(o => getCleanWaNumber(o.phone) === phoneClean);
 
@@ -982,7 +1002,6 @@
         return;
       }
 
-      // Trava 3: Limite de 1 avaliação para cada pedido que o cliente já fez
       const userReviews = storeReviews.filter(r => getCleanWaNumber(r.client_phone) === phoneClean);
       if (userReviews.length >= userOrders.length) {
         alert("Você já avaliou todos os pedidos que realizou conosco! Muito obrigado pelo carinho!");
@@ -1078,8 +1097,17 @@
       } else {
         closeSubmitReviewModal();
         await fetchReviews();
-        alert("Obrigado pela sua avaliação! Ela já está visível.");
+        openReviewSuccessModal();
       }
+    }
+
+    function openReviewSuccessModal() {
+      document.getElementById('reviewSuccessModal').classList.remove('hidden');
+    }
+
+    function closeReviewSuccessModal() {
+      document.getElementById('reviewSuccessModal').classList.add('hidden');
+      openReviewsModal();
     }
 
     // ==============================================
