@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="scroll-smooth overflow-x-hidden">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -53,6 +53,10 @@
   </script>
 
   <style>
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .line-clamp-2 {
@@ -65,17 +69,17 @@
     .badge-closed { background-color: #FDE8E8; color: #9B1C1C; }
   </style>
 </head>
-<body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12">
+<body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-24 md:pb-12 overflow-x-hidden">
 
   <!-- BARRA SUPERIOR DE HORÁRIO -->
-  <div class="bg-brand-black text-white text-xs py-1.5 px-4 border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto flex justify-center sm:justify-start items-center space-x-2">
-      <span id="storeStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all">
-        <span id="storeStatusDot" class="w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
+  <div class="bg-brand-black text-white text-xs py-1.5 px-3 sm:px-4 border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex justify-between sm:justify-start items-center space-x-2">
+      <span id="storeStatusBadge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold badge-open transition-all">
+        <span id="storeStatusDot" class="w-1.5 h-1.5 rounded-full mr-1.5 bg-emerald-500 animate-pulse"></span>
         <span id="storeStatusText">ABERTO AGORA</span>
       </span>
-      <span class="text-neutral-600">|</span>
-      <span class="text-neutral-300 text-[11px]" id="storeScheduleText">Atendimento Disponível</span>
+      <span class="text-neutral-600 hidden sm:inline">|</span>
+      <span class="text-neutral-300 text-[10px] sm:text-[11px] truncate" id="storeScheduleText">Atendimento Disponível</span>
     </div>
   </div>
 
@@ -85,63 +89,84 @@
     <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
   </div>
 
-  <!-- HEADER PRINCIPAL COM ENDEREÇO E LOGIN NA MESMA BARRA -->
+  <!-- HEADER PRINCIPAL (RESPONSIVO E SEM CORTES) -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4">
       
-      <!-- LADO ESQUERDO: LOGO E NOME -->
-      <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
-        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-xl shadow-sm">
-          <i class="fa-solid fa-burger"></i>
-        </div>
-        <div>
-          <h1 id="brandNameHeader" class="text-sm sm:text-lg font-extrabold tracking-tight text-brand-black leading-tight">PHSUBLIME FOOD</h1>
-          <p id="brandSloganHeader" class="text-[11px] text-gray-500 hidden sm:block">Sabor que combina com você!</p>
-        </div>
-      </div>
-
-      <!-- CENTRO: SELETOR DE ENDEREÇO / CEP AO LADO DO NOME -->
-      <div class="flex-1 max-w-xs sm:max-w-md mx-1 sm:mx-3">
-        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group shadow-xs">
-          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
-            <i class="fa-solid fa-location-dot text-xs sm:text-sm"></i>
-          </div>
-          <div class="truncate text-left">
-            <p class="font-extrabold text-gray-800 text-[11px] sm:text-xs flex items-center gap-1 leading-tight group-hover:text-amber-600 transition">
-              <span id="topAddressStreet" class="truncate">Informe seu endereço para entrega</span>
-              <i class="fa-solid fa-chevron-down text-[9px] text-gray-400 shrink-0"></i>
-            </p>
-            <p id="topDeliveryFeeTag" class="text-[10px] text-gray-500 truncate leading-tight mt-0.5">Clique para calcular taxa e tempo de entrega</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- LADO DIREITO: BOTÕES DE LOGIN, CARDÁPIO E PEDIDO -->
-      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+      <!-- LINHA 1: MARCA + LOGIN + PEDIDO -->
+      <div class="h-16 sm:h-20 flex items-center justify-between gap-2">
         
-        <!-- ENTRE OU CADASTRE-SE -->
-        <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
-          <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
-          <span id="topUserLabel" class="hidden md:inline">Entre ou Cadastre-se</span>
-        </button>
+        <!-- LOGO E NOME -->
+        <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-lg sm:text-xl shadow-xs">
+            <i class="fa-solid fa-burger"></i>
+          </div>
+          <div class="max-w-[130px] sm:max-w-none truncate">
+            <h1 id="brandNameHeader" class="text-sm sm:text-lg font-extrabold tracking-tight text-brand-black leading-tight truncate">PHSUBLIME FOOD</h1>
+            <p id="brandSloganHeader" class="text-[11px] text-gray-500 hidden sm:block">Sabor que combina com você!</p>
+          </div>
+        </div>
 
-        <button onclick="scrollToSection('cardapio')" class="hidden lg:inline-flex text-xs font-bold uppercase tracking-wider text-brand-black hover:text-brand-yellow transition px-3 py-2 cursor-pointer">
-          Ver Cardápio
-        </button>
+        <!-- SELETOR DE ENDEREÇO / CEP NO COMPUTADOR (ESCONDIDO NO MOBILE) -->
+        <div class="hidden md:flex flex-1 max-w-md mx-4">
+          <div onclick="openAddressModal()" class="w-full flex items-center space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-3 py-2 cursor-pointer transition group shadow-xs">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
+              <i class="fa-solid fa-location-dot text-sm"></i>
+            </div>
+            <div class="truncate text-left flex-1">
+              <p class="font-extrabold text-gray-800 text-xs flex items-center justify-between leading-tight group-hover:text-amber-600 transition">
+                <span id="topAddressStreet" class="truncate">Informe seu endereço para entrega</span>
+                <i class="fa-solid fa-chevron-down text-[9px] text-gray-400 shrink-0 ml-1"></i>
+              </p>
+              <p id="topDeliveryFeeTag" class="text-[10px] text-gray-500 truncate leading-tight mt-0.5">Clique para calcular taxa e tempo de entrega</p>
+            </div>
+          </div>
+        </div>
 
-        <!-- MEU PEDIDO -->
-        <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center space-x-2 transition shadow-soft cursor-pointer">
-          <i class="fa-solid fa-bag-shopping text-brand-yellow"></i>
-          <span class="hidden sm:inline">Meu Pedido</span>
-          <span id="cartHeaderCount" class="bg-brand-red text-white text-[11px] font-black w-5 h-5 rounded-full inline-flex items-center justify-center">0</span>
-        </button>
+        <!-- BOTÕES DA DIREITA -->
+        <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+          
+          <!-- BOTÃO DE LOGIN -->
+          <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
+            <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
+            <span id="topUserLabel" class="hidden sm:inline">Entre ou Cadastre-se</span>
+          </button>
+
+          <button onclick="scrollToSection('cardapio')" class="hidden lg:inline-flex text-xs font-bold uppercase tracking-wider text-brand-black hover:text-brand-yellow transition px-3 py-2 cursor-pointer">
+            Cardápio
+          </button>
+
+          <!-- MEU PEDIDO -->
+          <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center space-x-1.5 sm:space-x-2 transition shadow-soft cursor-pointer shrink-0">
+            <i class="fa-solid fa-bag-shopping text-brand-yellow"></i>
+            <span class="hidden sm:inline">Meu Pedido</span>
+            <span id="cartHeaderCount" class="bg-brand-red text-white text-[10px] sm:text-[11px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full inline-flex items-center justify-center">0</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- LINHA 2 NO MOBILE: CARD DE ENDEREÇO LIMPO E SEM APERTO -->
+      <div class="md:hidden pb-2.5 pt-0.5">
+        <div onclick="openAddressModal()" class="w-full flex items-center space-x-2 bg-gray-50 active:bg-gray-100 border border-gray-200/90 rounded-xl px-2.5 py-1.5 cursor-pointer transition">
+          <div class="w-6 h-6 rounded-lg bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-location-dot text-xs"></i>
+          </div>
+          <div class="truncate flex-1 text-left">
+            <p class="font-extrabold text-gray-800 text-[11px] flex items-center justify-between leading-tight">
+              <span id="topAddressStreetMobile" class="truncate">Informe seu endereço para entrega</span>
+              <i class="fa-solid fa-chevron-down text-[9px] text-gray-400 shrink-0 ml-1"></i>
+            </p>
+            <p id="topDeliveryFeeTagMobile" class="text-[9px] text-gray-500 truncate leading-tight mt-0.5">Clique para calcular taxa e tempo</p>
+          </div>
+        </div>
       </div>
 
     </div>
   </header>
 
   <!-- BANNER / HERO -->
-  <main>
+  <main class="overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-10 sm:py-16 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -169,7 +194,7 @@
 
         <div class="mt-8 pt-6 border-t border-neutral-800/80 grid grid-cols-3 gap-2 sm:gap-6 text-center sm:text-left">
           <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-xs sm:text-sm mb-1 sm:mb-0">
               <i class="fa-solid fa-star"></i>
             </div>
             <div>
@@ -178,7 +203,7 @@
             </div>
           </div>
           <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-xs sm:text-sm mb-1 sm:mb-0">
               <i class="fa-solid fa-motorcycle"></i>
             </div>
             <div>
@@ -187,7 +212,7 @@
             </div>
           </div>
           <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-xs sm:text-sm mb-1 sm:mb-0">
               <i class="fa-solid fa-credit-card"></i>
             </div>
             <div>
@@ -200,20 +225,20 @@
     </section>
 
     <!-- BARRA HORIZONTAL DE CATEGORIAS -->
-    <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
-      <div class="max-w-7xl mx-auto px-4">
-        <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
+    <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-[108px] md:top-20 z-20 py-2.5 sm:py-3 shadow-xs">
+      <div class="max-w-7xl mx-auto px-3 sm:px-4">
+        <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-0.5"></div>
       </div>
     </section>
 
     <!-- GRID DE PRODUTOS -->
-    <section class="max-w-7xl mx-auto px-4 py-8">
-      <div class="flex items-center justify-between mb-6">
+    <section class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h3 id="currentCategoryTitle" class="text-xl sm:text-2xl font-black text-brand-black">Todos os Itens</h3>
-          <p class="text-xs sm:text-sm text-gray-500">Clique para escolher e personalizar seu pedido</p>
+          <h3 id="currentCategoryTitle" class="text-lg sm:text-2xl font-black text-brand-black">Todos os Itens</h3>
+          <p class="text-[11px] sm:text-sm text-gray-500">Clique para escolher e personalizar seu pedido</p>
         </div>
-        <div class="relative w-40 sm:w-64">
+        <div class="relative w-full sm:w-64">
           <input 
             type="text" 
             id="searchInput" 
@@ -221,11 +246,11 @@
             placeholder="Buscar item..." 
             class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-yellow transition"
           />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 sm:top-3 text-gray-400 text-xs"></i>
         </div>
       </div>
 
-      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
     </section>
   </main>
 
@@ -294,18 +319,18 @@
   </footer>
 
   <!-- MODAL: INFORME SEU ENDEREÇO / CEP -->
-  <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
+  <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
       <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
-      <div class="p-6 sm:p-7">
-        <div class="text-center mb-6">
-          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2.5">
+      <div class="p-5 sm:p-7">
+        <div class="text-center mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-lg mx-auto mb-2">
             <i class="fa-solid fa-location-dot"></i>
           </div>
-          <h3 class="text-xl font-extrabold text-brand-black">Informe seu endereço</h3>
+          <h3 class="text-lg sm:text-xl font-extrabold text-brand-black">Informe seu endereço</h3>
           <p class="text-xs text-gray-500 mt-0.5">Calculamos a entrega e tempo estimado para você</p>
         </div>
 
@@ -320,13 +345,13 @@
                 placeholder="00000-000" 
                 oninput="formatCepInput(this)"
                 onkeydown="if(event.key==='Enter') searchCepManual()"
-                class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition"
+                class="w-full text-sm font-bold tracking-wider px-3.5 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition"
               />
               <button 
                 type="button" 
                 onclick="searchCepManual()" 
                 id="btnSearchCep"
-                class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black hover:bg-neutral-800 text-white font-black text-xs px-4 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black hover:bg-neutral-800 text-white font-black text-[11px] sm:text-xs px-3 sm:px-4 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
                 <span>BUSCAR CEP</span>
               </button>
             </div>
@@ -377,18 +402,18 @@
   </div>
 
   <!-- MODAL: IDENTIFICAÇÃO / LOGIN SEM CUSTO -->
-  <div id="authModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
       <div class="p-6 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-3">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2.5">
           <i class="fa-solid fa-mobile-screen-button"></i>
         </div>
-        <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
-        <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+        <h3 class="text-lg font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
+        <p class="text-xs text-gray-500 mb-5 leading-relaxed">
           Para salvar seus endereços, agilizar pedidos e consultar seu histórico.
         </p>
 
@@ -401,7 +426,7 @@
               placeholder="(21) 99999-9999" 
               required
               oninput="formatPhoneInput(this)"
-              class="w-full text-sm font-bold p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
+              class="w-full text-sm font-bold p-2.5 sm:p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
             />
           </div>
 
@@ -412,11 +437,11 @@
               id="authName" 
               placeholder="Ex: Carlos Oliveira" 
               required 
-              class="w-full text-sm p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
+              class="w-full text-sm p-2.5 sm:p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
             />
           </div>
 
-          <button type="submit" id="btnSubmitAuth" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3.5 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-3">
+          <button type="submit" id="btnSubmitAuth" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-3">
             <span>CONTINUAR</span>
             <i class="fa-solid fa-arrow-right"></i>
           </button>
@@ -432,40 +457,40 @@
   </div>
 
   <!-- MODAL DO PRODUTO -->
-  <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="relative h-56 sm:h-64 bg-neutral-100 overflow-hidden">
+      <div class="relative h-48 sm:h-64 bg-neutral-100 overflow-hidden">
         <img id="modalProductImg" src="" alt="Produto" class="w-full h-full object-cover" />
-        <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 bg-brand-black/70 hover:bg-brand-black text-white rounded-full flex items-center justify-center transition cursor-pointer">
+        <button onclick="closeProductModal()" class="absolute top-4 right-4 w-8 h-8 sm:w-9 sm:h-9 bg-brand-black/70 hover:bg-brand-black text-white rounded-full flex items-center justify-center transition cursor-pointer">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
-      <div class="p-6 overflow-y-auto">
+      <div class="p-5 sm:p-6 overflow-y-auto">
         <div class="flex justify-between items-start mb-2">
-          <h3 id="modalProductName" class="text-xl font-extrabold text-brand-black"></h3>
-          <span id="modalProductPrice" class="text-lg font-black text-brand-red"></span>
+          <h3 id="modalProductName" class="text-lg sm:text-xl font-extrabold text-brand-black"></h3>
+          <span id="modalProductPrice" class="text-base sm:text-lg font-black text-brand-red"></span>
         </div>
-        <p id="modalProductDesc" class="text-sm text-gray-500 mb-6 leading-relaxed"></p>
+        <p id="modalProductDesc" class="text-xs sm:text-sm text-gray-500 mb-5 leading-relaxed"></p>
 
-        <div class="mb-6">
-          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Observação do Item</label>
+        <div class="mb-5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">Observação do Item</label>
           <input 
             type="text" 
             id="modalProductNotes" 
             placeholder="Ex: Sem cebola, ponto da carne bem passado..." 
-            class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
+            class="w-full text-xs p-2.5 sm:p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
           />
         </div>
 
-        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div class="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
           <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
-            <button onclick="adjustModalQty(-1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">-</button>
-            <span id="modalQtyDisplay" class="w-10 text-center font-black text-sm text-brand-black">1</span>
-            <button onclick="adjustModalQty(1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">+</button>
+            <button onclick="adjustModalQty(-1)" class="w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">-</button>
+            <span id="modalQtyDisplay" class="w-8 sm:w-10 text-center font-black text-xs sm:text-sm text-brand-black">1</span>
+            <button onclick="adjustModalQty(1)" class="w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">+</button>
           </div>
 
-          <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
+          <button onclick="confirmAddToCart()" class="flex-1 ml-3 sm:ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
             <i class="fa-solid fa-bag-shopping"></i>
             <span>ADICIONAR AO CARRINHO</span>
           </button>
@@ -477,19 +502,19 @@
   <!-- DRAWER DO CARRINHO -->
   <div id="cartBackdrop" onclick="closeCartDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
-    <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-black text-white">
+    <div class="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between bg-brand-black text-white">
       <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-bag-shopping text-brand-yellow text-lg"></i>
-        <h3 class="font-extrabold text-base">Seu Carrinho</h3>
+        <i class="fa-solid fa-bag-shopping text-brand-yellow text-base sm:text-lg"></i>
+        <h3 class="font-extrabold text-sm sm:text-base">Seu Carrinho</h3>
       </div>
       <button onclick="closeCartDrawer()" class="text-gray-400 hover:text-white transition w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
     </div>
 
-    <div id="cartItemsList" class="flex-1 overflow-y-auto p-5 divide-y divide-gray-100"></div>
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-gray-100"></div>
 
-    <div id="cartFooterArea" class="p-5 bg-gray-50 border-t border-gray-200">
+    <div id="cartFooterArea" class="p-4 sm:p-5 bg-gray-50 border-t border-gray-200">
       <div class="space-y-1.5 text-xs mb-4">
         <div class="flex justify-between text-gray-600">
           <span>Subtotal dos Itens</span>
@@ -523,19 +548,19 @@
   </aside>
 
   <!-- MODAL DE CHECKOUT -->
-  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
-      <div class="p-5 bg-brand-black text-white flex items-center justify-between">
+      <div class="p-4 sm:p-5 bg-brand-black text-white flex items-center justify-between">
         <div>
-          <h3 class="font-extrabold text-base">Finalize seu Pedido</h3>
-          <p class="text-xs text-gray-400">Confirme seus dados para envio</p>
+          <h3 class="font-extrabold text-sm sm:text-base">Finalize seu Pedido</h3>
+          <p class="text-[11px] text-gray-400">Confirme seus dados para envio</p>
         </div>
         <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-gray-300 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form id="checkoutForm" onsubmit="processOrderSubmission(event)" class="p-6 overflow-y-auto space-y-5 text-xs">
+      <form id="checkoutForm" onsubmit="processOrderSubmission(event)" class="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 text-xs">
         <div>
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center justify-between">
             <span class="flex items-center gap-1.5">
@@ -544,7 +569,7 @@
             </span>
             <button type="button" onclick="openAuthModal()" class="text-brand-yellow hover:underline text-[11px] font-bold">Trocar Conta</button>
           </h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <div>
               <label class="block font-bold text-gray-700 mb-1">Seu Nome *</label>
               <input type="text" id="custName" placeholder="Ex: Roberto Silva" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
@@ -563,29 +588,29 @@
           </h4>
 
           <div class="grid grid-cols-3 gap-2">
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <label class="cursor-pointer border rounded-xl p-2 sm:p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="delivery" checked onchange="handleOrderTypeChange()" class="sr-only" />
-              <i class="fa-solid fa-motorcycle text-brand-yellow text-base block mb-1"></i>
-              <p class="font-black text-gray-800 text-[11px]">Delivery</p>
-              <p class="text-[9px] text-gray-500">Na sua casa</p>
+              <i class="fa-solid fa-motorcycle text-brand-yellow text-sm sm:text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[10px] sm:text-[11px]">Delivery</p>
+              <p class="text-[8px] sm:text-[9px] text-gray-500">Na sua casa</p>
             </label>
 
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <label class="cursor-pointer border rounded-xl p-2 sm:p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="pickup" onchange="handleOrderTypeChange()" class="sr-only" />
-              <i class="fa-solid fa-store text-blue-500 text-base block mb-1"></i>
-              <p class="font-black text-gray-800 text-[11px]">Retirada</p>
-              <p class="text-[9px] text-emerald-600 font-bold">Sem taxa</p>
+              <i class="fa-solid fa-store text-blue-500 text-sm sm:text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[10px] sm:text-[11px]">Retirada</p>
+              <p class="text-[8px] sm:text-[9px] text-emerald-600 font-bold">Sem taxa</p>
             </label>
 
-            <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
+            <label class="cursor-pointer border rounded-xl p-2 sm:p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="dine_in" onchange="handleOrderTypeChange()" class="sr-only" />
-              <i class="fa-solid fa-utensils text-emerald-500 text-base block mb-1"></i>
-              <p class="font-black text-gray-800 text-[11px]">Na Mesa</p>
-              <p class="text-[9px] text-brand-yellow font-black">No Salão</p>
+              <i class="fa-solid fa-utensils text-emerald-500 text-sm sm:text-base block mb-1"></i>
+              <p class="font-black text-gray-800 text-[10px] sm:text-[11px]">Na Mesa</p>
+              <p class="text-[8px] sm:text-[9px] text-brand-yellow font-black">No Salão</p>
             </label>
           </div>
 
-          <div id="deliveryFieldsArea" class="mt-4 space-y-3">
+          <div id="deliveryFieldsArea" class="mt-3.5 space-y-2.5 sm:space-y-3">
             <div class="grid grid-cols-3 gap-2">
               <div class="col-span-2">
                 <label class="block font-bold text-gray-700 mb-1">Rua / Logradouro *</label>
@@ -675,7 +700,7 @@
           <input type="text" id="orderNotes" placeholder="Ex: Tirar cebola, caprichar no molho..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
-        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+        <div class="p-3.5 sm:p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
           <div class="flex justify-between text-gray-600">
             <span>Subtotal dos Itens:</span>
             <span id="chkSubtotalText" class="font-bold text-gray-800">R$ 0,00</span>
@@ -690,7 +715,7 @@
           </div>
         </div>
 
-        <button type="submit" id="btnSubmitOrder" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-4 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
+        <button type="submit" id="btnSubmitOrder" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 sm:py-4 px-4 rounded-xl text-xs sm:text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <i class="fa-brands fa-whatsapp text-lg"></i>
           <span id="btnSubmitText">CONFIRMAR E ENVIAR NO WHATSAPP</span>
         </button>
@@ -699,12 +724,12 @@
   </div>
 
   <!-- MODAL DE SUCESSO -->
-  <div id="orderSuccessModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div id="orderSuccessModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl">
-      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+      <div class="w-14 sm:w-16 h-14 sm:h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl sm:text-3xl mx-auto mb-4">
         <i class="fa-solid fa-check"></i>
       </div>
-      <h3 class="text-2xl font-black text-brand-black mb-2">PEDIDO ENVIADO!</h3>
+      <h3 class="text-xl sm:text-2xl font-black text-brand-black mb-2">PEDIDO ENVIADO!</h3>
       <p class="text-xs sm:text-sm text-gray-500 mb-6 leading-relaxed">
         Seu pedido foi registrado na cozinha e a mensagem completa foi aberta no WhatsApp do restaurante.
       </p>
@@ -826,6 +851,20 @@
       input.value = v;
     }
 
+    function syncAddressLabels(addressText, feeText) {
+      const topDesk = document.getElementById('topAddressStreet');
+      const topMob = document.getElementById('topAddressStreetMobile');
+      const feeDesk = document.getElementById('topDeliveryFeeTag');
+      const feeMob = document.getElementById('topDeliveryFeeTagMobile');
+
+      if (topDesk) topDesk.innerText = addressText;
+      if (topMob) topMob.innerText = addressText;
+      if (feeText) {
+        if (feeDesk) feeDesk.innerText = feeText;
+        if (feeMob) feeMob.innerText = feeText;
+      }
+    }
+
     function openAddressModal() {
       document.getElementById('addressModal').classList.remove('hidden');
       if (appState.savedAddress) {
@@ -852,7 +891,7 @@
       const btn = document.getElementById('btnSearchCep');
 
       if (cep.length !== 8) {
-        feedback.innerText = 'Digite um CEP válido com 8 dígitos';
+        feedback.innerText = 'Digite um CEP com 8 dígitos';
         return;
       }
 
@@ -902,7 +941,7 @@
       if (document.getElementById('custComplement')) document.getElementById('custComplement').value = complement;
 
       const shortAddr = `${street}${number ? ', ' + number : ''} - ${neighborhood}`;
-      document.getElementById('topAddressStreet').innerText = shortAddr;
+      syncAddressLabels(shortAddr);
 
       closeAddressModal();
       await autoCalculateRouteDelivery();
@@ -915,7 +954,7 @@
         try {
           appState.savedAddress = JSON.parse(savedAddr);
           const shortAddr = `${appState.savedAddress.street}${appState.savedAddress.number ? ', ' + appState.savedAddress.number : ''} - ${appState.savedAddress.neighborhood}`;
-          document.getElementById('topAddressStreet').innerText = shortAddr;
+          syncAddressLabels(shortAddr);
           document.getElementById('custStreet').value = appState.savedAddress.street || '';
           document.getElementById('custNumber').value = appState.savedAddress.number || '';
           document.getElementById('custNeighborhood').value = appState.savedAddress.neighborhood || '';
@@ -968,12 +1007,12 @@
 
       if (appState.currentUser) {
         const firstName = appState.currentUser.name.split(' ')[0];
-        topLabel.innerText = `Olá, ${firstName}`;
+        if (topLabel) topLabel.innerText = `Olá, ${firstName}`;
         if (mobLabel) mobLabel.innerText = firstName;
         document.getElementById('custName').value = appState.currentUser.name;
         document.getElementById('custPhone').value = appState.currentUser.phone;
       } else {
-        topLabel.innerText = "Entre ou Cadastre-se";
+        if (topLabel) topLabel.innerText = "Entre ou Cadastre-se";
         if (mobLabel) mobLabel.innerText = "Perfil";
       }
     }
@@ -1086,12 +1125,12 @@
         const text = document.getElementById("storeStatusText");
 
         if (data.is_open) {
-          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-open transition-all";
-          dot.className = "w-2 h-2 rounded-full mr-1.5 bg-emerald-500 animate-pulse";
+          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold badge-open transition-all";
+          dot.className = "w-1.5 h-1.5 rounded-full mr-1.5 bg-emerald-500 animate-pulse";
           text.innerText = "ABERTO AGORA";
         } else {
-          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-closed transition-all";
-          dot.className = "w-2 h-2 rounded-full mr-1.5 bg-rose-500";
+          badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold badge-closed transition-all";
+          dot.className = "w-1.5 h-1.5 rounded-full mr-1.5 bg-rose-500";
           text.innerText = "FECHADO NO MOMENTO";
         }
 
@@ -1267,7 +1306,9 @@
           if (noticeTitle) noticeTitle.innerText = `Frete calculado: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
           if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
 
-          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • 40-50 min`;
+          const labelFee = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • 40-50 min`;
+          const shortAddr = `${street}${number ? ', ' + number : ''} - ${neighborhood}`;
+          syncAddressLabels(shortAddr, labelFee);
 
           updateCheckoutTotals();
         }
@@ -1296,13 +1337,13 @@
       container.innerHTML = storeCategories.map(cat => {
         const isActive = appState.selectedCategory.toLowerCase() === cat.id.toLowerCase();
         const activeClass = isActive 
-          ? "bg-brand-black text-brand-yellow font-extrabold shadow-sm scale-105" 
+          ? "bg-brand-black text-brand-yellow font-extrabold shadow-xs scale-105" 
           : "bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold";
 
         return `
           <button 
             onclick="selectCategory('${cat.id}')" 
-            class="whitespace-nowrap px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center space-x-2 transition transform active:scale-95 cursor-pointer ${activeClass}">
+            class="whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm flex items-center space-x-2 transition transform active:scale-95 cursor-pointer ${activeClass}">
             <i class="${cat.icon || 'fa-solid fa-tag'}"></i>
             <span>${cat.name}</span>
           </button>
@@ -1351,25 +1392,25 @@
       }
 
       grid.innerHTML = filtered.map(p => `
-        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-soft transition group flex flex-col justify-between">
+        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-xs hover:shadow-soft transition group flex flex-col justify-between">
           <div>
-            <div class="relative h-44 sm:h-48 overflow-hidden bg-gray-100 cursor-pointer" onclick="openProductModal(${p.id})">
+            <div class="relative h-40 sm:h-48 overflow-hidden bg-gray-100 cursor-pointer" onclick="openProductModal(${p.id})">
               <img src="${p.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
             </div>
-            <div class="p-4">
-              <h4 class="font-extrabold text-base text-brand-black group-hover:text-brand-yellow transition">${p.name}</h4>
+            <div class="p-3.5 sm:p-4">
+              <h4 class="font-extrabold text-sm sm:text-base text-brand-black group-hover:text-brand-yellow transition">${p.name}</h4>
               <p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">${p.description || ''}</p>
             </div>
           </div>
 
-          <div class="p-4 pt-0 flex items-center justify-between mt-2">
+          <div class="p-3.5 sm:p-4 pt-0 flex items-center justify-between mt-2">
             <div>
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Preço</span>
-              <span class="text-base font-black text-brand-black">R$ ${formatMoney(p.price)}</span>
+              <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase font-bold block">Preço</span>
+              <span class="text-sm sm:text-base font-black text-brand-black">R$ ${formatMoney(p.price)}</span>
             </div>
             <button 
               onclick="openProductModal(${p.id})" 
-              class="bg-brand-black hover:bg-brand-yellow hover:text-brand-black text-white text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-sm active:scale-95 cursor-pointer">
+              class="bg-brand-black hover:bg-brand-yellow hover:text-brand-black text-white text-xs font-black px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-xs active:scale-95 cursor-pointer">
               <i class="fa-solid fa-plus"></i>
               <span>ADICIONAR</span>
             </button>
@@ -1457,7 +1498,7 @@
       if (appState.cart.length === 0) {
         list.innerHTML = `
           <div class="text-center py-16">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-3 text-2xl">
+            <div class="w-14 sm:w-16 h-14 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-3 text-xl sm:text-2xl">
               <i class="fa-solid fa-bag-shopping"></i>
             </div>
             <p class="font-extrabold text-sm text-brand-black">Seu carrinho está vazio</p>
@@ -1474,7 +1515,7 @@
         const itemSubtotal = Number(item.product.price) * item.quantity;
         return `
           <div class="py-3 flex items-start justify-between space-x-3">
-            <img src="${item.product.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-14 h-14 rounded-xl object-cover" />
+            <img src="${item.product.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80'}" class="w-12 sm:w-14 h-12 sm:h-14 rounded-xl object-cover shrink-0" />
             <div class="flex-1">
               <div class="flex justify-between items-start">
                 <h5 class="font-black text-xs text-brand-black">${item.product.name}</h5>
