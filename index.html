@@ -540,7 +540,6 @@
         </div>
         <p id="modalProductDesc" class="text-sm text-gray-500 mb-5 leading-relaxed"></p>
 
-        <!-- SEÇÃO DINÂMICA DE ADICIONAIS -->
         <div id="modalAddonsSection" class="hidden mb-6 pt-3 border-t border-gray-100">
           <div class="flex justify-between items-center mb-2.5">
             <h4 id="addonGroupDisplayTitle" class="text-xs font-black uppercase text-brand-black tracking-wider">ADICIONAIS</h4>
@@ -861,7 +860,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO CLIENTE -->
+  <!-- JAVASCRIPT DO CLIENTE COM TRAVA DE 1 AVALIAÇÃO POR TELEFONE -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -871,7 +870,6 @@
       name: "PHSUBLIME FOOD",
       whatsapp: "5521986147221",
       deliveryTime: "40 - 50 min",
-      pickupTime: "15 - 25 min",
       isOpen: true,
       showReviews: true,
       paymentMethods: { pix: true, money: true, credit: true, debit: true },
@@ -945,7 +943,7 @@
       input.value = v;
     }
 
-    // AVALIAÇÕES EM TEMPO REAL (CONSIDERA APENAS AS VISÍVEIS)
+    // AVALIAÇÕES EM TEMPO REAL (CALCULA APENAS AS VISÍVEIS)
     async function fetchReviews() {
       const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -978,15 +976,16 @@
       }
 
       const sum = storeReviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
-      const avg = (sum / storeReviews.length).toFixed(1);
+      const avgNum = sum / storeReviews.length;
+      const avg = avgNum.toFixed(1);
 
       if (heroAvg) heroAvg.innerText = avg;
       if (heroCount) heroCount.innerText = `${storeReviews.length} avaliações de clientes →`;
       if (modalAvg) modalAvg.innerText = avg;
       if (modalTotalText) modalTotalText.innerText = `Baseado em ${storeReviews.length} avaliações reais de clientes`;
 
-      renderStars(Math.round(avg), heroStars);
-      renderStars(Math.round(avg), modalStars);
+      renderStars(Math.round(avgNum), heroStars);
+      renderStars(Math.round(avgNum), modalStars);
     }
 
     function renderStars(rating, container) {
@@ -1048,7 +1047,7 @@
       }).join('');
     }
 
-    // TRAVAS: LOGIN + PEDIDO REGISTRADO NO BANCO
+    // TRAVA BLINDADA: APENAS 1 AVALIAÇÃO POR NÚMERO DE TELEFONE (WHATSAPP)
     async function checkEligibilityToReview() {
       if (!appState.currentUser) {
         alert("Por favor, informe seu WhatsApp para poder avaliar.");
@@ -1058,18 +1057,31 @@
       }
 
       const phoneClean = getCleanWaNumber(appState.currentUser.phone);
+      const pureDigits = phoneClean.replace(/^55/, '');
 
+      // 1. CHECAGEM DIRETA NO SUPABASE: ESSE NÚMERO JÁ AVALIOU?
+      const { data: allReviewsInDb } = await db.from('reviews').select('id, client_phone');
+      if (allReviewsInDb && allReviewsInDb.length > 0) {
+        const alreadyReviewed = allReviewsInDb.some(r => {
+          const rPhone = getCleanWaNumber(r.client_phone || '');
+          return rPhone === phoneClean || rPhone.endsWith(pureDigits) || phoneClean.endsWith(rPhone.replace(/^55/, ''));
+        });
+
+        if (alreadyReviewed) {
+          alert("Identificamos que você já avaliou nosso restaurante com este número de WhatsApp! Agradecemos muito pelo seu feedback e carinho!");
+          return;
+        }
+      }
+
+      // 2. VERIFICA SE O CLIENTE TEM PEDIDO NO RESTAURANTE
       const { data: orders } = await db.from('orders').select('id, phone');
-      const userOrders = (orders || []).filter(o => getCleanWaNumber(o.phone) === phoneClean);
+      const userOrders = (orders || []).filter(o => {
+        const oPhone = getCleanWaNumber(o.phone || '');
+        return oPhone === phoneClean || oPhone.endsWith(pureDigits) || phoneClean.endsWith(oPhone.replace(/^55/, ''));
+      });
 
       if (!userOrders || userOrders.length === 0) {
         alert("Para avaliar, você precisa ter feito pelo menos um pedido com nosso restaurante!");
-        return;
-      }
-
-      const userReviews = storeReviews.filter(r => getCleanWaNumber(r.client_phone) === phoneClean);
-      if (userReviews.length >= userOrders.length) {
-        alert("Você já avaliou todos os pedidos que realizou conosco! Muito obrigado pelo carinho!");
         return;
       }
 
@@ -1139,12 +1151,33 @@
 
     async function handleSendReview(e) {
       e.preventDefault();
-      const rating = parseInt(document.getElementById('selectedStarValue').value, 10) || 5;
-      const comment = document.getElementById('reviewCommentInput').value.trim();
+
+      const phoneClean = getCleanWaNumber(appState.currentUser.phone);
+      const pureDigits = phoneClean.replace(/^55/, '');
 
       const btn = document.getElementById('btnSubmitReview');
       btn.disabled = true;
       btn.innerText = "ENVIANDO...";
+
+      // SEGUNDA CHECAGEM DE SEGURANÇA ANTES DO INSERT
+      const { data: checkBeforeInsert } = await db.from('reviews').select('id, client_phone');
+      if (checkBeforeInsert) {
+        const alreadyDone = checkBeforeInsert.some(r => {
+          const rPhone = getCleanWaNumber(r.client_phone || '');
+          return rPhone === phoneClean || rPhone.endsWith(pureDigits) || phoneClean.endsWith(rPhone.replace(/^55/, ''));
+        });
+
+        if (alreadyDone) {
+          alert("Identificamos que este número de telefone já enviou uma avaliação. Agradecemos pelo seu carinho!");
+          btn.disabled = false;
+          btn.innerText = "PUBLICAR AVALIAÇÃO";
+          closeSubmitReviewModal();
+          return;
+        }
+      }
+
+      const rating = parseInt(document.getElementById('selectedStarValue').value, 10) || 5;
+      const comment = document.getElementById('reviewCommentInput').value.trim();
 
       const { error } = await db.from('reviews').insert([{
         client_name: appState.currentUser.name,
@@ -1176,7 +1209,6 @@
       openReviewsModal();
     }
 
-    // MODAL DE LOJA FECHADA
     function openStoreClosedModal() {
       document.getElementById('storeClosedModal').classList.remove('hidden');
     }
@@ -1419,7 +1451,6 @@
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
         storeConfig.address = data.address || storeConfig.address;
         storeConfig.deliveryTime = data.delivery_time || "40 - 50 min";
-        storeConfig.pickupTime = data.pickup_time || "15 - 25 min";
         storeConfig.isOpen = data.is_open !== false;
         storeConfig.showReviews = data.show_reviews !== false;
 
@@ -1844,7 +1875,6 @@
       `).join("");
     }
 
-    // MODAL DO PRODUTO (COM ADICIONAIS)
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
@@ -2198,7 +2228,7 @@
       } else if (orderType === "pickup") {
         destinationType = "Retirada no Balcão";
         deliveryAddressText = "Balcão da Loja";
-        deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis\n*Previsão:* ${storeConfig.pickupTime}`;
+        deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis`;
 
         const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
         paymentDetails = paymentMethodRadio ? paymentMethodRadio.value : 'Pagar na Retirada';
