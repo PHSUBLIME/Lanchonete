@@ -51,10 +51,7 @@
   </script>
 
   <style>
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
+    html, body { max-width: 100%; overflow-x: hidden; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .line-clamp-2 {
@@ -156,7 +153,7 @@
     </div>
   </header>
 
-  <!-- BANNER / HERO LIMPO (SOMENTE NOME E AVALIAÇÃO) -->
+  <!-- BANNER HERO (SOMENTE NOME E AVALIAÇÃO) -->
   <main class="max-w-full overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-8 sm:py-12 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -217,7 +214,7 @@
     </section>
   </main>
 
-  <!-- FOOTER COMPLETO COM REDES SOCIAIS E WHATSAPP -->
+  <!-- FOOTER COMPLETO COM REDES SOCIAIS, WHATSAPP E GOOGLE -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -238,7 +235,7 @@
             <span id="footerStoreWhatsapp">(21) 98614-7221</span>
           </p>
 
-          <!-- BOTÕES DE REDES SOCIAIS E WHATSAPP NO RODAPÉ -->
+          <!-- BOTÕES DE REDES SOCIAIS, WHATSAPP E AVALIAÇÃO NO GOOGLE -->
           <div class="flex flex-wrap items-center gap-2 pt-1">
             <a id="footerBtnWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-sm">
               <i class="fa-brands fa-whatsapp text-base"></i>
@@ -251,6 +248,10 @@
             <a id="footerBtnFacebook" href="https://facebook.com" target="_blank" class="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-blue-400 font-bold text-xs px-3 py-2.5 rounded-xl border border-neutral-700 transition">
               <i class="fa-brands fa-facebook text-base"></i>
               <span>Facebook</span>
+            </a>
+            <a id="footerBtnGoogle" href="https://search.google.com/local/writereview" target="_blank" class="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold text-xs px-3 py-2.5 rounded-xl border border-neutral-700 transition">
+              <i class="fa-brands fa-google text-base text-red-400"></i>
+              <span>Avaliar no Google</span>
             </a>
           </div>
         </div>
@@ -296,6 +297,35 @@
       </div>
     </div>
   </footer>
+
+  <!-- NOVO MODAL MODERNO: LOJA FECHADA / PAUSADA -->
+  <div id="storeClosedModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div class="w-16 h-16 bg-rose-50 text-brand-red rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <h3 class="text-xl font-black text-brand-black mb-1">Estamos Fechados no Momento</h3>
+      <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+        Nossa cozinha está descansando e não estamos recebendo novos pedidos agora. Mas você pode continuar olhando nosso cardápio à vontade!
+      </p>
+
+      <div class="bg-gray-50 p-3.5 rounded-2xl border border-gray-100 text-xs mb-5 text-left space-y-1">
+        <span class="font-bold text-gray-700 text-[11px] block uppercase mb-1 flex items-center gap-1">
+          <i class="fa-solid fa-calendar-days text-brand-yellow"></i>
+          Horário de Atendimento:
+        </span>
+        <div id="closedModalSchedule" class="text-gray-500 text-[11px] space-y-0.5">
+          <p>Segunda a Quinta: 18:00 às 23:00</p>
+          <p>Sexta e Sábado: 18:00 às 00:00</p>
+          <p>Domingo: 18:00 às 23:00</p>
+        </div>
+      </div>
+
+      <button onclick="closeStoreClosedModal()" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-soft cursor-pointer">
+        Entendido, Apenas Ver Cardápio
+      </button>
+    </div>
+  </div>
 
   <!-- MODAL: MURAL DE AVALIAÇÕES -->
   <div id="reviewsModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -1126,6 +1156,15 @@
       openReviewsModal();
     }
 
+    // MODAL DE LOJA FECHADA
+    function openStoreClosedModal() {
+      document.getElementById('storeClosedModal').classList.remove('hidden');
+    }
+
+    function closeStoreClosedModal() {
+      document.getElementById('storeClosedModal').classList.add('hidden');
+    }
+
     // ==============================================
     // LOCALIZAÇÃO E ENDEREÇO
     // ==============================================
@@ -1383,13 +1422,20 @@
         if (document.getElementById('pickupAddressText')) document.getElementById('pickupAddressText').innerText = storeConfig.address;
 
         const scheduleList = document.getElementById('footerScheduleList');
-        if (scheduleList && Array.isArray(data.business_hours) && data.business_hours.length === 3) {
-          scheduleList.innerHTML = data.business_hours.map(item => `
+        const modalSchedule = document.getElementById('closedModalSchedule');
+        if (Array.isArray(data.business_hours) && data.business_hours.length === 3) {
+          const scheduleHtml = data.business_hours.map(item => `
             <li class="flex justify-between">
               <span>${item.days}</span>
               <span class="text-white font-medium">${item.hours}</span>
             </li>
           `).join("");
+          if (scheduleList) scheduleList.innerHTML = scheduleHtml;
+          if (modalSchedule) {
+            modalSchedule.innerHTML = data.business_hours.map(item => `
+              <p class="flex justify-between"><span>${item.days}</span><strong class="text-gray-700">${item.hours}</strong></p>
+            `).join("");
+          }
         }
 
         // FORMAS DE PAGAMENTO NO RODAPÉ
@@ -1410,7 +1456,7 @@
         const waLink = `https://wa.me/${getCleanWaNumber(storeConfig.whatsapp)}`;
         if (document.getElementById('footerBtnWhatsapp')) document.getElementById('footerBtnWhatsapp').href = waLink;
 
-        // ATUALIZAÇÃO EM TEMPO REAL DO STATUS (ABERTO / FECHADO)
+        // ATUALIZAÇÃO DO STATUS DA LOJA
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -1431,7 +1477,6 @@
       }
     }
 
-    // FORMAS DE PAGAMENTO FILTRADAS PELAS CONFIGURAÇÕES DO ADMIN
     function renderPaymentOptions() {
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const paymentSectionBlock = document.getElementById('paymentSectionBlock');
@@ -1630,11 +1675,7 @@
           if (noticeTitle) noticeTitle.innerText = `Frete calculado: R$ ${formatMoney(storeConfig.currentAutoFee)}`;
           if (noticeSub) noticeSub.innerText = `Distância: ~${km.toFixed(1)} km`;
 
-          const feeTag = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • ⏱️ ${storeConfig.deliveryTime}`;
-          document.getElementById('topDeliveryFeeTag').innerText = feeTag;
-          if (document.getElementById('topDeliveryFeeTagMobile')) {
-            document.getElementById('topDeliveryFeeTagMobile').innerText = feeTag;
-          }
+          document.getElementById('topDeliveryFeeTag').innerText = `Taxa: R$ ${formatMoney(storeConfig.currentAutoFee)} (~${km.toFixed(1)} km) • ⏱️ ${storeConfig.deliveryTime}`;
 
           updateCheckoutTotals();
         }
@@ -1649,7 +1690,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchReviews())
         .subscribe();
 
-      // RADAR EM SEGUNDO PLANO A CADA 5 SEGUNDOS (GARANTE ATUALIZAÇÃO SEM F5)
+      // Polling a cada 5 segundos para garantir atualização imediata no celular
       setInterval(fetchSettings, 5000);
     }
 
@@ -1994,7 +2035,7 @@
 
     function startCheckout() {
       if (!storeConfig.isOpen) {
-        alert("A loja está fechada no momento. Não estamos recebendo pedidos!");
+        openStoreClosedModal();
         return;
       }
 
@@ -2049,7 +2090,8 @@
       e.preventDefault();
 
       if (!storeConfig.isOpen) {
-        alert("A loja está pausada no momento. Pedido não pode ser enviado!");
+        closeCheckoutModal();
+        openStoreClosedModal();
         return;
       }
 
@@ -2142,7 +2184,7 @@ ${phone || 'Não informado'}
 ${itemsListFormatted}
 
 💰 *SUBTOTAL:* R$ ${formatMoney(subtotal)}
-🛵 *TAXA:* R$ ${formatMoney(feeApplied)}
+🛵 *TAXA:* R$ ${formatMoney(deliveryFeeApplied)}
 💵 *TOTAL:* R$ ${formatMoney(grandTotal)}
 
 ⏱️ *TEMPO PREVISTO:* ${storeConfig.deliveryTime}
