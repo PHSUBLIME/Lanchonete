@@ -86,7 +86,7 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN REAL E CRIPTOGRAFADA -->
+  <!-- TELA DE LOGIN -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-brand-black flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-brand-dark p-8 rounded-3xl border border-neutral-800 shadow-2xl">
       <div class="text-center mb-8">
@@ -112,13 +112,6 @@
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
-
-      <div class="mt-6 pt-6 border-t border-neutral-800 text-center">
-        <span class="text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-lock text-emerald-500"></i>
-          Conexão Segura Criptografada SSL
-        </span>
-      </div>
     </div>
   </div>
 
@@ -472,11 +465,12 @@
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
-          <p class="text-xs text-gray-400">Endereço com cidade/estado, tempos de entrega, horários e frete por KM</p>
+          <p class="text-xs text-gray-400">Endereço com cidade/estado, formas de pagamento, horários e frete</p>
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
           
+          <!-- IDENTIDADE E ENDEREÇO -->
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Endereço Completo
@@ -497,6 +491,36 @@
                 <input type="text" id="cfgAddress" placeholder="Ex: Rua Marcílio Dias, 24, Campo Lindo, Seropédica - RJ" class="w-full p-3 rounded-xl bg-neutral-900 border border-amber-400/60 text-white focus:outline-none font-bold" required />
                 <span class="text-[10px] text-gray-400 mt-1 block leading-tight">⚠️ Sempre coloque o Bairro, Cidade e UF para o GPS não calcular a distância em outro estado!</span>
               </div>
+            </div>
+          </div>
+
+          <!-- FORMAS DE PAGAMENTO ACEITAS -->
+          <div class="pt-4 border-t border-neutral-800 space-y-3">
+            <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-credit-card"></i> Formas de Pagamento Aceitas no Cardápio
+            </h3>
+            <p class="text-[11px] text-gray-400">Marque apenas as formas que seu restaurante aceita no momento:</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
+                <input type="checkbox" id="cfgPayPix" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
+                <span class="font-bold text-gray-200 text-xs">PIX</span>
+              </label>
+
+              <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
+                <input type="checkbox" id="cfgPayMoney" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
+                <span class="font-bold text-gray-200 text-xs">Dinheiro</span>
+              </label>
+
+              <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
+                <input type="checkbox" id="cfgPayCredit" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
+                <span class="font-bold text-gray-200 text-xs">Crédito</span>
+              </label>
+
+              <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
+                <input type="checkbox" id="cfgPayDebit" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
+                <span class="font-bold text-gray-200 text-xs">Débito</span>
+              </label>
             </div>
           </div>
 
@@ -869,6 +893,35 @@
     </div>
   </div>
 
+  <!-- NOVO MODAL MODERNO: AJUSTE RÁPIDO DO TEMPO DE ESPERA (SEM PROMPT CINZA) -->
+  <div id="deliveryTimeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs text-center">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-brand-yellow flex items-center justify-center mx-auto text-xl mb-3">
+        <i class="fa-solid fa-stopwatch"></i>
+      </div>
+      <h3 class="text-base font-black text-white mb-1">Previsão de Entrega</h3>
+      <p class="text-gray-400 text-[11px] mb-4">Selecione uma opção rápida ou digite um tempo:</p>
+
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button type="button" onclick="setQuickTimePreset('20 - 30 min')" class="p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold transition cursor-pointer">20 - 30 min</button>
+        <button type="button" onclick="setQuickTimePreset('30 - 40 min')" class="p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold transition cursor-pointer">30 - 40 min</button>
+        <button type="button" onclick="setQuickTimePreset('40 - 50 min')" class="p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold transition cursor-pointer">40 - 50 min</button>
+        <button type="button" onclick="setQuickTimePreset('50 - 60 min')" class="p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold transition cursor-pointer">50 - 60 min</button>
+        <button type="button" onclick="setQuickTimePreset('60 - 80 min')" class="col-span-2 p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold transition cursor-pointer">60 - 80 min (Movimento Alto)</button>
+      </div>
+
+      <div class="mb-4 text-left">
+        <label class="block text-[10px] text-gray-400 mb-1 font-bold">Ou digite o tempo livremente:</label>
+        <input type="text" id="modalQuickTimeInput" placeholder="Ex: 45 - 55 min" class="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-white font-bold text-center text-sm focus:outline-none focus:border-brand-yellow" />
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" onclick="closeDeliveryTimeModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Cancelar</button>
+        <button type="button" onclick="saveDeliveryTimeFromModal()" class="flex-1 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-2.5 rounded-xl transition shadow-md cursor-pointer">Salvar Tempo</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ÁREA DE IMPRESSÃO TÉRMICA -->
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
@@ -891,6 +944,7 @@
     window.currentSettleOrderId = null;
     window.adminSelectedCategory = 'all';
     window.adminProductSearchQuery = '';
+    let audioContextInstance = null;
 
     const PRESET_CATEGORY_ICONS = [
       { icon: 'fa-solid fa-mug-hot', label: 'Café' },
@@ -906,6 +960,48 @@
       { icon: 'fa-solid fa-cheese', label: 'Queijo' },
       { icon: 'fa-solid fa-tag', label: 'Geral' }
     ];
+
+    // DESBLOQUEIO DE ÁUDIO NO PRIMEIRO TOQUE
+    function initUserAudio() {
+      if (!audioContextInstance) {
+        audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContextInstance.state === 'suspended') {
+        audioContextInstance.resume();
+      }
+    }
+    window.addEventListener('click', initUserAudio, { once: true });
+
+    function playOrderChime() {
+      try {
+        initUserAudio();
+        const ctx = audioContextInstance || new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Toca dois tons nítidos em sequência (Ding-Dong)
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(587.33, now); // Ré
+        gain1.gain.setValueAtTime(0.4, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(880, now + 0.2); // Lá
+        gain2.gain.setValueAtTime(0.5, now + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.2);
+        osc2.stop(now + 0.65);
+      } catch (e) {}
+    }
 
     function showToast(title, message, isError = false) {
       const toast = document.getElementById("toastNotification");
@@ -1000,6 +1096,14 @@
         if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
         if (document.getElementById('cfgPickupTime')) document.getElementById('cfgPickupTime').value = window.pickupTimeCurrent;
 
+        // FORMAS DE PAGAMENTO
+        if (data.payment_methods) {
+          document.getElementById('cfgPayPix').checked = data.payment_methods.pix !== false;
+          document.getElementById('cfgPayMoney').checked = data.payment_methods.money !== false;
+          document.getElementById('cfgPayCredit').checked = data.payment_methods.credit !== false;
+          document.getElementById('cfgPayDebit').checked = data.payment_methods.debit !== false;
+        }
+
         if (Array.isArray(data.business_hours) && data.business_hours.length === 3) {
           document.getElementById('cfgDays1').value = data.business_hours[0].days;
           document.getElementById('cfgHours1').value = data.business_hours[0].hours;
@@ -1029,24 +1133,37 @@
       }
     }
 
-    async function quickEditDeliveryTime() {
-      const newTime = prompt("Qual o tempo estimado de entrega agora? (Ex: 30 - 40 min, 50 - 60 min):", window.deliveryTimeCurrent);
-      if (!newTime || !newTime.trim()) return;
+    // MODAL ELEGANTE DE TEMPO DE ESPERA
+    function quickEditDeliveryTime() {
+      document.getElementById('modalQuickTimeInput').value = window.deliveryTimeCurrent;
+      document.getElementById('deliveryTimeModal').classList.remove('hidden');
+    }
 
-      window.deliveryTimeCurrent = newTime.trim();
+    function closeDeliveryTimeModal() {
+      document.getElementById('deliveryTimeModal').classList.add('hidden');
+    }
+
+    function setQuickTimePreset(val) {
+      document.getElementById('modalQuickTimeInput').value = val;
+      saveDeliveryTimeFromModal();
+    }
+
+    async function saveDeliveryTimeFromModal() {
+      const newTime = document.getElementById('modalQuickTimeInput').value.trim();
+      if (!newTime) return;
+
+      window.deliveryTimeCurrent = newTime;
       localStorage.setItem('admin_quick_delivery_time', window.deliveryTimeCurrent);
       document.getElementById("btnQuickDeliveryTime").innerText = window.deliveryTimeCurrent;
       if (document.getElementById('cfgDeliveryTime')) document.getElementById('cfgDeliveryTime').value = window.deliveryTimeCurrent;
 
+      closeDeliveryTimeModal();
+
       const { error } = await db.from('store_settings').upsert({ id: 1, delivery_time: window.deliveryTimeCurrent });
-      if (error) {
-        showToast("Tempo Salvo!", `Alterado para ${window.deliveryTimeCurrent} (localmente).`);
-      } else {
-        showToast("Tempo Atualizado!", `Tempo alterado para ${window.deliveryTimeCurrent}.`);
-      }
+      showToast("Tempo Atualizado!", `Previsão alterada para ${window.deliveryTimeCurrent}.`);
     }
 
-    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES (O ENDEREÇO NUNCA MAIS SOME!)
+    // SALVAMENTO BLINDADO DE CONFIGURAÇÕES
     async function saveStoreSettings(e) {
       e.preventDefault();
 
@@ -1055,6 +1172,13 @@
       const newAddress = document.getElementById('cfgAddress').value.trim();
       const newDeliveryTime = document.getElementById('cfgDeliveryTime').value.trim();
       const newPickupTime = document.getElementById('cfgPickupTime').value.trim();
+
+      const paymentMethods = {
+        pix: document.getElementById('cfgPayPix').checked,
+        money: document.getElementById('cfgPayMoney').checked,
+        credit: document.getElementById('cfgPayCredit').checked,
+        debit: document.getElementById('cfgPayDebit').checked
+      };
 
       const businessHours = [
         { days: document.getElementById('cfgDays1').value.trim(), hours: document.getElementById('cfgHours1').value.trim() },
@@ -1080,6 +1204,7 @@
         address: newAddress,
         delivery_time: window.deliveryTimeCurrent,
         pickup_time: newPickupTime || '15 - 25 min',
+        payment_methods: paymentMethods,
         business_hours: businessHours,
         delivery_tiers: tiers,
         delivery_fee: tiers[0].price,
@@ -1088,10 +1213,11 @@
 
       let { error } = await db.from('store_settings').upsert(payload);
 
-      // Se der erro por coluna de tempo que não exista no banco, salva sem elas para garantir que o endereço salve!
-      if (error && (error.message.includes('delivery_time') || error.message.includes('pickup_time') || error.code === '42703')) {
+      // Fallback seguro se colunas extras não existirem no banco
+      if (error && (error.message.includes('delivery_time') || error.message.includes('payment_methods') || error.code === '42703')) {
         delete payload.delivery_time;
         delete payload.pickup_time;
+        delete payload.payment_methods;
         const retry = await db.from('store_settings').upsert(payload);
         error = retry.error;
       }
@@ -1101,8 +1227,71 @@
       } else {
         const brandHeader = document.getElementById('adminBrandName');
         if (brandHeader) brandHeader.innerText = newName;
-        showToast("Configurações Salvas!", "Endereço e parâmetros gravados com sucesso.");
+        showToast("Configurações Salvas!", "Endereço, horários e formas de pagamento salvos.");
         fetchSettings();
+      }
+    }
+
+    // EXCLUIR PEDIDO DA FILA
+    async function deleteOrder(orderId) {
+      if (confirm(`Deseja realmente excluir o pedido #${orderId}?`)) {
+        const { error } = await db.from('orders').delete().eq('id', orderId);
+        if (error) {
+          showToast("Erro ao Excluir", error.message, true);
+        } else {
+          // Atualiza lista local na hora
+          window.storeOrders = window.storeOrders.filter(o => o.id !== orderId);
+          renderOrders();
+          updateDashboardMetrics();
+          showToast("Pedido Excluído", `Pedido #${orderId} removido do sistema.`);
+        }
+      }
+    }
+
+    // BAIXA NO PEDIDO (INSTANTÂNEA E GARANTIDA)
+    function openPaymentSettlementModal(orderId) {
+      const ord = window.storeOrders.find(o => o.id === orderId);
+      if (!ord) return;
+
+      window.currentSettleOrderId = orderId;
+      document.getElementById('settleOrderSubtitle').innerText = `Pedido #${ord.id} • ${ord.client}`;
+      document.getElementById('settleOrderAmount').innerText = `R$ ${Number(ord.total).toFixed(2).replace('.', ',')}`;
+      document.getElementById('settleOrderOriginalPayment').innerText = `Informado: ${ord.payment || 'A Combinar'}`;
+
+      document.getElementById('paymentSettlementModal').classList.remove('hidden');
+    }
+
+    function closePaymentSettlementModal() {
+      document.getElementById('paymentSettlementModal').classList.add('hidden');
+      window.currentSettleOrderId = null;
+    }
+
+    async function confirmOrderPayment(chosenMethod) {
+      if (!window.currentSettleOrderId) return;
+      const orderId = window.currentSettleOrderId;
+
+      // 1. Atualiza imediatamente no estado local da tela para sumir da visão de abertos
+      const ord = window.storeOrders.find(o => o.id === orderId);
+      if (ord) {
+        ord.status = 'Entregue';
+        ord.payment = chosenMethod;
+      }
+
+      closePaymentSettlementModal();
+      renderOrders();
+      updateDashboardMetrics();
+
+      // 2. Grava no banco de dados Supabase
+      const { error } = await db.from('orders').update({
+        status: 'Entregue',
+        payment: chosenMethod
+      }).eq('id', orderId);
+
+      if (error) {
+        showToast("Erro ao Baixar", error.message, true);
+        await fetchOrders();
+      } else {
+        showToast("Pedido Concluído!", `Pedido #${orderId} baixado como ${chosenMethod}.`);
       }
     }
 
@@ -1190,7 +1379,7 @@
       document.getElementById("productEditModal").classList.add("hidden");
     }
 
-    // SALVAMENTO BLINDADO DE PRODUTOS (O ITEM NUNCA MAIS SOME DA TELA!)
+    // SALVAMENTO BLINDADO DE PRODUTOS
     async function handleSaveProduct(e) {
       e.preventDefault();
 
@@ -1228,7 +1417,7 @@
         ? await db.from('products').update(payload).eq('id', editId)
         : await db.from('products').insert([{ id: Date.now(), ...payload }]);
 
-      // Se der erro por causa da coluna 'addons' no banco, salva sem ela para o produto NÃO se perder!
+      // Fallback seguro caso addons não exista na tabela do banco
       if (res.error && (res.error.message.includes('addons') || res.error.code === '42703')) {
         delete payload.addons;
         res = editId 
@@ -1243,7 +1432,6 @@
         showToast("Produto Salvo com Sucesso!", `${name} está gravado no cardápio.`);
       }
 
-      // Muda o filtro para 'Todas' para que o novo produto apareça na hora na tela
       window.adminSelectedCategory = 'all';
       closeProductModal();
       await fetchProducts();
@@ -1388,14 +1576,18 @@
                 <option value="Cancelado" ${isCancelado ? 'selected' : ''}>❌ Cancelado</option>
               </select>
 
-              <div class="grid grid-cols-2 gap-1.5 pt-1">
+              <div class="grid grid-cols-3 gap-1.5 pt-1">
                 <button onclick="printReceipt('${ord.id}')" class="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
                   <i class="fa-solid fa-print"></i>
-                  <span>Comanda</span>
+                  <span class="hidden sm:inline">Comanda</span>
                 </button>
                 <button onclick="openPaymentSettlementModal('${ord.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm cursor-pointer">
                   <i class="fa-solid fa-check"></i>
                   <span>Baixar</span>
+                </button>
+                <button onclick="deleteOrder('${ord.id}')" title="Excluir este pedido" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-800/80 text-rose-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 transition cursor-pointer">
+                  <i class="fa-solid fa-trash"></i>
+                  <span class="hidden sm:inline">Excluir</span>
                 </button>
               </div>
             </div>
@@ -1462,37 +1654,6 @@
       receiptArea.classList.remove("hidden");
       window.print();
       receiptArea.classList.add("hidden");
-    }
-
-    function openPaymentSettlementModal(orderId) {
-      const ord = window.storeOrders.find(o => o.id === orderId);
-      if (!ord) return;
-
-      window.currentSettleOrderId = orderId;
-      document.getElementById('settleOrderSubtitle').innerText = `Pedido #${ord.id} • ${ord.client}`;
-      document.getElementById('settleOrderAmount').innerText = `R$ ${Number(ord.total).toFixed(2).replace('.', ',')}`;
-      document.getElementById('settleOrderOriginalPayment').innerText = `Informado: ${ord.payment || 'A Combinar'}`;
-
-      document.getElementById('paymentSettlementModal').classList.remove('hidden');
-    }
-
-    function closePaymentSettlementModal() {
-      document.getElementById('paymentSettlementModal').classList.add('hidden');
-      window.currentSettleOrderId = null;
-    }
-
-    async function confirmOrderPayment(chosenMethod) {
-      if (!window.currentSettleOrderId) return;
-      const orderId = window.currentSettleOrderId;
-
-      await db.from('orders').update({
-        status: 'Entregue',
-        payment: chosenMethod
-      }).eq('id', orderId);
-
-      closePaymentSettlementModal();
-      await fetchOrders();
-      showToast("Pedido Concluído!", `Pedido #${orderId} baixado como ${chosenMethod}.`);
     }
 
     function renderProductsList() {
@@ -1917,7 +2078,8 @@
       const numTables = parseInt(document.getElementById('numTablesInput').value, 10) || 6;
       let html = '';
       for (let i = 1; i <= numTables; i++) {
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent("https://lanchonete.phsublime.com.br/index.html?mesa=" + i)}`;
+        const tableUrl = `${window.location.origin}/index.html?mesa=${i}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tableUrl)}`;
         html += `
           <div class="bg-white text-brand-black p-5 rounded-2xl border-2 border-brand-yellow flex flex-col items-center text-center shadow-lg">
             <h4 class="font-black text-base text-brand-black mb-2">MESA 0${i}</h4>
@@ -1938,6 +2100,7 @@
 
     window.handleLogin = async function(e) {
       e.preventDefault();
+      initUserAudio();
       let u = document.getElementById("loginUser").value.trim();
       if (!u.includes("@")) u += "@loja.com";
       const p = document.getElementById("loginPass").value;
@@ -1984,9 +2147,15 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .subscribe();
+
+      // Checagem automática periódica a cada 8 segundos para nunca perder pedidos
+      setInterval(fetchOrders, 8000);
     }
 
-    document.addEventListener("DOMContentLoaded", checkAuthSession);
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAuthSession();
+      setupRealtimeListeners();
+    });
   </script>
 </body>
 </html>
