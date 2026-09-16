@@ -5,19 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>PHSUBLIME FOOD | Cardápio Digital</title>
 
+  <!-- ÍCONE DA ABA (FAVICON) -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
+
+  <!-- META TAGS DE COMPARTILHAMENTO -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/" />
   <meta property="og:title" content="PHSUBLIME FOOD | Cardápio Online" />
-  <meta property="og:description" content="Lanches artesanais, porções e bebidas." />
+  <meta property="og:description" content="Faça seu pedido online de forma rápida! Lanches artesanais, porções e bebidas." />
   <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
+  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -72,15 +79,17 @@
     </div>
   </div>
 
-  <!-- AVISO DE MESA -->
+  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
-    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos à vontade!</span>
+    <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
   </div>
 
   <!-- HEADER -->
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-3">
+      
+      <!-- LOGO E NOME -->
       <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-xl shadow-sm">
           <i class="fa-solid fa-burger"></i>
@@ -93,7 +102,7 @@
 
       <!-- SELETOR DE ENDEREÇO / CEP -->
       <div class="flex-1 max-w-xs sm:max-w-md mx-1 sm:mx-3">
-        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group">
+        <div onclick="openAddressModal()" class="flex items-center space-x-2 sm:space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition group shadow-xs">
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition">
             <i class="fa-solid fa-location-dot text-xs sm:text-sm"></i>
           </div>
@@ -107,6 +116,7 @@
         </div>
       </div>
 
+      <!-- BOTÕES DA DIREITA -->
       <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
         <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
           <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
@@ -123,10 +133,11 @@
           <span id="cartHeaderCount" class="bg-brand-red text-white text-[11px] font-black w-5 h-5 rounded-full inline-flex items-center justify-center">0</span>
         </button>
       </div>
+
     </div>
   </header>
 
-  <!-- BANNER / HERO -->
+  <!-- BANNER / HERO (APENAS COM AVALIAÇÃO DINÂMICA) -->
   <main>
     <section id="inicio" class="relative bg-brand-black text-white py-10 sm:py-16 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -153,39 +164,28 @@
           </div>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-neutral-800/80 grid grid-cols-3 gap-2 sm:gap-6 text-center sm:text-left">
-          <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
+        <!-- DESTAQUE EXCLUSIVO DE AVALIAÇÃO EM TEMPO REAL -->
+        <div class="mt-8 pt-6 border-t border-neutral-800/80 flex items-center">
+          <button onclick="openReviewsModal()" class="flex items-center space-x-3.5 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700/80 px-4 py-3 rounded-2xl transition cursor-pointer group shadow-sm">
+            <div class="w-11 h-11 rounded-xl bg-amber-400/20 text-brand-yellow flex items-center justify-center text-lg group-hover:scale-110 transition">
               <i class="fa-solid fa-star"></i>
             </div>
-            <div>
-              <p class="text-xs sm:text-sm font-bold">Avaliação 4,9</p>
-              <p class="text-[11px] text-gray-400 hidden sm:block">+2.500 avaliações</p>
+            <div class="text-left">
+              <div class="flex items-center gap-1.5">
+                <span id="heroAvgRating" class="text-base font-black text-white leading-none">5.0</span>
+                <div id="heroStarsIcons" class="flex text-brand-yellow text-xs gap-0.5">
+                  <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <p id="heroReviewCount" class="text-xs text-gray-400 font-semibold mt-1">Ver avaliações dos clientes →</p>
             </div>
-          </div>
-          <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
-              <i class="fa-solid fa-motorcycle"></i>
-            </div>
-            <div>
-              <p class="text-xs sm:text-sm font-bold">Entrega & Salão</p>
-              <p class="text-[11px] text-gray-400 hidden sm:block">Rápido e fresquinho</p>
-            </div>
-          </div>
-          <div class="flex flex-col sm:flex-row items-center sm:space-x-3">
-            <div class="w-9 h-9 rounded-lg bg-neutral-800 text-brand-yellow flex items-center justify-center text-sm mb-1 sm:mb-0">
-              <i class="fa-solid fa-credit-card"></i>
-            </div>
-            <div>
-              <p class="text-xs sm:text-sm font-bold">Pagamento Fácil</p>
-              <p class="text-[11px] text-gray-400 hidden sm:block">Pix, Cartões e Dinheiro</p>
-            </div>
-          </div>
+          </button>
         </div>
+
       </div>
     </section>
 
-    <!-- BARRA DE CATEGORIAS -->
+    <!-- BARRA HORIZONTAL DE CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-16 sm:top-20 z-20 py-3 shadow-sm">
       <div class="max-w-7xl mx-auto px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -215,7 +215,7 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- FOOTER COMPLETO COM PAGAMENTOS DINÂMICOS -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -279,10 +279,99 @@
     </div>
   </footer>
 
+  <!-- MODAL: MURAL DE AVALIAÇÕES DOS CLIENTES -->
+  <div id="reviewsModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-black text-white">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-star text-brand-yellow text-lg"></i>
+          <h3 class="font-extrabold text-base">Avaliações dos Clientes</h3>
+        </div>
+        <button onclick="closeReviewsModal()" class="text-gray-400 hover:text-white transition w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+        <div>
+          <div class="flex items-baseline space-x-2">
+            <span id="modalReviewsAvg" class="text-3xl font-black text-brand-black">5.0</span>
+            <div id="modalReviewsStars" class="flex text-brand-yellow text-xs gap-0.5"></div>
+          </div>
+          <p id="modalReviewsTotalText" class="text-xs text-gray-500 font-medium">Baseado em avaliações reais</p>
+        </div>
+        <button onclick="checkEligibilityToReview()" class="bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Avaliar Pedido</span>
+        </button>
+      </div>
+
+      <div id="reviewsFeedContainer" class="flex-1 overflow-y-auto p-5 space-y-3.5 divide-y divide-gray-100"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: FORMULÁRIO PARA DEIXAR AVALIAÇÃO COM FOTO -->
+  <div id="submitReviewModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <button onclick="closeSubmitReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-brand-black">Avalie sua Experiência</h3>
+        <p class="text-xs text-gray-500">Sua opinião ajuda outros clientes e o restaurante!</p>
+      </div>
+
+      <form onsubmit="handleSendReview(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-extrabold uppercase text-gray-700 text-[11px] mb-2 text-center">Quantas estrelas você dá?</label>
+          <div class="flex justify-center items-center space-x-2 text-2xl text-gray-300">
+            <button type="button" onclick="setReviewRating(1)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setReviewRating(2)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setReviewRating(3)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setReviewRating(4)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setReviewRating(5)" class="star-btn cursor-pointer transition hover:scale-110 text-brand-yellow"><i class="fa-solid fa-star"></i></button>
+          </div>
+          <input type="hidden" id="selectedStarValue" value="5" />
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Seu Comentário ou Elogio *</label>
+          <textarea id="reviewCommentInput" rows="3" placeholder="Ex: Lanche sensacional, quentinho e atendimento nota 10!" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow text-xs resize-none"></textarea>
+        </div>
+
+        <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 text-center">
+          <label class="block font-bold text-gray-700 mb-1.5 text-[11px]">Foto do Pedido (Opcional)</label>
+          <div class="flex flex-col items-center justify-center">
+            <div id="reviewPhotoPreviewWrapper" class="hidden mb-2 relative w-24 h-24 rounded-xl overflow-hidden border border-gray-300">
+              <img id="reviewPhotoPreview" src="" class="w-full h-full object-cover" />
+              <button type="button" onclick="removeReviewPhoto()" class="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full flex items-center justify-center text-[10px] cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <label class="cursor-pointer inline-flex items-center gap-2 bg-white border border-gray-300 hover:border-brand-yellow px-3 py-2 rounded-xl text-[11px] font-bold text-gray-700 transition shadow-xs">
+              <i class="fa-solid fa-camera text-brand-yellow"></i>
+              <span>Escolher ou Tirar Foto</span>
+              <input type="file" id="reviewFileInput" accept="image/*" onchange="handleReviewPhotoUpload(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmitReview" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs transition shadow-soft cursor-pointer">
+          PUBLICAR AVALIAÇÃO
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: INFORME SEU ENDEREÇO / CEP -->
   <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
-      <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
+      <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
@@ -299,21 +388,9 @@
           <div>
             <label class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-500 mb-1.5">Insira o CEP do Endereço</label>
             <div class="relative">
-              <input 
-                type="text" 
-                id="cepInput" 
-                maxlength="9" 
-                placeholder="00000-000" 
-                oninput="formatCepInput(this)"
-                onkeydown="if(event.key==='Enter') searchCepManual()"
-                class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition"
-              />
-              <button 
-                type="button" 
-                onclick="searchCepManual()" 
-                id="btnSearchCep"
-                class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black hover:bg-neutral-800 text-white font-black text-xs px-4 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
-                <span>BUSCAR CEP</span>
+              <input type="text" id="cepInput" maxlength="9" placeholder="00000-000" oninput="formatCepInput(this)" class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition" />
+              <button type="button" onclick="searchCepManual()" id="btnSearchCep" class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black text-white font-black text-xs px-4 rounded-lg transition cursor-pointer">
+                BUSCAR CEP
               </button>
             </div>
             <div class="flex justify-between items-center mt-1.5 text-[11px]">
@@ -324,35 +401,19 @@
 
           <div id="addressDetailFields" class="space-y-3 pt-2 border-t border-gray-100 hidden">
             <div class="grid grid-cols-3 gap-2">
-              <div class="col-span-2">
-                <label class="block text-[11px] font-bold text-gray-600 mb-1">Rua / Logradouro *</label>
-                <input type="text" id="modalStreet" placeholder="Ex: Rua Barata Ribeiro" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-gray-600 mb-1">Número *</label>
-                <input type="text" id="modalNumber" placeholder="Ex: 100" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
-              </div>
+              <input type="text" id="modalStreet" placeholder="Rua *" class="col-span-2 p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              <input type="text" id="modalNumber" placeholder="Nº *" class="p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
-
             <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold text-gray-600 mb-1">Bairro *</label>
-                <input type="text" id="modalNeighborhood" placeholder="Ex: Centro" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-gray-600 mb-1">Complemento</label>
-                <input type="text" id="modalComplement" placeholder="Ex: Apt 201" class="w-full p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
-              </div>
+              <input type="text" id="modalNeighborhood" placeholder="Bairro *" class="p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+              <input type="text" id="modalComplement" placeholder="Complemento" class="p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
-
-            <button onclick="confirmModalAddress()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-2">
-              <i class="fa-solid fa-check"></i>
-              <span>CONFIRMAR ESTE ENDEREÇO</span>
+            <button onclick="confirmModalAddress()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs transition cursor-pointer mt-2">
+              CONFIRMAR ESTE ENDEREÇO
             </button>
           </div>
 
           <div class="pt-3 border-t border-gray-100 text-center">
-            <p class="text-xs text-gray-400 mb-2">Vai retirar na loja ou comer no salão?</p>
             <button onclick="skipAddressSelection()" class="text-xs font-black text-brand-black hover:text-brand-yellow transition underline cursor-pointer">
               Continuar para retirar ou salão →
             </button>
@@ -364,60 +425,34 @@
 
   <!-- MODAL: IDENTIFICAÇÃO / LOGIN SEM CUSTO -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer z-10">
+    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative p-6 text-center">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
-      <div class="p-6 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-3">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-        </div>
-        <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
-        <p class="text-xs text-gray-500 mb-6 leading-relaxed">
-          Para salvar seus endereços, agilizar pedidos e consultar seu histórico.
-        </p>
-
-        <form id="authForm" onsubmit="handleCustomerLogin(event)" class="space-y-3 text-left">
-          <div>
-            <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">WhatsApp / Celular *</label>
-            <input 
-              type="tel" 
-              id="authPhone" 
-              placeholder="(21) 99999-9999" 
-              required
-              oninput="formatPhoneInput(this)"
-              class="w-full text-sm font-bold p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
-            />
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">Seu Nome *</label>
-            <input 
-              type="text" 
-              id="authName" 
-              placeholder="Ex: Carlos Oliveira" 
-              required 
-              class="w-full text-sm p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" 
-            />
-          </div>
-
-          <button type="submit" id="btnSubmitAuth" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3.5 px-4 rounded-xl text-xs transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer mt-3">
-            <span>CONTINUAR</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </form>
-
-        <div class="mt-4 pt-3 border-t border-gray-100">
-          <button onclick="closeAuthModal()" class="text-xs text-gray-400 hover:text-gray-600 transition cursor-pointer">
-            Continuar sem entrar agora →
-          </button>
-        </div>
+      <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-3">
+        <i class="fa-solid fa-mobile-screen-button"></i>
       </div>
+      <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
+      <p class="text-xs text-gray-500 mb-6">Para salvar seus endereços e avaliar pedidos.</p>
+
+      <form id="authForm" onsubmit="handleCustomerLogin(event)" class="space-y-3 text-left">
+        <div>
+          <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">WhatsApp / Celular *</label>
+          <input type="tel" id="authPhone" placeholder="(21) 99999-9999" required oninput="formatPhoneInput(this)" class="w-full text-sm font-bold p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">Seu Nome *</label>
+          <input type="text" id="authName" placeholder="Ex: Carlos Oliveira" required class="w-full text-sm p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
+        </div>
+        <button type="submit" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3.5 px-4 rounded-xl text-xs transition cursor-pointer mt-3">
+          CONTINUAR
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- MODAL DO PRODUTO (COM SEÇÃO DE ADICIONAIS) -->
+  <!-- MODAL DO PRODUTO (COM ADICIONAIS) -->
   <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
       <div class="relative h-56 sm:h-64 bg-neutral-100 overflow-hidden shrink-0">
@@ -445,12 +480,7 @@
 
         <div class="mb-6">
           <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Observação do Item</label>
-          <input 
-            type="text" 
-            id="modalProductNotes" 
-            placeholder="Ex: Sem cebola, ponto da carne bem passado..." 
-            class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
-          />
+          <input type="text" id="modalProductNotes" placeholder="Ex: Sem cebola, ponto da carne..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
 
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -460,7 +490,7 @@
             <button onclick="adjustModalQty(1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">+</button>
           </div>
 
-          <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
+          <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition cursor-pointer">
             <i class="fa-solid fa-bag-shopping"></i>
             <span id="btnModalAddToCartText">ADICIONAR AO CARRINHO</span>
           </button>
@@ -501,7 +531,7 @@
       </div>
 
       <div class="space-y-2">
-        <button onclick="startCheckout()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
+        <button onclick="startCheckout()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-sm transition cursor-pointer">
           <span>FINALIZAR PEDIDO</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -517,7 +547,7 @@
     </div>
   </aside>
 
-  <!-- MODAL DE CHECKOUT COMPLETO -->
+  <!-- MODAL DE CHECKOUT -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -525,7 +555,7 @@
           <h3 class="font-extrabold text-base">Finalize seu Pedido</h3>
           <p class="text-xs text-gray-400">Confirme seus dados para envio</p>
         </div>
-        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-gray-300 cursor-pointer">
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-800 text-gray-300 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -776,14 +806,16 @@
       ],
       currentAutoFee: 5.00,
       currentCalculatedKm: null,
-      address: "Rua Marcílio Dias, Campo Lindo, Seropédica - RJ"
+      address: "Rua Marcílio Dias, 24, Campo Lindo, Seropédica - RJ"
     };
 
     let storeCategories = [];
     let storeProducts = [];
+    let storeReviews = [];
     let cachedStoreCoords = null;
     let autoCalcTimeout = null;
     let identifiedTable = null;
+    let currentReviewPhotoBase64 = '';
 
     let appState = {
       cart: [],
@@ -802,7 +834,9 @@
 
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
-      if (clean.length === 10 || clean.length === 11) clean = '55' + clean;
+      if (clean.length === 10 || clean.length === 11) {
+        clean = '55' + clean;
+      }
       return clean;
     }
 
@@ -810,18 +844,247 @@
       let v = input.value.replace(/\D/g, '');
       if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
       input.value = v;
-      if (v.replace(/\D/g, '').length === 8) searchCepManual();
+      if (v.replace(/\D/g, '').length === 8) {
+        searchCepManual();
+      }
     }
 
     function formatPhoneInput(input) {
       let v = input.value.replace(/\D/g, '');
       if (v.length > 11) v = v.substring(0, 11);
-      if (v.length > 10) v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7,11)}`;
-      else if (v.length > 6) v = `(${v.substring(0,2)}) ${v.substring(2,6)}-${v.substring(6,10)}`;
-      else if (v.length > 2) v = `(${v.substring(0,2)}) ${v.substring(2)}`;
+      if (v.length > 10) {
+        v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7,11)}`;
+      } else if (v.length > 6) {
+        v = `(${v.substring(0,2)}) ${v.substring(2,6)}-${v.substring(6,10)}`;
+      } else if (v.length > 2) {
+        v = `(${v.substring(0,2)}) ${v.substring(2)}`;
+      }
       input.value = v;
     }
 
+    // ==============================================
+    // FLUXO DE AVALIAÇÕES EM TEMPO REAL COM FOTOS
+    // ==============================================
+    async function fetchReviews() {
+      const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
+      if (data) {
+        storeReviews = data;
+        updateReviewsStats();
+      }
+    }
+
+    function updateReviewsStats() {
+      const heroAvg = document.getElementById('heroAvgRating');
+      const heroCount = document.getElementById('heroReviewCount');
+      const heroStars = document.getElementById('heroStarsIcons');
+      const modalAvg = document.getElementById('modalReviewsAvg');
+      const modalTotalText = document.getElementById('modalReviewsTotalText');
+      const modalStars = document.getElementById('modalReviewsStars');
+
+      if (storeReviews.length === 0) {
+        if (heroAvg) heroAvg.innerText = "5.0";
+        if (heroCount) heroCount.innerText = "Novo • Seja o primeiro a avaliar!";
+        if (modalAvg) modalAvg.innerText = "5.0";
+        if (modalTotalText) modalTotalText.innerText = "Nenhuma avaliação enviada ainda";
+        renderStars(5, heroStars);
+        renderStars(5, modalStars);
+        return;
+      }
+
+      const sum = storeReviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+      const avg = (sum / storeReviews.length).toFixed(1);
+
+      if (heroAvg) heroAvg.innerText = avg;
+      if (heroCount) heroCount.innerText = `${storeReviews.length} avaliações de clientes →`;
+      if (modalAvg) modalAvg.innerText = avg;
+      if (modalTotalText) modalTotalText.innerText = `Baseado em ${storeReviews.length} avaliações reais de clientes`;
+
+      renderStars(Math.round(avg), heroStars);
+      renderStars(Math.round(avg), modalStars);
+    }
+
+    function renderStars(rating, container) {
+      if (!container) return;
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        html += `<i class="fa-solid fa-star ${i <= rating ? 'text-brand-yellow' : 'text-gray-300'}"></i>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function openReviewsModal() {
+      renderReviewsFeed();
+      document.getElementById('reviewsModal').classList.remove('hidden');
+    }
+
+    function closeReviewsModal() {
+      document.getElementById('reviewsModal').classList.add('hidden');
+    }
+
+    function renderReviewsFeed() {
+      const container = document.getElementById('reviewsFeedContainer');
+      if (!container) return;
+
+      if (storeReviews.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10">
+            <i class="fa-solid fa-star text-gray-300 text-3xl mb-2"></i>
+            <p class="font-bold text-gray-700 text-xs">Nenhuma avaliação cadastrada ainda.</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Faça um pedido e seja o primeiro a deixar um elogio!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = storeReviews.map(r => {
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-brand-yellow' : 'text-gray-200'} text-[10px]"></i>`;
+        }
+        const firstName = r.client_name ? r.client_name.split(' ')[0] : 'Cliente';
+        const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '';
+
+        return `
+          <div class="pt-3.5 first:pt-0">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-black text-xs text-brand-black">${firstName}</span>
+              <span class="text-[10px] text-gray-400 font-medium">${dateStr}</span>
+            </div>
+            <div class="flex items-center space-x-1 mb-1.5">${starsHtml}</div>
+            <p class="text-xs text-gray-600 leading-relaxed">${r.comment || ''}</p>
+            ${r.photo ? `
+              <div class="mt-2 w-28 h-28 rounded-xl overflow-hidden border border-gray-200 shadow-xs">
+                <img src="${r.photo}" class="w-full h-full object-cover" />
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // TRAVAS ANTI-ENGRAÇADINHOS (TRAVA 1: LOGIN / TRAVA 2: PEDIDO FEITO)
+    async function checkEligibilityToReview() {
+      if (!appState.currentUser) {
+        alert("Por favor, informe seu WhatsApp para poder avaliar.");
+        closeReviewsModal();
+        openAuthModal();
+        return;
+      }
+
+      const phoneClean = getCleanWaNumber(appState.currentUser.phone);
+
+      // Trava 2: Verifica se existe pelo menos um pedido feito com esse telefone
+      const { data: orders } = await db.from('orders').select('id, phone');
+      const userOrders = (orders || []).filter(o => getCleanWaNumber(o.phone) === phoneClean);
+
+      if (!userOrders || userOrders.length === 0) {
+        alert("Para avaliar, você precisa ter feito pelo menos um pedido com nosso restaurante!");
+        return;
+      }
+
+      // Trava 3: Limite de 1 avaliação para cada pedido que o cliente já fez
+      const userReviews = storeReviews.filter(r => getCleanWaNumber(r.client_phone) === phoneClean);
+      if (userReviews.length >= userOrders.length) {
+        alert("Você já avaliou todos os pedidos que realizou conosco! Muito obrigado pelo carinho!");
+        return;
+      }
+
+      closeReviewsModal();
+      openSubmitReviewModal();
+    }
+
+    function openSubmitReviewModal() {
+      setReviewRating(5);
+      document.getElementById('reviewCommentInput').value = '';
+      removeReviewPhoto();
+      document.getElementById('submitReviewModal').classList.remove('hidden');
+    }
+
+    function closeSubmitReviewModal() {
+      document.getElementById('submitReviewModal').classList.add('hidden');
+    }
+
+    function setReviewRating(val) {
+      document.getElementById('selectedStarValue').value = val;
+      const btns = document.querySelectorAll('.star-btn');
+      btns.forEach((btn, idx) => {
+        btn.className = `star-btn cursor-pointer transition hover:scale-110 ${idx < val ? 'text-brand-yellow' : 'text-gray-300'}`;
+      });
+    }
+
+    function handleReviewPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const maxDim = 400;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+          } else {
+            if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          currentReviewPhotoBase64 = canvas.toDataURL("image/jpeg", 0.70);
+          document.getElementById('reviewPhotoPreview').src = currentReviewPhotoBase64;
+          document.getElementById('reviewPhotoPreviewWrapper').classList.remove('hidden');
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeReviewPhoto() {
+      currentReviewPhotoBase64 = '';
+      document.getElementById('reviewPhotoPreview').src = '';
+      document.getElementById('reviewPhotoPreviewWrapper').classList.add('hidden');
+      const fileInp = document.getElementById('reviewFileInput');
+      if (fileInp) fileInp.value = '';
+    }
+
+    async function handleSendReview(e) {
+      e.preventDefault();
+      const rating = parseInt(document.getElementById('selectedStarValue').value, 10) || 5;
+      const comment = document.getElementById('reviewCommentInput').value.trim();
+
+      const btn = document.getElementById('btnSubmitReview');
+      btn.disabled = true;
+      btn.innerText = "ENVIANDO...";
+
+      const { error } = await db.from('reviews').insert([{
+        client_name: appState.currentUser.name,
+        client_phone: appState.currentUser.phone,
+        rating: rating,
+        comment: comment,
+        photo: currentReviewPhotoBase64 || null
+      }]);
+
+      btn.disabled = false;
+      btn.innerText = "PUBLICAR AVALIAÇÃO";
+
+      if (error) {
+        alert("Erro ao enviar avaliação: " + error.message);
+      } else {
+        closeSubmitReviewModal();
+        await fetchReviews();
+        alert("Obrigado pela sua avaliação! Ela já está visível.");
+      }
+    }
+
+    // ==============================================
+    // LOCALIZAÇÃO E ENDEREÇO
+    // ==============================================
     function openAddressModal() {
       document.getElementById('addressModal').classList.remove('hidden');
       if (appState.savedAddress) {
@@ -1017,7 +1280,8 @@
       await Promise.all([
         fetchCategories(),
         fetchProducts(),
-        fetchSettings()
+        fetchSettings(),
+        fetchReviews()
       ]);
       setupRealtimeListeners();
     }
@@ -1078,7 +1342,7 @@
           `).join("");
         }
 
-        // ATUALIZA VISIBILIDADE DAS FORMAS DE PAGAMENTO NO RODAPÉ
+        // FORMAS DE PAGAMENTO NO RODAPÉ
         const pms = storeConfig.paymentMethods || { pix: true, money: true, credit: true, debit: true };
         const bPix = document.getElementById('footerBadgePix');
         const bCredit = document.getElementById('footerBadgeCredit');
@@ -1125,7 +1389,6 @@
       }
     }
 
-    // FORMAS DE PAGAMENTO FILTRADAS PELAS CONFIGURAÇÕES DO ADMIN
     function renderPaymentOptions() {
       const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
       const paymentSectionBlock = document.getElementById('paymentSectionBlock');
@@ -1336,6 +1599,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchCategories())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchReviews())
         .subscribe();
     }
 
@@ -1435,7 +1699,7 @@
       `).join("");
     }
 
-    // MODAL DE PRODUTO COM ADICIONAIS
+    // MODAL DO PRODUTO (COM ADICIONAIS)
     function openProductModal(productId) {
       const prod = storeProducts.find(p => p.id === productId);
       if (!prod) return;
@@ -1841,7 +2105,7 @@ ${orderNotes}
 
 Obrigado pelo pedido!`;
 
-      // 1. Grava no Supabase
+      // 1. Grava no Supabase primeiro
       const submitBtn = document.getElementById("btnSubmitOrder");
       submitBtn.disabled = true;
       submitBtn.innerText = "ENVIANDO PEDIDO...";
