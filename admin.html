@@ -37,15 +37,64 @@
 
   <style>
     .qrcode-box img, .qrcode-box canvas { margin: 0 auto; border-radius: 8px; }
+
     @media print {
-      body * { visibility: hidden; }
-      #printableReceipt, #printableReceipt * { visibility: visible; }
-      #printableReceipt {
-        position: absolute; left: 0; top: 0; width: 80mm; margin: 0; padding: 8px;
-        background: #fff; color: #000; font-family: monospace; font-size: 12px;
+      /* Remove cabeçalho e rodapé do Chrome (tira o link do site e o título no topo) */
+      @page {
+        margin: 0 !important;
+        size: auto;
       }
-      #printAreaTables, #printAreaTables * { visibility: visible; }
-      #printAreaTables { position: absolute; left: 0; top: 0; width: 100%; background: #fff; color: #000; }
+
+      /* Zera a altura da página para não gerar páginas em branco extras */
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+
+      /* Esconde todo o painel e deixa exclusivamente o cupom existir */
+      body > *:not(#printableReceipt):not(#printAreaTables) {
+        display: none !important;
+      }
+
+      /* Trava a comanda no padrão térmico de 80mm sem quebra de página */
+      #printableReceipt {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 80mm !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 8px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: monospace !important;
+        font-size: 12px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+
+      #printableReceipt * {
+        visibility: visible !important;
+        color: #000000 !important;
+      }
+
+      #printAreaTables {
+        width: 100% !important;
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      #printAreaTables * {
+        visibility: visible !important;
+      }
     }
   </style>
 </head>
@@ -124,7 +173,7 @@
             </button>
           </div>
 
-          <!-- BOTÃO NOVO: IMPRESSÃO AUTOMÁTICA -->
+          <!-- BOTÃO: IMPRESSÃO AUTOMÁTICA -->
           <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
             <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-print text-brand-yellow"></i>
@@ -147,7 +196,7 @@
           </div>
 
           <!-- TESTAR ALARME -->
-          <button onclick="playOrderChime()" title="Clique para testar o som do alarme" class="w-full py-1.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] text-gray-300 font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
+          <button onclick="playOrderChime()" title="Clique para testar o som do alarme" class="w-full py-1.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-dialog-button text-[11px] text-gray-300 font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
             <i class="fa-solid fa-volume-high text-brand-yellow"></i>
             <span>Testar Alarme Sonoro</span>
           </button>
@@ -264,7 +313,7 @@
               <h2 class="text-2xl font-black text-white">Controle Financeiro & Caixa</h2>
               <span id="shiftBadgeStatus" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">CAIXA DO TURNO ABERTO</span>
             </div>
-            <p class="text-xs text-gray-400">Caixa do dia e faturamento bruto mensal acumulado em tempo real</p>
+            <p class="text-xs text-gray-400">Caixa do dia e faturamento bruto acumulado</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="printTodayClosingReceipt()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow text-xs font-black px-4 py-2.5 rounded-xl border border-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-md">
@@ -328,7 +377,7 @@
         <div class="mb-6 pt-2">
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-calendar-check text-sm"></i> Faturamento Mensal Consolidado (Tempo Real)
+              <i class="fa-solid fa-calendar-check text-sm"></i> Faturamento Mensal Consolidado
             </h4>
             <div class="flex items-center space-x-2">
               <select id="selectMonthFilter" onchange="filterClosuresByMonth(this.value)" class="text-xs font-black p-2 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none"></select>
@@ -341,13 +390,11 @@
               <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="monthTotalGross">R$ 0,00</h3>
               <p class="text-[10px] text-gray-400">Dias fechados + vendas de hoje</p>
             </div>
-
             <div class="bg-neutral-900 p-4 rounded-2xl border border-neutral-800">
               <span class="text-[10px] font-bold text-gray-400 uppercase">Total de Pedidos no Mês</span>
               <h3 class="text-2xl font-black text-white mt-0.5" id="monthTotalOrders">0 pedidos</h3>
               <p class="text-[10px] text-gray-400">Volume de vendas no mês</p>
             </div>
-
             <div class="bg-neutral-900 p-4 rounded-2xl border border-neutral-800">
               <span class="text-[10px] font-bold text-rose-400 uppercase">Perdas / Cancelados no Mês</span>
               <h3 class="text-2xl font-black text-rose-400 mt-0.5" id="monthTotalLoss">R$ 0,00</h3>
@@ -383,7 +430,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-2xl font-black text-white">Moderação de Avaliações</h2>
-            <p class="text-xs text-gray-400">Aprove, oculte ou exclua comentários e fotos enviados pelos clientes</p>
+            <p class="text-xs text-gray-400">Aprove, oculte ou exclua comentários e fotos</p>
           </div>
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center space-x-3 text-xs">
             <label class="flex items-center space-x-2 font-bold text-gray-200 cursor-pointer">
@@ -438,7 +485,6 @@
               class="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-brand-yellow transition font-medium"
             />
           </div>
-
           <div id="adminCategoryPills" class="flex flex-wrap items-center gap-2 pb-1"></div>
         </div>
 
@@ -471,11 +517,11 @@
         <div id="tableCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 6: CONFIGURAÇÕES DA LOJA -->
+      <!-- ABA 6: CONFIGURAÇÕES -->
       <section id="tab-settings" class="tab-content hidden max-w-2xl">
         <div class="mb-6">
           <h2 class="text-2xl font-black text-white">Configurações do Estabelecimento</h2>
-          <p class="text-xs text-gray-400">Endereço, redes sociais no rodapé, formas de pagamento e frete</p>
+          <p class="text-xs text-gray-400">Endereço, redes sociais no rodapé, pagamentos e frete</p>
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
@@ -500,7 +546,7 @@
             </div>
           </div>
 
-          <!-- REDES SOCIAIS & LINKS -->
+          <!-- REDES SOCIAIS -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-share-nodes"></i> Redes Sociais & Links do Rodapé
@@ -552,7 +598,7 @@
             </div>
           </div>
 
-          <!-- PAGAMENTOS -->
+          <!-- FORMAS DE PAGAMENTO -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-credit-card"></i> Formas de Pagamento Aceitas no Cardápio
@@ -616,7 +662,7 @@
             </div>
           </div>
 
-          <!-- FRETE -->
+          <!-- FRETE POR KM -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
@@ -1000,7 +1046,7 @@
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
 
-  <!-- JAVASCRIPT DO PAINEL COM IMPRESSÃO AUTOMÁTICA -->
+  <!-- SCRIPT -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -1028,7 +1074,7 @@
     let lastChimeTriggerTimestamp = 0;
     let lastAutoPrintedOrderId = null;
 
-    // IMPRESSÃO AUTOMÁTICA (Salva no dispositivo)
+    // IMPRESSÃO AUTOMÁTICA
     window.isAutoPrintEnabled = localStorage.getItem('admin_autoprint_enabled') === 'true';
 
     function updateAutoPrintUI() {
@@ -1049,7 +1095,7 @@
       updateAutoPrintUI();
       showToast(
         "Impressão Automática",
-        window.isAutoPrintEnabled ? "LIGADA! As comandas serão impressas ao receber o pedido." : "DESLIGADA."
+        window.isAutoPrintEnabled ? "LIGADA! Comandas serão impressas automaticamente." : "DESLIGADA."
       );
     }
 
@@ -1939,7 +1985,7 @@
       showToast("Status Atualizado", `Pedido #${id} marcado como ${newStatus}.`);
     }
 
-    // IMPRESSÃO DE COMANDA (ACEITA ID OU OBJETO DO PEDIDO)
+    // IMPRESSÃO DE COMANDA
     function printReceipt(orderOrId) {
       let ord = null;
       if (typeof orderOrId === 'object' && orderOrId !== null) {
@@ -2655,7 +2701,7 @@
       document.getElementById(`nav-${tabId}`).className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
     }
 
-    // TEMPO REAL COM DISPARO DA IMPRESSÃO AUTOMÁTICA
+    // SINCRONIZAÇÃO EM TEMPO REAL COM DISPARO DA IMPRESSÃO AUTOMÁTICA
     function setupRealtimeListeners() {
       db.channel('admin_live')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
