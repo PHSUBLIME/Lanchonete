@@ -1137,16 +1137,14 @@
       }
     }
 
-    // BAIXA PELO CLIENTE (BOTAO "JÁ RECEBI!")
-    async function confirmCustomerDelivered() {
-      if (!currentActiveOrder) return;
-      if (confirm(`Confirmar que você já recebeu o Pedido #${currentActiveOrder.id}?`)) {
-        const orderRef = currentActiveOrder;
-        await db.from('orders').update({ status: 'Entregue' }).eq('id', orderRef.id.toString());
-        clearActiveTracking();
-        triggerUberReviewPrompt(orderRef);
-      }
-    }
+    // BAIXA PELO CLIENTE (BOTAO "JÁ RECEBI!") - SEM CAIXA FEIA
+async function confirmCustomerDelivered() {
+  if (!currentActiveOrder) return;
+  const orderRef = currentActiveOrder;
+  await db.from('orders').update({ status: 'Entregue' }).eq('id', orderRef.id.toString());
+  clearActiveTracking();
+  triggerUberReviewPrompt(orderRef);
+}
 
     // DISPARA O POPUP ESTILO UBER E SOME A TARJA
     function triggerUberReviewPrompt(orderRef) {
