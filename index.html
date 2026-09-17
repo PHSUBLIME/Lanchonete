@@ -153,7 +153,7 @@
     </div>
   </header>
 
-  <!-- BANNER HERO LIMPO (SOMENTE NOME E AVALIAÇÃO DINÂMICA) -->
+  <!-- BANNER HERO -->
   <main class="max-w-full overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-8 sm:py-12 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -164,7 +164,7 @@
           <h2 id="bannerTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">PHSUBLIME FOOD</h2>
         </div>
 
-        <!-- AVALIAÇÃO EM DESTAQUE (MOSTRA OU ESCONDE VIA ADMIN) -->
+        <!-- AVALIAÇÃO EM DESTAQUE -->
         <div id="heroReviewsCardWrapper" class="flex items-center">
           <button onclick="openReviewsModal()" class="flex items-center space-x-3.5 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700/80 px-4 py-3 rounded-2xl transition cursor-pointer group shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-brand-yellow flex items-center justify-center text-lg group-hover:scale-110 transition">
@@ -214,7 +214,7 @@
     </section>
   </main>
 
-  <!-- FOOTER COMPLETO COM REDES SOCIAIS, WHATSAPP E GOOGLE DINÂMICOS -->
+  <!-- FOOTER -->
   <footer class="bg-brand-black text-white pt-12 pb-8 border-t border-neutral-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-neutral-800 text-sm">
@@ -235,7 +235,7 @@
             <span id="footerStoreWhatsapp">(21) 98614-7221</span>
           </p>
 
-          <!-- BOTÕES DE REDES SOCIAIS DINÂMICOS -->
+          <!-- BOTÕES DE REDES SOCIAIS -->
           <div class="flex flex-wrap items-center gap-2 pt-1" id="footerSocialButtonsContainer">
             <a id="footerBtnWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-sm">
               <i class="fa-brands fa-whatsapp text-base"></i>
@@ -298,7 +298,7 @@
     </div>
   </footer>
 
-  <!-- MODAL: LOJA FECHADA / PAUSADA -->
+  <!-- MODAL: LOJA FECHADA -->
   <div id="storeClosedModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       <div class="w-16 h-16 bg-rose-50 text-brand-red rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
@@ -358,7 +358,7 @@
     </div>
   </div>
 
-  <!-- MODAL: FORMULÁRIO PARA DEIXAR AVALIAÇÃO COM FOTO -->
+  <!-- MODAL: FORMULÁRIO DE AVALIAÇÃO -->
   <div id="submitReviewModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
       <button onclick="closeSubmitReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
@@ -416,7 +416,7 @@
     </div>
   </div>
 
-  <!-- MODAL: SUCESSO DA AVALIAÇÃO COM ESTRELA DOURADA -->
+  <!-- MODAL: SUCESSO DA AVALIAÇÃO -->
   <div id="reviewSuccessModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 text-center shadow-2xl">
       <div class="w-16 h-16 bg-amber-50 text-brand-yellow rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
@@ -432,7 +432,7 @@
     </div>
   </div>
 
-  <!-- MODAL: INFORME SEU ENDEREÇO / CEP -->
+  <!-- MODAL: ENDEREÇO / CEP -->
   <div id="addressModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
       <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
@@ -570,6 +570,27 @@
             <span id="btnModalAddToCartText">ADICIONAR AO CARRINHO</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOVO MODAL: ESCOLHA APÓS ADICIONAR ITEM -->
+  <div id="itemAddedModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 class="text-lg font-black text-brand-black mb-1">Item adicionado com sucesso!</h3>
+      <p class="text-xs text-gray-500 mb-5">O que você deseja fazer agora?</p>
+
+      <div class="space-y-2.5">
+        <button onclick="goToCartFromItemModal()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>VER CARRINHO / FINALIZAR</span>
+        </button>
+        <button onclick="continueShopping()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer">
+          Continuar Comprando
+        </button>
       </div>
     </div>
   </div>
@@ -860,7 +881,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO CLIENTE COM TRAVA DE 1 AVALIAÇÃO POR TELEFONE -->
+  <!-- JAVASCRIPT DO SISTEMA -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -943,7 +964,7 @@
       input.value = v;
     }
 
-    // AVALIAÇÕES EM TEMPO REAL (CALCULA APENAS AS VISÍVEIS)
+    // AVALIAÇÕES
     async function fetchReviews() {
       const { data } = await db.from('reviews').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -1047,7 +1068,6 @@
       }).join('');
     }
 
-    // TRAVA BLINDADA: APENAS 1 AVALIAÇÃO POR NÚMERO DE TELEFONE (WHATSAPP)
     async function checkEligibilityToReview() {
       if (!appState.currentUser) {
         alert("Por favor, informe seu WhatsApp para poder avaliar.");
@@ -1059,7 +1079,6 @@
       const phoneClean = getCleanWaNumber(appState.currentUser.phone);
       const pureDigits = phoneClean.replace(/^55/, '');
 
-      // 1. CHECAGEM DIRETA NO SUPABASE: ESSE NÚMERO JÁ AVALIOU?
       const { data: allReviewsInDb } = await db.from('reviews').select('id, client_phone');
       if (allReviewsInDb && allReviewsInDb.length > 0) {
         const alreadyReviewed = allReviewsInDb.some(r => {
@@ -1073,7 +1092,6 @@
         }
       }
 
-      // 2. VERIFICA SE O CLIENTE TEM PEDIDO NO RESTAURANTE
       const { data: orders } = await db.from('orders').select('id, phone');
       const userOrders = (orders || []).filter(o => {
         const oPhone = getCleanWaNumber(o.phone || '');
@@ -1159,7 +1177,6 @@
       btn.disabled = true;
       btn.innerText = "ENVIANDO...";
 
-      // SEGUNDA CHECAGEM DE SEGURANÇA ANTES DO INSERT
       const { data: checkBeforeInsert } = await db.from('reviews').select('id, client_phone');
       if (checkBeforeInsert) {
         const alreadyDone = checkBeforeInsert.some(r => {
@@ -1492,7 +1509,6 @@
           }
         }
 
-        // REDES SOCIAIS DINÂMICAS NO RODAPÉ
         const soc = storeConfig.socialLinks || {};
         const btnWa = document.getElementById('footerBtnWhatsapp');
         const btnInsta = document.getElementById('footerBtnInstagram');
@@ -1523,7 +1539,6 @@
           if (googleConfig.url) btnGoogle.href = googleConfig.url;
         }
 
-        // FORMAS DE PAGAMENTO NO RODAPÉ
         const pms = storeConfig.paymentMethods || { pix: true, money: true, credit: true, debit: true };
         const bPix = document.getElementById('footerBadgePix');
         const bCredit = document.getElementById('footerBadgeCredit');
@@ -1538,7 +1553,6 @@
         const feeBadge = document.getElementById('chkDeliveryFeeText');
         if (feeBadge) feeBadge.innerText = `R$ ${formatMoney(storeConfig.currentAutoFee)}`;
 
-        // STATUS DA LOJA
         const badge = document.getElementById("storeStatusBadge");
         const dot = document.getElementById("storeStatusDot");
         const text = document.getElementById("storeStatusText");
@@ -1973,6 +1987,7 @@
       }
     }
 
+    // ADICIONAR AO CARRINHO (AGORA ABRE O MODAL DE ESCOLHA)
     function confirmAddToCart() {
       if (!appState.modalItem) return;
       const notes = document.getElementById("modalProductNotes").value.trim();
@@ -2001,6 +2016,21 @@
 
       closeProductModal();
       updateCartBadge();
+
+      // Abre o modal com a escolha em vez do carrinho
+      openItemAddedModal();
+    }
+
+    function openItemAddedModal() {
+      document.getElementById("itemAddedModal").classList.remove("hidden");
+    }
+
+    function continueShopping() {
+      document.getElementById("itemAddedModal").classList.add("hidden");
+    }
+
+    function goToCartFromItemModal() {
+      document.getElementById("itemAddedModal").classList.add("hidden");
       openCartDrawer();
     }
 
