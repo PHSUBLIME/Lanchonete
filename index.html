@@ -66,6 +66,41 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12 max-w-full overflow-x-hidden">
 
+  <!-- ============================================================ -->
+  <!-- BARRA FIXA DE RASTREAMENTO AO VIVO (FLUTUANTE NO TOPO) -->
+  <!-- ============================================================ -->
+  <div id="liveTrackingBar" class="hidden fixed top-2 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-2xl z-40 bg-neutral-900/95 border border-brand-yellow/60 text-white rounded-2xl shadow-2xl p-2.5 sm:p-3 backdrop-blur-md transition-all duration-300">
+    <div class="flex items-center justify-between gap-2">
+      
+      <!-- Informações do Status -->
+      <div class="flex items-center space-x-2.5 truncate cursor-pointer flex-1" onclick="openTrackingModal()">
+        <span id="trackBarStatusDot" class="w-3 h-3 rounded-full bg-brand-yellow animate-pulse shrink-0"></span>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] font-black uppercase tracking-wider text-brand-yellow" id="trackBarOrderNumber">Pedido #----</span>
+            <span class="text-[9px] text-gray-400 font-bold hidden sm:inline">• Toque para detalhes</span>
+          </div>
+          <p class="text-xs sm:text-sm font-extrabold text-white truncate" id="trackBarStatusText">Carregando status...</p>
+        </div>
+      </div>
+
+      <!-- Botões de Ação na Barra -->
+      <div class="flex items-center space-x-1.5 shrink-0">
+        <!-- Botão Baixa pelo Cliente -->
+        <button type="button" id="btnTrackBarConfirmReceived" onclick="confirmCustomerDelivered()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] px-3 py-2 rounded-xl transition shadow-md flex items-center gap-1 cursor-pointer active:scale-95">
+          <i class="fa-solid fa-check"></i>
+          <span>JÁ RECEBI!</span>
+        </button>
+
+        <!-- Botão Detalhes -->
+        <button type="button" onclick="openTrackingModal()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold text-xs p-2 rounded-xl border border-neutral-700 transition cursor-pointer" title="Ver Linha do Tempo">
+          <i class="fa-solid fa-timeline"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- BARRA SUPERIOR DE HORÁRIO -->
   <div class="bg-brand-black text-white text-xs py-1.5 px-3 sm:px-4 border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex justify-between sm:justify-start items-center space-x-2">
@@ -235,7 +270,6 @@
             <span id="footerStoreWhatsapp">(21) 98614-7221</span>
           </p>
 
-          <!-- BOTÕES DE REDES SOCIAIS -->
           <div class="flex flex-wrap items-center gap-2 pt-1" id="footerSocialButtonsContainer">
             <a id="footerBtnWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-sm">
               <i class="fa-brands fa-whatsapp text-base"></i>
@@ -297,6 +331,111 @@
       </div>
     </div>
   </footer>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: LINHA DO TEMPO DETALHADA DO RASTREAMENTO -->
+  <!-- ============================================================ -->
+  <div id="trackingModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      <div class="p-5 bg-brand-black text-white flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-brand-yellow tracking-wider" id="trackModalHeaderOrder">PEDIDO #----</span>
+          <h3 class="font-black text-base">Acompanhar Pedido</h3>
+        </div>
+        <button onclick="closeTrackingModal()" class="w-8 h-8 rounded-full bg-neutral-800 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 text-xs">
+        
+        <!-- CARD DO STATUS ATUAL -->
+        <div id="trackModalCurrentBanner" class="p-4 rounded-2xl border text-center transition-all bg-amber-50 border-amber-200">
+          <span id="trackModalStatusBadgeText" class="font-black text-sm text-brand-black block uppercase">RECEBIDO PELA LOJA</span>
+          <p id="trackModalStatusSubtext" class="text-xs text-gray-600 mt-1">Seu pedido foi registrado e aguarda confirmação da cozinha.</p>
+        </div>
+
+        <!-- LINHA DO TEMPO VISUAL (STEPPER) -->
+        <div class="space-y-4 px-2">
+          <!-- Etapa 1: Recebido -->
+          <div class="flex items-start space-x-3.5" id="stepNode-novo">
+            <div class="w-8 h-8 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-novo">
+              <i class="fa-solid fa-receipt text-xs"></i>
+            </div>
+            <div class="flex-1 pt-1">
+              <h5 class="font-black text-brand-black text-xs">1. Pedido Recebido</h5>
+              <p class="text-[11px] text-gray-500">Seu pedido chegou ao restaurante.</p>
+            </div>
+          </div>
+
+          <!-- Etapa 2: Na Cozinha -->
+          <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-preparo">
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-preparo">
+              <i class="fa-solid fa-fire text-xs"></i>
+            </div>
+            <div class="flex-1 pt-1">
+              <h5 class="font-black text-brand-black text-xs">2. Na Cozinha (Em Preparo)</h5>
+              <p class="text-[11px] text-gray-500">Os ingredientes estão sendo preparados com carinho.</p>
+            </div>
+          </div>
+
+          <!-- Etapa 3: Saiu para Entrega -->
+          <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-saiu">
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-saiu">
+              <i class="fa-solid fa-motorcycle text-xs"></i>
+            </div>
+            <div class="flex-1 pt-1">
+              <h5 class="font-black text-brand-black text-xs" id="stepTitle-saiu">3. Saiu para Entrega</h5>
+              <p class="text-[11px] text-gray-500" id="stepSub-saiu">O motoboy está a caminho do seu endereço.</p>
+            </div>
+          </div>
+
+          <!-- Etapa 4: Concluído / Entregue -->
+          <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-entregue">
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-entregue">
+              <i class="fa-solid fa-check text-xs"></i>
+            </div>
+            <div class="flex-1 pt-1">
+              <h5 class="font-black text-brand-black text-xs">4. Pedido Entregue</h5>
+              <p class="text-[11px] text-gray-500">Bom apetite e obrigado pela preferência!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESUMO DO PEDIDO -->
+        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-gray-500">Destino:</span>
+            <strong class="text-brand-black" id="trackModalDestText">Carregando...</strong>
+          </div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-gray-500">Total a Pagar:</span>
+            <strong class="text-brand-red font-black text-sm" id="trackModalTotalText">R$ 0,00</strong>
+          </div>
+        </div>
+
+        <!-- BOTÕES DO MODAL -->
+        <div class="space-y-2 pt-2">
+          <!-- Botão Baixa pelo Cliente -->
+          <button type="button" id="btnTrackModalReceived" onclick="confirmCustomerDelivered()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
+            <i class="fa-solid fa-check text-base"></i>
+            <span>JÁ RECEBI MEU PEDIDO!</span>
+          </button>
+
+          <!-- Botão Avaliar Pedido (Aparece se já Entregue) -->
+          <button type="button" id="btnTrackModalReview" onclick="openSubmitReviewFromTrack()" class="hidden w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer">
+            <i class="fa-solid fa-star"></i>
+            <span>AVALIAR ESSE PEDIDO</span>
+          </button>
+
+          <button type="button" onclick="closeTrackingModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
+            Continuar Olhando o Cardápio
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: LOJA FECHADA -->
   <div id="storeClosedModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -574,7 +713,7 @@
     </div>
   </div>
 
-  <!-- NOVO MODAL: ESCOLHA APÓS ADICIONAR ITEM -->
+  <!-- MODAL: ESCOLHA APÓS ADICIONAR ITEM -->
   <div id="itemAddedModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
@@ -841,13 +980,17 @@
         </div>
       </div>
 
-      <div class="space-y-3">
-        <a id="btnSuccessWhatsappDirect" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft">
+      <div class="space-y-2.5">
+        <button onclick="openTrackingModalFromSuccess()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
+          <i class="fa-solid fa-timeline"></i>
+          <span>ACOMPANHAR STATUS AO VIVO</span>
+        </button>
+        <a id="btnSuccessWhatsappDirect" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-soft">
           <i class="fa-brands fa-whatsapp text-lg"></i>
-          <span>ABRIR CONVERSA NO WHATSAPP</span>
+          <span>Reabrir Conversa no WhatsApp</span>
         </a>
-        <button onclick="closeSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-brand-black font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer">
-          Fazer Outro Pedido
+        <button onclick="closeSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-brand-black font-bold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
+          Continuar Olhando o Cardápio
         </button>
       </div>
     </div>
@@ -918,6 +1061,8 @@
     let autoCalcTimeout = null;
     let identifiedTable = null;
     let currentReviewPhotoBase64 = '';
+    let currentActiveOrder = null;
+    let trackingRealtimeChannel = null;
 
     let appState = {
       cart: [],
@@ -962,6 +1107,230 @@
         v = `(${v.substring(0,2)}) ${v.substring(2)}`;
       }
       input.value = v;
+    }
+
+    // ============================================================
+    // SISTEMA DE RASTREAMENTO EM TEMPO REAL & BAIXA DUPLA
+    // ============================================================
+    function checkActiveOrderOnLoad() {
+      const savedOrderId = localStorage.getItem('phsublime_active_order_id');
+      if (savedOrderId) {
+        fetchAndTrackOrder(savedOrderId);
+      }
+    }
+
+    async function fetchAndTrackOrder(orderId) {
+      const { data, error } = await db.from('orders').select('*').eq('id', orderId.toString()).maybeSingle();
+      if (data) {
+        currentActiveOrder = data;
+        renderTrackingStatus(data);
+        setupOrderRealtimeListener(data.id);
+      } else {
+        clearActiveTracking();
+      }
+    }
+
+    function setupOrderRealtimeListener(orderId) {
+      if (trackingRealtimeChannel) {
+        trackingRealtimeChannel.unsubscribe();
+      }
+
+      trackingRealtimeChannel = db.channel('live_order_' + orderId)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${orderId}`
+        }, payload => {
+          currentActiveOrder = payload.new;
+          renderTrackingStatus(payload.new);
+        })
+        .subscribe();
+    }
+
+    function renderTrackingStatus(order) {
+      if (!order) {
+        clearActiveTracking();
+        return;
+      }
+
+      const bar = document.getElementById('liveTrackingBar');
+      const orderNum = document.getElementById('trackBarOrderNumber');
+      const statusText = document.getElementById('trackBarStatusText');
+      const dot = document.getElementById('trackBarStatusDot');
+      const btnReceived = document.getElementById('btnTrackBarConfirmReceived');
+
+      const modalHeaderOrder = document.getElementById('trackModalHeaderOrder');
+      const modalBanner = document.getElementById('trackModalCurrentBanner');
+      const modalBadge = document.getElementById('trackModalStatusBadgeText');
+      const modalSub = document.getElementById('trackModalStatusSubtext');
+      const modalDest = document.getElementById('trackModalDestText');
+      const modalTotal = document.getElementById('trackModalTotalText');
+      const btnModalReceived = document.getElementById('btnTrackModalReceived');
+      const btnModalReview = document.getElementById('btnTrackModalReview');
+
+      const status = (order.status || 'Novo').trim();
+
+      if (status === 'Cancelado') {
+        bar.classList.remove('hidden');
+        dot.className = "w-3 h-3 rounded-full bg-rose-500 shrink-0";
+        orderNum.innerText = `Pedido #${order.id}`;
+        statusText.innerText = "Pedido Cancelado pela Loja";
+        btnReceived.classList.add('hidden');
+
+        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-rose-50 border-rose-200 text-rose-700";
+        modalBadge.innerText = "PEDIDO CANCELADO";
+        modalSub.innerText = "Este pedido foi cancelado no painel da lanchonete.";
+        btnModalReceived.classList.add('hidden');
+        btnModalReview.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      orderNum.innerText = `Pedido #${order.id}`;
+      modalHeaderOrder.innerText = `PEDIDO #${order.id}`;
+      modalDest.innerText = order.address || order.type || 'Consumo';
+      modalTotal.innerText = `R$ ${formatMoney(order.total)}`;
+
+      // Reset dos Steppers
+      const nodes = {
+        novo: document.getElementById('stepNode-novo'),
+        preparo: document.getElementById('stepNode-preparo'),
+        saiu: document.getElementById('stepNode-saiu'),
+        entregue: document.getElementById('stepNode-entregue')
+      };
+      const icons = {
+        novo: document.getElementById('stepIcon-novo'),
+        preparo: document.getElementById('stepIcon-preparo'),
+        saiu: document.getElementById('stepIcon-saiu'),
+        entregue: document.getElementById('stepIcon-entregue')
+      };
+
+      Object.values(nodes).forEach(n => { n.className = "flex items-start space-x-3.5 opacity-40"; });
+      Object.values(icons).forEach(i => { i.className = "w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm"; });
+
+      // Configuração visual por status
+      if (status === 'Novo') {
+        dot.className = "w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0";
+        statusText.innerText = "Recebido • Aguardando Cozinha";
+        btnReceived.classList.remove('hidden');
+
+        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-amber-50 border-amber-200";
+        modalBadge.innerText = "PEDIDO RECEBIDO";
+        modalSub.innerText = "Seu pedido foi registrado e aguarda confirmação da cozinha.";
+
+        nodes.novo.className = "flex items-start space-x-3.5 opacity-100";
+        icons.novo.className = "w-8 h-8 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
+
+        btnModalReceived.classList.remove('hidden');
+        btnModalReview.classList.add('hidden');
+
+      } else if (status === 'Em preparo' || status === 'Pronto') {
+        dot.className = "w-3 h-3 rounded-full bg-blue-500 animate-pulse shrink-0";
+        statusText.innerText = status === 'Pronto' ? "Pronto na Cozinha!" : "Na Cozinha • Em Preparo";
+        btnReceived.classList.remove('hidden');
+
+        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-blue-50 border-blue-200";
+        modalBadge.innerText = status === 'Pronto' ? "PRONTO PARA ENTREGA / SERVIR" : "EM PREPARO NA COZINHA";
+        modalSub.innerText = "Os lanches estão sendo montados e embalados com todo carinho!";
+
+        nodes.novo.className = "flex items-start space-x-3.5 opacity-100";
+        icons.novo.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm";
+        nodes.preparo.className = "flex items-start space-x-3.5 opacity-100";
+        icons.preparo.className = "w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
+
+        btnModalReceived.classList.remove('hidden');
+        btnModalReview.classList.add('hidden');
+
+      } else if (status === 'Saiu') {
+        dot.className = "w-3 h-3 rounded-full bg-purple-500 animate-pulse shrink-0";
+        statusText.innerText = "A Caminho • Motoboy na Estrada!";
+        btnReceived.classList.remove('hidden');
+
+        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-purple-50 border-purple-200";
+        modalBadge.innerText = "SAIU PARA ENTREGA!";
+        modalSub.innerText = "O entregador já está em trânsito com seu pedido!";
+
+        nodes.novo.className = "flex items-start space-x-3.5 opacity-100";
+        icons.novo.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm";
+        nodes.preparo.className = "flex items-start space-x-3.5 opacity-100";
+        icons.preparo.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm";
+        nodes.saiu.className = "flex items-start space-x-3.5 opacity-100";
+        icons.saiu.className = "w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
+
+        btnModalReceived.classList.remove('hidden');
+        btnModalReview.classList.add('hidden');
+
+      } else if (status === 'Entregue' || status === 'Finalizado') {
+        dot.className = "w-3 h-3 rounded-full bg-emerald-500 shrink-0";
+        statusText.innerText = "Pedido Entregue • Bom Apetite!";
+        btnReceived.classList.add('hidden');
+
+        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-emerald-50 border-emerald-300 text-emerald-900";
+        modalBadge.innerText = "PEDIDO ENTREGUE COM SUCESSO!";
+        modalSub.innerText = "Esperamos que você ame a sua refeição! Que tal avaliar agora?";
+
+        Object.values(nodes).forEach(n => { n.className = "flex items-start space-x-3.5 opacity-100"; });
+        Object.values(icons).forEach(i => { i.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm"; });
+
+        btnModalReceived.classList.add('hidden');
+        btnModalReview.classList.remove('hidden');
+      }
+    }
+
+    // BAIXA PELO PRÓPRIO CLIENTE (BOTAO "JÁ RECEBI!")
+    async function confirmCustomerDelivered() {
+      if (!currentActiveOrder) return;
+
+      if (confirm(`Confirmar que você já recebeu o Pedido #${currentActiveOrder.id}?`)) {
+        const orderId = currentActiveOrder.id;
+
+        // Atualiza no Supabase imediatamente (o Admin recebe em tempo real)
+        const { error } = await db.from('orders').update({ status: 'Entregue' }).eq('id', orderId.toString());
+
+        if (!error) {
+          currentActiveOrder.status = 'Entregue';
+          renderTrackingStatus(currentActiveOrder);
+          alert("Que maravilha! Pedido marcado como entregue. Tenha um ótimo apetite!");
+          openSubmitReviewFromTrack();
+        } else {
+          alert("Erro ao confirmar entrega: " + error.message);
+        }
+      }
+    }
+
+    function openSubmitReviewFromTrack() {
+      closeTrackingModal();
+      if (!appState.currentUser && currentActiveOrder) {
+        appState.currentUser = { name: currentActiveOrder.client, phone: currentActiveOrder.phone };
+        localStorage.setItem('food_logged_user', JSON.stringify(appState.currentUser));
+      }
+      openSubmitReviewModal();
+    }
+
+    function openTrackingModal() {
+      if (!currentActiveOrder) return;
+      renderTrackingStatus(currentActiveOrder);
+      document.getElementById('trackingModal').classList.remove('hidden');
+    }
+
+    function closeTrackingModal() {
+      document.getElementById('trackingModal').classList.add('hidden');
+    }
+
+    function openTrackingModalFromSuccess() {
+      closeSuccessModal();
+      openTrackingModal();
+    }
+
+    function clearActiveTracking() {
+      localStorage.removeItem('phsublime_active_order_id');
+      currentActiveOrder = null;
+      document.getElementById('liveTrackingBar').classList.add('hidden');
+      closeTrackingModal();
+      if (trackingRealtimeChannel) {
+        trackingRealtimeChannel.unsubscribe();
+      }
     }
 
     // AVALIAÇÕES
@@ -1432,6 +1801,7 @@
       detectTableUrlParam();
       checkSavedUserSession();
       checkInitialLocationPrompt();
+      checkActiveOrderOnLoad();
 
       await Promise.all([
         fetchCategories(),
@@ -1987,7 +2357,6 @@
       }
     }
 
-    // ADICIONAR AO CARRINHO (AGORA ABRE O MODAL DE ESCOLHA)
     function confirmAddToCart() {
       if (!appState.modalItem) return;
       const notes = document.getElementById("modalProductNotes").value.trim();
@@ -2016,8 +2385,6 @@
 
       closeProductModal();
       updateCartBadge();
-
-      // Abre o modal com a escolha em vez do carrinho
       openItemAddedModal();
     }
 
@@ -2311,13 +2678,16 @@ ${paymentDetails}
 📝 *OBSERVAÇÕES:*
 ${orderNotes}
 
+📍 *ACOMPANHE O STATUS AO VIVO:*
+https://lanchonete.phsublime.com.br/
+
 Obrigado pelo pedido!`;
 
       const submitBtn = document.getElementById("btnSubmitOrder");
       submitBtn.disabled = true;
       submitBtn.innerText = "ENVIANDO PEDIDO...";
 
-      const { error: dbError } = await db.from('orders').insert([{
+      const newOrderPayload = {
         id: orderNumber.toString(),
         client: name,
         phone: phone,
@@ -2329,7 +2699,9 @@ Obrigado pelo pedido!`;
         notes: (orderNotes !== "Nenhuma" ? orderNotes : "") + (orderType === "dine_in" ? ` [Consumo Local - ${deliveryAddressText}]` : ""),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: "Novo"
-      }]);
+      };
+
+      const { error: dbError } = await db.from('orders').insert([newOrderPayload]);
 
       submitBtn.disabled = false;
       submitBtn.innerText = "CONFIRMAR E ENVIAR NO WHATSAPP";
@@ -2338,6 +2710,12 @@ Obrigado pelo pedido!`;
         alert("Erro ao registrar pedido no sistema: " + dbError.message);
         return;
       }
+
+      // Salva para a Barra de Rastreamento ao Vivo
+      localStorage.setItem('phsublime_active_order_id', orderNumber.toString());
+      currentActiveOrder = newOrderPayload;
+      renderTrackingStatus(newOrderPayload);
+      setupOrderRealtimeListener(orderNumber.toString());
 
       const waNumber = getCleanWaNumber(storeConfig.whatsapp);
       const encodedMessage = encodeURIComponent(message);
