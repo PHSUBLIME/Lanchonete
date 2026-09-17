@@ -4,25 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>PHSUBLIME FOOD | Cardápio Digital</title>
-
-  <!-- ÍCONE DA ABA (FAVICON) -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
-
-  <!-- META TAGS DE COMPARTILHAMENTO -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/" />
   <meta property="og:title" content="PHSUBLIME FOOD | Cardápio Online" />
   <meta property="og:description" content="Lanches artesanais, porções e bebidas." />
   <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
 
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -32,47 +25,29 @@
           fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
           colors: {
             brand: {
-              black: '#171717',
-              dark: '#212121',
-              yellow: '#FFB800',
-              yellowHover: '#E0A200',
-              red: '#E53935',
-              grayLight: '#F8F9FA',
-              grayBorder: '#E5E7EB'
+              black: '#171717', dark: '#212121', yellow: '#FFB800',
+              yellowHover: '#E0A200', red: '#E53935', grayLight: '#F8F9FA', grayBorder: '#E5E7EB'
             }
           },
-          boxShadow: {
-            soft: '0 8px 30px rgba(0,0,0,0.06)',
-            floating: '0 12px 35px -4px rgba(0,0,0,0.15)'
-          }
+          boxShadow: { soft: '0 8px 30px rgba(0,0,0,0.06)', floating: '0 12px 35px -4px rgba(0,0,0,0.15)' }
         }
       }
     }
   </script>
-
   <style>
     html, body { max-width: 100%; overflow-x: hidden; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .line-clamp-2 {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .badge-open { background-color: #DEF7EC; color: #03543F; }
     .badge-closed { background-color: #FDE8E8; color: #9B1C1C; }
   </style>
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12 max-w-full overflow-x-hidden">
 
-  <!-- ============================================================ -->
-  <!-- BARRA FIXA DE RASTREAMENTO AO VIVO (FLUTUANTE NO TOPO) -->
-  <!-- ============================================================ -->
+  <!-- BARRA FIXA DE RASTREAMENTO FLUTUANTE -->
   <div id="liveTrackingBar" class="hidden fixed top-2 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-2xl z-40 bg-neutral-900/95 border border-brand-yellow/60 text-white rounded-2xl shadow-2xl p-2.5 sm:p-3 backdrop-blur-md transition-all duration-300">
     <div class="flex items-center justify-between gap-2">
-      
-      <!-- Informações do Status -->
       <div class="flex items-center space-x-2.5 truncate cursor-pointer flex-1" onclick="openTrackingModal()">
         <span id="trackBarStatusDot" class="w-3 h-3 rounded-full bg-brand-yellow animate-pulse shrink-0"></span>
         <div class="truncate">
@@ -83,21 +58,15 @@
           <p class="text-xs sm:text-sm font-extrabold text-white truncate" id="trackBarStatusText">Carregando status...</p>
         </div>
       </div>
-
-      <!-- Botões de Ação na Barra -->
       <div class="flex items-center space-x-1.5 shrink-0">
-        <!-- Botão Baixa pelo Cliente -->
         <button type="button" id="btnTrackBarConfirmReceived" onclick="confirmCustomerDelivered()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] px-3 py-2 rounded-xl transition shadow-md flex items-center gap-1 cursor-pointer active:scale-95">
           <i class="fa-solid fa-check"></i>
           <span>JÁ RECEBI!</span>
         </button>
-
-        <!-- Botão Detalhes -->
         <button type="button" onclick="openTrackingModal()" class="bg-neutral-800 hover:bg-neutral-700 text-brand-yellow font-bold text-xs p-2 rounded-xl border border-neutral-700 transition cursor-pointer" title="Ver Linha do Tempo">
           <i class="fa-solid fa-timeline"></i>
         </button>
       </div>
-
     </div>
   </div>
 
@@ -113,7 +82,7 @@
     </div>
   </div>
 
-  <!-- AVISO DE MESA RECONHECIDA POR QR CODE -->
+  <!-- AVISO DE MESA -->
   <div id="tableBannerNotice" class="hidden bg-brand-yellow text-brand-black px-4 py-2 text-center text-xs font-black shadow-md border-b border-amber-400 flex items-center justify-center space-x-2">
     <i class="fa-solid fa-utensils text-sm"></i>
     <span>Você está na <strong id="tableBannerNumber">MESA 01</strong> • Faça seus pedidos por aqui à vontade!</span>
@@ -123,8 +92,6 @@
   <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-3 sm:px-4">
       <div class="h-16 sm:h-20 flex items-center justify-between gap-2">
-        
-        <!-- LOGO E NOME -->
         <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer shrink-0" onclick="scrollToSection('inicio')">
           <div class="w-9 h-9 sm:w-11 sm:h-11 bg-brand-yellow rounded-xl flex items-center justify-center font-black text-brand-black text-lg sm:text-xl shadow-xs">
             <i class="fa-solid fa-burger"></i>
@@ -135,7 +102,6 @@
           </div>
         </div>
 
-        <!-- SELETOR DE ENDEREÇO (DESKTOP) -->
         <div class="hidden md:flex flex-1 max-w-md mx-4">
           <div onclick="openAddressModal()" class="w-full flex items-center space-x-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 rounded-2xl px-3 py-2 cursor-pointer transition group shadow-xs">
             <div class="w-8 h-8 rounded-xl bg-amber-100 text-brand-yellow flex items-center justify-center shrink-0">
@@ -151,17 +117,14 @@
           </div>
         </div>
 
-        <!-- BOTÕES DA DIREITA -->
         <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
           <button onclick="openAuthModal()" class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:text-brand-yellow hover:bg-gray-50 transition border border-transparent hover:border-gray-200 cursor-pointer">
             <i class="fa-regular fa-user text-brand-yellow text-sm"></i>
             <span id="topUserLabel" class="hidden sm:inline">Entre ou Cadastre-se</span>
           </button>
-
           <button onclick="scrollToSection('cardapio')" class="hidden lg:inline-flex text-xs font-bold uppercase tracking-wider text-brand-black hover:text-brand-yellow transition px-3 py-2 cursor-pointer">
             Cardápio
           </button>
-
           <button onclick="openCartDrawer()" class="relative bg-brand-black hover:bg-neutral-800 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center space-x-1.5 sm:space-x-2 transition shadow-soft cursor-pointer shrink-0">
             <i class="fa-solid fa-bag-shopping text-brand-yellow"></i>
             <span class="hidden sm:inline">Meu Pedido</span>
@@ -170,7 +133,6 @@
         </div>
       </div>
 
-      <!-- SELETOR DE ENDEREÇO (MOBILE) -->
       <div class="md:hidden pb-2.5 pt-0.5">
         <div onclick="openAddressModal()" class="w-full flex items-center space-x-2 bg-gray-50 active:bg-gray-100 border border-gray-200/90 rounded-xl px-2.5 py-1.5 cursor-pointer">
           <div class="w-6 h-6 rounded-lg bg-amber-100 text-brand-yellow flex items-center justify-center shrink-0">
@@ -188,18 +150,15 @@
     </div>
   </header>
 
-  <!-- BANNER HERO -->
+  <!-- MAIN -->
   <main class="max-w-full overflow-x-hidden">
     <section id="inicio" class="relative bg-brand-black text-white py-8 sm:py-12 overflow-hidden">
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
-
       <div class="max-w-7xl mx-auto px-4 relative z-10">
         <div class="mb-4">
           <h2 id="bannerTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">PHSUBLIME FOOD</h2>
         </div>
-
-        <!-- AVALIAÇÃO EM DESTAQUE -->
         <div id="heroReviewsCardWrapper" class="flex items-center">
           <button onclick="openReviewsModal()" class="flex items-center space-x-3.5 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700/80 px-4 py-3 rounded-2xl transition cursor-pointer group shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-brand-yellow flex items-center justify-center text-lg group-hover:scale-110 transition">
@@ -219,14 +178,14 @@
       </div>
     </section>
 
-    <!-- BARRA DE CATEGORIAS -->
+    <!-- CATEGORIAS -->
     <section id="cardapio" class="bg-white border-b border-gray-200 sticky top-[108px] md:top-20 z-20 py-2.5 sm:py-3 shadow-xs">
       <div class="max-w-7xl mx-auto px-3 sm:px-4">
         <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-0.5"></div>
       </div>
     </section>
 
-    <!-- GRID DE PRODUTOS -->
+    <!-- PRODUTOS -->
     <section class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
@@ -234,17 +193,10 @@
           <p class="text-[11px] sm:text-sm text-gray-500">Escolha e personalize com adicionais</p>
         </div>
         <div class="relative w-full sm:w-64">
-          <input 
-            type="text" 
-            id="searchInput" 
-            oninput="handleSearch(this.value)" 
-            placeholder="Buscar item..." 
-            class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-yellow transition"
-          />
+          <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Buscar item..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-yellow transition" />
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 sm:top-3 text-gray-400 text-xs"></i>
         </div>
       </div>
-
       <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
     </section>
   </main>
@@ -269,7 +221,6 @@
             <i class="fa-brands fa-whatsapp text-emerald-400"></i>
             <span id="footerStoreWhatsapp">(21) 98614-7221</span>
           </p>
-
           <div class="flex flex-wrap items-center gap-2 pt-1" id="footerSocialButtonsContainer">
             <a id="footerBtnWhatsapp" href="https://wa.me/5521986147221" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition shadow-sm">
               <i class="fa-brands fa-whatsapp text-base"></i>
@@ -312,29 +263,23 @@
 
       <div class="mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-400 gap-4">
         <div class="text-center sm:text-left">
-          <p class="font-medium text-neutral-300">
-            Sistema desenvolvido comercialmente por <strong class="text-white">PHSUBLIME</strong>.
-          </p>
+          <p class="font-medium text-neutral-300">Sistema desenvolvido comercialmente por <strong class="text-white">PHSUBLIME</strong>.</p>
           <p class="text-[11px] text-neutral-500">PHSUBLIME • Soluções Digitais para Negócios de Alimentação.</p>
         </div>
         <div class="flex items-center space-x-4">
           <a href="https://instagram.com/PHSUBLIME" target="_blank" class="text-neutral-400 hover:text-brand-yellow transition flex items-center gap-1">
-            <i class="fa-brands fa-instagram"></i>
-            <span>@PHSUBLIME</span>
+            <i class="fa-brands fa-instagram"></i><span>@PHSUBLIME</span>
           </a>
           <span class="text-neutral-700">|</span>
           <a href="https://wa.me/5521986147221" target="_blank" class="text-neutral-400 hover:text-emerald-400 transition flex items-center gap-1">
-            <i class="fa-brands fa-whatsapp"></i>
-            <span>(21) 98614-7221</span>
+            <i class="fa-brands fa-whatsapp"></i><span>(21) 98614-7221</span>
           </a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- ============================================================ -->
-  <!-- MODAL: LINHA DO TEMPO DETALHADA DO RASTREAMENTO -->
-  <!-- ============================================================ -->
+  <!-- MODAL: LINHA DO TEMPO DO RASTREAMENTO -->
   <div id="trackingModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       <div class="p-5 bg-brand-black text-white flex items-center justify-between">
@@ -348,16 +293,12 @@
       </div>
 
       <div class="p-6 overflow-y-auto space-y-6 text-xs">
-        
-        <!-- CARD DO STATUS ATUAL -->
         <div id="trackModalCurrentBanner" class="p-4 rounded-2xl border text-center transition-all bg-amber-50 border-amber-200">
           <span id="trackModalStatusBadgeText" class="font-black text-sm text-brand-black block uppercase">RECEBIDO PELA LOJA</span>
           <p id="trackModalStatusSubtext" class="text-xs text-gray-600 mt-1">Seu pedido foi registrado e aguarda confirmação da cozinha.</p>
         </div>
 
-        <!-- LINHA DO TEMPO VISUAL (STEPPER) -->
         <div class="space-y-4 px-2">
-          <!-- Etapa 1: Recebido -->
           <div class="flex items-start space-x-3.5" id="stepNode-novo">
             <div class="w-8 h-8 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-novo">
               <i class="fa-solid fa-receipt text-xs"></i>
@@ -368,7 +309,6 @@
             </div>
           </div>
 
-          <!-- Etapa 2: Na Cozinha -->
           <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-preparo">
             <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-preparo">
               <i class="fa-solid fa-fire text-xs"></i>
@@ -379,18 +319,16 @@
             </div>
           </div>
 
-          <!-- Etapa 3: Saiu para Entrega -->
           <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-saiu">
             <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-saiu">
               <i class="fa-solid fa-motorcycle text-xs"></i>
             </div>
             <div class="flex-1 pt-1">
-              <h5 class="font-black text-brand-black text-xs" id="stepTitle-saiu">3. Saiu para Entrega</h5>
-              <p class="text-[11px] text-gray-500" id="stepSub-saiu">O motoboy está a caminho do seu endereço.</p>
+              <h5 class="font-black text-brand-black text-xs">3. Saiu para Entrega</h5>
+              <p class="text-[11px] text-gray-500">O motoboy está a caminho do seu endereço.</p>
             </div>
           </div>
 
-          <!-- Etapa 4: Concluído / Entregue -->
           <div class="flex items-start space-x-3.5 opacity-40" id="stepNode-entregue">
             <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm" id="stepIcon-entregue">
               <i class="fa-solid fa-check text-xs"></i>
@@ -402,7 +340,6 @@
           </div>
         </div>
 
-        <!-- RESUMO DO PEDIDO -->
         <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
           <div class="flex justify-between items-center text-xs">
             <span class="text-gray-500">Destino:</span>
@@ -414,25 +351,15 @@
           </div>
         </div>
 
-        <!-- BOTÕES DO MODAL -->
         <div class="space-y-2 pt-2">
-          <!-- Botão Baixa pelo Cliente -->
           <button type="button" id="btnTrackModalReceived" onclick="confirmCustomerDelivered()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
             <i class="fa-solid fa-check text-base"></i>
             <span>JÁ RECEBI MEU PEDIDO!</span>
           </button>
-
-          <!-- Botão Avaliar Pedido (Aparece se já Entregue) -->
-          <button type="button" id="btnTrackModalReview" onclick="openSubmitReviewFromTrack()" class="hidden w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center space-x-1.5 transition cursor-pointer">
-            <i class="fa-solid fa-star"></i>
-            <span>AVALIAR ESSE PEDIDO</span>
-          </button>
-
           <button type="button" onclick="closeTrackingModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
             Continuar Olhando o Cardápio
           </button>
         </div>
-
       </div>
     </div>
   </div>
@@ -447,11 +374,9 @@
       <p class="text-xs text-gray-500 mb-4 leading-relaxed">
         Nossa cozinha está descansando e não estamos recebendo novos pedidos agora. Mas você pode continuar olhando nosso cardápio à vontade!
       </p>
-
       <div class="bg-gray-50 p-3.5 rounded-2xl border border-gray-100 text-xs mb-5 text-left space-y-1">
         <span class="font-bold text-gray-700 text-[11px] block uppercase mb-1 flex items-center gap-1">
-          <i class="fa-solid fa-calendar-days text-brand-yellow"></i>
-          Horário de Atendimento:
+          <i class="fa-solid fa-calendar-days text-brand-yellow"></i> Horário de Atendimento:
         </span>
         <div id="closedModalSchedule" class="text-gray-500 text-[11px] space-y-0.5">
           <p>Segunda a Quinta: 18:00 às 23:00</p>
@@ -459,7 +384,6 @@
           <p>Domingo: 18:00 às 23:00</p>
         </div>
       </div>
-
       <button onclick="closeStoreClosedModal()" class="w-full bg-brand-black hover:bg-neutral-800 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-soft cursor-pointer">
         Entendido, Apenas Ver Cardápio
       </button>
@@ -478,7 +402,6 @@
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-
       <div class="p-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
         <div>
           <div class="flex items-baseline space-x-2">
@@ -492,30 +415,29 @@
           <span>Avaliar Pedido</span>
         </button>
       </div>
-
       <div id="reviewsFeedContainer" class="flex-1 overflow-y-auto p-5 space-y-3.5 divide-y divide-gray-100"></div>
     </div>
   </div>
 
-  <!-- MODAL: FORMULÁRIO DE AVALIAÇÃO -->
+  <!-- MODAL: FORMULÁRIO DE AVALIAÇÃO (ESTILO UBER APÓS ENTREGA) -->
   <div id="submitReviewModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-      <button onclick="closeSubmitReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+      <button onclick="closeSubmitReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
       <div class="text-center mb-5">
-        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2">
+        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-2 shadow-inner">
           <i class="fa-solid fa-star"></i>
         </div>
-        <h3 class="text-lg font-extrabold text-brand-black">Avalie sua Experiência</h3>
-        <p class="text-xs text-gray-500">Sua opinião ajuda outros clientes e o restaurante!</p>
+        <h3 class="text-xl font-extrabold text-brand-black" id="submitReviewHeading">Como foi sua experiência?</h3>
+        <p class="text-xs text-gray-500" id="submitReviewSubheading">Seu pedido foi finalizado! Avalie nosso lanche e atendimento.</p>
       </div>
 
       <form onsubmit="handleSendReview(event)" class="space-y-4 text-xs">
         <div>
           <label class="block font-extrabold uppercase text-gray-700 text-[11px] mb-2 text-center">Quantas estrelas você dá?</label>
-          <div class="flex justify-center items-center space-x-2 text-2xl text-gray-300">
+          <div class="flex justify-center items-center space-x-2 text-3xl text-gray-300">
             <button type="button" onclick="setReviewRating(1)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
             <button type="button" onclick="setReviewRating(2)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
             <button type="button" onclick="setReviewRating(3)" class="star-btn cursor-pointer transition hover:scale-110"><i class="fa-solid fa-star"></i></button>
@@ -527,7 +449,7 @@
 
         <div>
           <label class="block font-bold text-gray-700 mb-1">Seu Comentário ou Elogio *</label>
-          <textarea id="reviewCommentInput" rows="3" placeholder="Ex: Lanche sensacional, quentinho e atendimento nota 10!" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow text-xs resize-none"></textarea>
+          <textarea id="reviewCommentInput" rows="3" placeholder="Ex: Lanche quentinho, saboroso e entrega super rápida!" required class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow text-xs resize-none"></textarea>
         </div>
 
         <div class="p-3 bg-gray-50 rounded-2xl border border-gray-200 text-center">
@@ -539,7 +461,6 @@
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
-
             <label class="cursor-pointer inline-flex items-center gap-2 bg-white border border-gray-300 hover:border-brand-yellow px-3 py-2 rounded-xl text-[11px] font-bold text-gray-700 transition shadow-xs">
               <i class="fa-solid fa-camera text-brand-yellow"></i>
               <span>Escolher ou Tirar Foto</span>
@@ -577,7 +498,6 @@
       <button onclick="closeAddressModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
-
       <div class="p-6 sm:p-7">
         <div class="text-center mb-6">
           <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-xl mx-auto mb-2.5">
@@ -586,19 +506,11 @@
           <h3 class="text-xl font-extrabold text-brand-black">Informe seu endereço</h3>
           <p class="text-xs text-gray-500 mt-0.5">Calculamos a entrega e tempo estimado para você</p>
         </div>
-
         <div class="space-y-4">
           <div>
             <label class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-500 mb-1.5">Insira o CEP do Endereço</label>
             <div class="relative">
-              <input 
-                type="text" 
-                id="cepInput" 
-                maxlength="9" 
-                placeholder="00000-000" 
-                oninput="formatCepInput(this)" 
-                class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition" 
-              />
+              <input type="text" id="cepInput" maxlength="9" placeholder="00000-000" oninput="formatCepInput(this)" class="w-full text-sm font-bold tracking-wider px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow transition" />
               <button type="button" onclick="searchCepManual()" id="btnSearchCep" class="absolute right-1.5 top-1.5 bottom-1.5 bg-brand-black text-white font-black text-xs px-4 rounded-lg transition cursor-pointer">
                 BUSCAR CEP
               </button>
@@ -608,7 +520,6 @@
               <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" class="text-gray-400 hover:text-brand-yellow underline transition ml-auto">Não sabe seu CEP?</a>
             </div>
           </div>
-
           <div id="addressDetailFields" class="space-y-3 pt-2 border-t border-gray-100 hidden">
             <div class="grid grid-cols-3 gap-2">
               <input type="text" id="modalStreet" placeholder="Rua *" class="col-span-2 p-2.5 text-xs rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
@@ -622,7 +533,6 @@
               CONFIRMAR ESTE ENDEREÇO
             </button>
           </div>
-
           <div class="pt-3 border-t border-gray-100 text-center">
             <button onclick="skipAddressSelection()" class="text-xs font-black text-brand-black hover:text-brand-yellow transition underline cursor-pointer">
               Continuar para retirar ou salão →
@@ -639,13 +549,11 @@
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
-
       <div class="w-14 h-14 rounded-2xl bg-amber-50 text-brand-yellow flex items-center justify-center text-2xl mx-auto mb-3">
         <i class="fa-solid fa-mobile-screen-button"></i>
       </div>
       <h3 class="text-xl font-extrabold text-brand-black mb-1">Entre ou cadastre-se</h3>
       <p class="text-xs text-gray-500 mb-6">Para salvar seus endereços e avaliar pedidos.</p>
-
       <form id="authForm" onsubmit="handleCustomerLogin(event)" class="space-y-3 text-left">
         <div>
           <label class="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">WhatsApp / Celular *</label>
@@ -662,7 +570,7 @@
     </div>
   </div>
 
-  <!-- MODAL DO PRODUTO COM ADICIONAIS -->
+  <!-- MODAL DO PRODUTO -->
   <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
       <div class="relative h-56 sm:h-64 bg-neutral-100 overflow-hidden shrink-0">
@@ -671,14 +579,12 @@
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
-
       <div class="p-6 overflow-y-auto">
         <div class="flex justify-between items-start mb-2">
           <h3 id="modalProductName" class="text-xl font-extrabold text-brand-black"></h3>
           <span id="modalProductPrice" class="text-lg font-black text-brand-red"></span>
         </div>
         <p id="modalProductDesc" class="text-sm text-gray-500 mb-5 leading-relaxed"></p>
-
         <div id="modalAddonsSection" class="hidden mb-6 pt-3 border-t border-gray-100">
           <div class="flex justify-between items-center mb-2.5">
             <h4 id="addonGroupDisplayTitle" class="text-xs font-black uppercase text-brand-black tracking-wider">ADICIONAIS</h4>
@@ -686,24 +592,16 @@
           </div>
           <div id="modalAddonsList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
         </div>
-
         <div class="mb-6">
           <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Observação do Item</label>
-          <input 
-            type="text" 
-            id="modalProductNotes" 
-            placeholder="Ex: Sem cebola, ponto da carne..." 
-            class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow"
-          />
+          <input type="text" id="modalProductNotes" placeholder="Ex: Sem cebola, ponto da carne..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
         </div>
-
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
             <button onclick="adjustModalQty(-1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">-</button>
             <span id="modalQtyDisplay" class="w-10 text-center font-black text-sm text-brand-black">1</span>
             <button onclick="adjustModalQty(1)" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition cursor-pointer">+</button>
           </div>
-
           <button onclick="confirmAddToCart()" class="flex-1 ml-4 bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition cursor-pointer shadow-soft">
             <i class="fa-solid fa-bag-shopping"></i>
             <span id="btnModalAddToCartText">ADICIONAR AO CARRINHO</span>
@@ -713,7 +611,7 @@
     </div>
   </div>
 
-  <!-- MODAL: ESCOLHA APÓS ADICIONAR ITEM -->
+  <!-- MODAL: DECISÃO APÓS ADICIONAR ITEM -->
   <div id="itemAddedModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
@@ -721,7 +619,6 @@
       </div>
       <h3 class="text-lg font-black text-brand-black mb-1">Item adicionado com sucesso!</h3>
       <p class="text-xs text-gray-500 mb-5">O que você deseja fazer agora?</p>
-
       <div class="space-y-2.5">
         <button onclick="goToCartFromItemModal()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
           <i class="fa-solid fa-bag-shopping"></i>
@@ -746,9 +643,7 @@
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
     </div>
-
     <div id="cartItemsList" class="flex-1 overflow-y-auto p-5 divide-y divide-gray-100"></div>
-
     <div id="cartFooterArea" class="p-5 bg-gray-50 border-t border-gray-200">
       <div class="space-y-1.5 text-xs mb-4">
         <div class="flex justify-between text-gray-600">
@@ -764,7 +659,6 @@
           <span id="cartGrandTotalText" class="text-brand-black">R$ 0,00</span>
         </div>
       </div>
-
       <div class="space-y-2">
         <button onclick="startCheckout()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-sm transition shadow-soft flex items-center justify-center space-x-2 cursor-pointer">
           <span>FINALIZAR PEDIDO</span>
@@ -794,7 +688,6 @@
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-
       <form id="checkoutForm" onsubmit="processOrderSubmission(event)" class="p-6 overflow-y-auto space-y-5 text-xs">
         <div>
           <h4 class="font-extrabold text-brand-black uppercase tracking-wider text-[11px] mb-3 flex items-center justify-between">
@@ -821,7 +714,6 @@
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">2</span>
             Como deseja receber seu pedido?
           </h4>
-
           <div class="grid grid-cols-3 gap-2">
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="delivery" checked onchange="handleOrderTypeChange()" class="sr-only" />
@@ -829,14 +721,12 @@
               <p class="font-black text-gray-800 text-[11px]">Delivery</p>
               <p class="text-[9px] text-gray-500">Na sua casa</p>
             </label>
-
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="pickup" onchange="handleOrderTypeChange()" class="sr-only" />
               <i class="fa-solid fa-store text-blue-500 text-base block mb-1"></i>
               <p class="font-black text-gray-800 text-[11px]">Retirada</p>
               <p class="text-[9px] text-emerald-600 font-bold">Sem taxa</p>
             </label>
-
             <label class="cursor-pointer border rounded-xl p-2.5 text-center transition border-gray-200 has-[:checked]:border-brand-yellow has-[:checked]:bg-amber-50">
               <input type="radio" name="orderType" value="dine_in" onchange="handleOrderTypeChange()" class="sr-only" />
               <i class="fa-solid fa-utensils text-emerald-500 text-base block mb-1"></i>
@@ -870,7 +760,6 @@
               <label class="block font-bold text-gray-700 mb-1">Ponto de Referência</label>
               <input type="text" id="custReference" placeholder="Ex: Próximo à praça" class="w-full p-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-yellow" />
             </div>
-
             <div id="deliveryFeeNoticeBox" class="p-3 bg-neutral-100 rounded-xl border border-neutral-200 text-xs flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-motorcycle text-brand-yellow text-base"></i>
@@ -908,9 +797,7 @@
             <span class="w-5 h-5 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center text-[10px]">3</span>
             Forma de Pagamento
           </h4>
-
           <div id="paymentOptionsContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-
           <div id="cashChangeArea" class="hidden mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
             <span class="font-bold text-gray-700 block">Precisa de troco?</span>
             <div class="flex items-center space-x-4">
@@ -968,7 +855,6 @@
       <p class="text-xs sm:text-sm text-gray-500 mb-6 leading-relaxed">
         Seu pedido foi registrado na cozinha e a mensagem completa foi aberta no WhatsApp do restaurante.
       </p>
-
       <div class="p-4 bg-gray-50 rounded-2xl text-left text-xs mb-6 space-y-1.5 border border-gray-100">
         <div class="flex justify-between">
           <span class="text-gray-500">Número do Pedido:</span>
@@ -979,7 +865,6 @@
           <span id="successOrderTotal" class="font-extrabold text-brand-red"></span>
         </div>
       </div>
-
       <div class="space-y-2.5">
         <button onclick="openTrackingModalFromSuccess()" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-soft cursor-pointer">
           <i class="fa-solid fa-timeline"></i>
@@ -1003,12 +888,10 @@
         <i class="fa-solid fa-house text-base mb-0.5"></i>
         <span>Início</span>
       </button>
-
       <button onclick="openAddressModal()" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
         <i class="fa-solid fa-location-dot text-base mb-0.5"></i>
         <span>Endereço</span>
       </button>
-
       <button onclick="openCartDrawer()" class="flex flex-col items-center py-1 text-brand-black relative cursor-pointer">
         <div class="relative inline-block">
           <i class="fa-solid fa-bag-shopping text-base mb-0.5 text-brand-yellow"></i>
@@ -1016,7 +899,6 @@
         </div>
         <span id="mobileCartTotal">R$ 0,00</span>
       </button>
-
       <button onclick="openAuthModal()" class="flex flex-col items-center py-1 text-gray-600 hover:text-brand-yellow cursor-pointer">
         <i class="fa-solid fa-user text-base mb-0.5"></i>
         <span id="mobileUserBtnLabel">Perfil</span>
@@ -1024,7 +906,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT DO SISTEMA -->
+  <!-- SCRIPT -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -1081,9 +963,7 @@
 
     function getCleanWaNumber(phone) {
       let clean = (phone || '').toString().replace(/\D/g, '');
-      if (clean.length === 10 || clean.length === 11) {
-        clean = '55' + clean;
-      }
+      if (clean.length === 10 || clean.length === 11) clean = '55' + clean;
       return clean;
     }
 
@@ -1091,9 +971,7 @@
       let v = input.value.replace(/\D/g, '');
       if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
       input.value = v;
-      if (v.replace(/\D/g, '').length === 8) {
-        searchCepManual();
-      }
+      if (v.replace(/\D/g, '').length === 8) searchCepManual();
     }
 
     function formatPhoneInput(input) {
@@ -1109,19 +987,20 @@
       input.value = v;
     }
 
-    // ============================================================
-    // SISTEMA DE RASTREAMENTO EM TEMPO REAL & BAIXA DUPLA
-    // ============================================================
+    // RASTREAMENTO COM SUMIÇO IMEDIATO E POPUP UBER
     function checkActiveOrderOnLoad() {
       const savedOrderId = localStorage.getItem('phsublime_active_order_id');
-      if (savedOrderId) {
-        fetchAndTrackOrder(savedOrderId);
-      }
+      if (savedOrderId) fetchAndTrackOrder(savedOrderId);
     }
 
     async function fetchAndTrackOrder(orderId) {
-      const { data, error } = await db.from('orders').select('*').eq('id', orderId.toString()).maybeSingle();
+      const { data } = await db.from('orders').select('*').eq('id', orderId.toString()).maybeSingle();
       if (data) {
+        const st = (data.status || 'Novo').trim();
+        if (st === 'Entregue' || st === 'Finalizado') {
+          clearActiveTracking();
+          return;
+        }
         currentActiveOrder = data;
         renderTrackingStatus(data);
         setupOrderRealtimeListener(data.id);
@@ -1131,17 +1010,22 @@
     }
 
     function setupOrderRealtimeListener(orderId) {
-      if (trackingRealtimeChannel) {
-        trackingRealtimeChannel.unsubscribe();
-      }
+      if (trackingRealtimeChannel) trackingRealtimeChannel.unsubscribe();
 
       trackingRealtimeChannel = db.channel('live_order_' + orderId)
         .on('postgres_changes', {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `id=eq.${orderId}`
+          event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}`
         }, payload => {
+          const newStatus = (payload.new.status || '').trim();
+
+          // SE FOI FINALIZADO NO ADMIN OU CLIENTE: SOME A TARJA NA HORA E ABRE AVALIAÇÃO UBER!
+          if (newStatus === 'Entregue' || newStatus === 'Finalizado') {
+            const orderRef = payload.new;
+            clearActiveTracking();
+            triggerUberReviewPrompt(orderRef);
+            return;
+          }
+
           currentActiveOrder = payload.new;
           renderTrackingStatus(payload.new);
         })
@@ -1167,7 +1051,6 @@
       const modalDest = document.getElementById('trackModalDestText');
       const modalTotal = document.getElementById('trackModalTotalText');
       const btnModalReceived = document.getElementById('btnTrackModalReceived');
-      const btnModalReview = document.getElementById('btnTrackModalReview');
 
       const status = (order.status || 'Novo').trim();
 
@@ -1175,14 +1058,13 @@
         bar.classList.remove('hidden');
         dot.className = "w-3 h-3 rounded-full bg-rose-500 shrink-0";
         orderNum.innerText = `Pedido #${order.id}`;
-        statusText.innerText = "Pedido Cancelado pela Loja";
+        statusText.innerText = "Pedido Cancelado";
         btnReceived.classList.add('hidden');
 
         modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-rose-50 border-rose-200 text-rose-700";
         modalBadge.innerText = "PEDIDO CANCELADO";
-        modalSub.innerText = "Este pedido foi cancelado no painel da lanchonete.";
+        modalSub.innerText = "Este pedido foi cancelado no painel do restaurante.";
         btnModalReceived.classList.add('hidden');
-        btnModalReview.classList.add('hidden');
         return;
       }
 
@@ -1192,7 +1074,6 @@
       modalDest.innerText = order.address || order.type || 'Consumo';
       modalTotal.innerText = `R$ ${formatMoney(order.total)}`;
 
-      // Reset dos Steppers
       const nodes = {
         novo: document.getElementById('stepNode-novo'),
         preparo: document.getElementById('stepNode-preparo'),
@@ -1209,7 +1090,6 @@
       Object.values(nodes).forEach(n => { n.className = "flex items-start space-x-3.5 opacity-40"; });
       Object.values(icons).forEach(i => { i.className = "w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-black shrink-0 shadow-sm"; });
 
-      // Configuração visual por status
       if (status === 'Novo') {
         dot.className = "w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0";
         statusText.innerText = "Recebido • Aguardando Cozinha";
@@ -1221,9 +1101,7 @@
 
         nodes.novo.className = "flex items-start space-x-3.5 opacity-100";
         icons.novo.className = "w-8 h-8 rounded-full bg-brand-yellow text-brand-black flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
-
         btnModalReceived.classList.remove('hidden');
-        btnModalReview.classList.add('hidden');
 
       } else if (status === 'Em preparo' || status === 'Pronto') {
         dot.className = "w-3 h-3 rounded-full bg-blue-500 animate-pulse shrink-0";
@@ -1231,16 +1109,14 @@
         btnReceived.classList.remove('hidden');
 
         modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-blue-50 border-blue-200";
-        modalBadge.innerText = status === 'Pronto' ? "PRONTO PARA ENTREGA / SERVIR" : "EM PREPARO NA COZINHA";
-        modalSub.innerText = "Os lanches estão sendo montados e embalados com todo carinho!";
+        modalBadge.innerText = status === 'Pronto' ? "PRONTO PARA SERVIR / ENTREGA" : "EM PREPARO NA COZINHA";
+        modalSub.innerText = "Seus lanches estão sendo preparados e embalados com todo carinho!";
 
         nodes.novo.className = "flex items-start space-x-3.5 opacity-100";
         icons.novo.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm";
         nodes.preparo.className = "flex items-start space-x-3.5 opacity-100";
         icons.preparo.className = "w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
-
         btnModalReceived.classList.remove('hidden');
-        btnModalReview.classList.add('hidden');
 
       } else if (status === 'Saiu') {
         dot.className = "w-3 h-3 rounded-full bg-purple-500 animate-pulse shrink-0";
@@ -1257,55 +1133,34 @@
         icons.preparo.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm";
         nodes.saiu.className = "flex items-start space-x-3.5 opacity-100";
         icons.saiu.className = "w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-black shrink-0 shadow-sm animate-pulse";
-
         btnModalReceived.classList.remove('hidden');
-        btnModalReview.classList.add('hidden');
-
-      } else if (status === 'Entregue' || status === 'Finalizado') {
-        dot.className = "w-3 h-3 rounded-full bg-emerald-500 shrink-0";
-        statusText.innerText = "Pedido Entregue • Bom Apetite!";
-        btnReceived.classList.add('hidden');
-
-        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-emerald-50 border-emerald-300 text-emerald-900";
-        modalBadge.innerText = "PEDIDO ENTREGUE COM SUCESSO!";
-        modalSub.innerText = "Esperamos que você ame a sua refeição! Que tal avaliar agora?";
-
-        Object.values(nodes).forEach(n => { n.className = "flex items-start space-x-3.5 opacity-100"; });
-        Object.values(icons).forEach(i => { i.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black shrink-0 shadow-sm"; });
-
-        btnModalReceived.classList.add('hidden');
-        btnModalReview.classList.remove('hidden');
       }
     }
 
-    // BAIXA PELO PRÓPRIO CLIENTE (BOTAO "JÁ RECEBI!")
+    // BAIXA PELO CLIENTE (BOTAO "JÁ RECEBI!")
     async function confirmCustomerDelivered() {
       if (!currentActiveOrder) return;
-
       if (confirm(`Confirmar que você já recebeu o Pedido #${currentActiveOrder.id}?`)) {
-        const orderId = currentActiveOrder.id;
-
-        // Atualiza no Supabase imediatamente (o Admin recebe em tempo real)
-        const { error } = await db.from('orders').update({ status: 'Entregue' }).eq('id', orderId.toString());
-
-        if (!error) {
-          currentActiveOrder.status = 'Entregue';
-          renderTrackingStatus(currentActiveOrder);
-          alert("Que maravilha! Pedido marcado como entregue. Tenha um ótimo apetite!");
-          openSubmitReviewFromTrack();
-        } else {
-          alert("Erro ao confirmar entrega: " + error.message);
-        }
+        const orderRef = currentActiveOrder;
+        await db.from('orders').update({ status: 'Entregue' }).eq('id', orderRef.id.toString());
+        clearActiveTracking();
+        triggerUberReviewPrompt(orderRef);
       }
     }
 
-    function openSubmitReviewFromTrack() {
-      closeTrackingModal();
-      if (!appState.currentUser && currentActiveOrder) {
-        appState.currentUser = { name: currentActiveOrder.client, phone: currentActiveOrder.phone };
-        localStorage.setItem('food_logged_user', JSON.stringify(appState.currentUser));
+    // DISPARA O POPUP ESTILO UBER E SOME A TARJA
+    function triggerUberReviewPrompt(orderRef) {
+      clearActiveTracking();
+      if (orderRef) {
+        if (!appState.currentUser) {
+          appState.currentUser = { name: orderRef.client, phone: orderRef.phone };
+          localStorage.setItem('food_logged_user', JSON.stringify(appState.currentUser));
+          updateUserInterface();
+        }
       }
-      openSubmitReviewModal();
+      setTimeout(() => {
+        openSubmitReviewModal();
+      }, 400);
     }
 
     function openTrackingModal() {
@@ -1326,10 +1181,12 @@
     function clearActiveTracking() {
       localStorage.removeItem('phsublime_active_order_id');
       currentActiveOrder = null;
-      document.getElementById('liveTrackingBar').classList.add('hidden');
+      const bar = document.getElementById('liveTrackingBar');
+      if (bar) bar.classList.add('hidden');
       closeTrackingModal();
       if (trackingRealtimeChannel) {
         trackingRealtimeChannel.unsubscribe();
+        trackingRealtimeChannel = null;
       }
     }
 
@@ -1344,9 +1201,7 @@
 
     function updateReviewsStats() {
       const cardWrapper = document.getElementById('heroReviewsCardWrapper');
-      if (cardWrapper) {
-        cardWrapper.style.display = storeConfig.showReviews !== false ? 'flex' : 'none';
-      }
+      if (cardWrapper) cardWrapper.style.display = storeConfig.showReviews !== false ? 'flex' : 'none';
 
       const heroAvg = document.getElementById('heroAvgRating');
       const heroCount = document.getElementById('heroReviewCount');
@@ -1454,9 +1309,8 @@
           const rPhone = getCleanWaNumber(r.client_phone || '');
           return rPhone === phoneClean || rPhone.endsWith(pureDigits) || phoneClean.endsWith(rPhone.replace(/^55/, ''));
         });
-
         if (alreadyReviewed) {
-          alert("Identificamos que você já avaliou nosso restaurante com este número de WhatsApp! Agradecemos muito pelo seu feedback e carinho!");
+          alert("Identificamos que você já avaliou nosso restaurante com este número de WhatsApp! Agradecemos muito pelo seu carinho!");
           return;
         }
       }
@@ -1539,6 +1393,12 @@
     async function handleSendReview(e) {
       e.preventDefault();
 
+      if (!appState.currentUser) {
+        alert("Por favor, faça login com seu WhatsApp para enviar.");
+        openAuthModal();
+        return;
+      }
+
       const phoneClean = getCleanWaNumber(appState.currentUser.phone);
       const pureDigits = phoneClean.replace(/^55/, '');
 
@@ -1552,7 +1412,6 @@
           const rPhone = getCleanWaNumber(r.client_phone || '');
           return rPhone === phoneClean || rPhone.endsWith(pureDigits) || phoneClean.endsWith(rPhone.replace(/^55/, ''));
         });
-
         if (alreadyDone) {
           alert("Identificamos que este número de telefone já enviou uma avaliação. Agradecemos pelo seu carinho!");
           btn.disabled = false;
@@ -1640,13 +1499,11 @@
       try {
         const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await res.json();
-
         if (data.erro) {
           feedback.innerText = 'CEP não encontrado!';
           btn.innerText = 'BUSCAR CEP';
           return;
         }
-
         document.getElementById('modalStreet').value = data.logradouro || '';
         document.getElementById('modalNeighborhood').value = data.bairro || '';
         document.getElementById('addressDetailFields').classList.remove('hidden');
@@ -1788,7 +1645,6 @@
           bannerNum.innerText = `MESA ${identifiedTable.padStart(2, '0')}`;
           banner.classList.remove('hidden');
         }
-
         const dineInRadio = document.querySelector('input[name="orderType"][value="dine_in"]');
         if (dineInRadio) dineInRadio.checked = true;
         const tableInput = document.getElementById('custTableInput');
@@ -1832,7 +1688,6 @@
 
     async function fetchSettings() {
       const { data } = await db.from('store_settings').select('*').eq('id', 1).maybeSingle();
-      
       if (data) {
         storeConfig.name = data.store_name || storeConfig.name;
         storeConfig.whatsapp = data.whatsapp || storeConfig.whatsapp;
@@ -1841,13 +1696,8 @@
         storeConfig.isOpen = data.is_open !== false;
         storeConfig.showReviews = data.show_reviews !== false;
 
-        if (data.social_links) {
-          storeConfig.socialLinks = data.social_links;
-        }
-
-        if (data.payment_methods) {
-          storeConfig.paymentMethods = data.payment_methods;
-        }
+        if (data.social_links) storeConfig.socialLinks = data.social_links;
+        if (data.payment_methods) storeConfig.paymentMethods = data.payment_methods;
 
         if (Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4) {
           storeConfig.deliveryTiers = data.delivery_tiers;
@@ -1867,8 +1717,7 @@
         if (Array.isArray(data.business_hours) && data.business_hours.length === 3) {
           const scheduleHtml = data.business_hours.map(item => `
             <li class="flex justify-between">
-              <span>${item.days}</span>
-              <span class="text-white font-medium">${item.hours}</span>
+              <span>${item.days}</span><span class="text-white font-medium">${item.hours}</span>
             </li>
           `).join("");
           if (scheduleList) scheduleList.innerHTML = scheduleHtml;
@@ -2102,9 +1951,7 @@
       const customerAddressFull = `${street}, ${number || ''}, ${neighborhood}, Rio de Janeiro`;
 
       try {
-        if (!cachedStoreCoords) {
-          cachedStoreCoords = await getCoordinates(storeConfig.address);
-        }
+        if (!cachedStoreCoords) cachedStoreCoords = await getCoordinates(storeConfig.address);
         if (!cachedStoreCoords) return;
 
         const custCoords = await getCoordinates(customerAddressFull);
@@ -2181,9 +2028,7 @@
           : "bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold";
 
         return `
-          <button 
-            onclick="selectCategory('${cat.id}')" 
-            class="whitespace-nowrap px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center space-x-2 transition transform active:scale-95 cursor-pointer ${activeClass}">
+          <button onclick="selectCategory('${cat.id}')" class="whitespace-nowrap px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center space-x-2 transition transform active:scale-95 cursor-pointer ${activeClass}">
             <i class="${cat.icon || 'fa-solid fa-tag'}"></i>
             <span>${cat.name}</span>
           </button>
@@ -2248,9 +2093,7 @@
               <span class="text-[10px] text-gray-400 uppercase font-bold block">Preço</span>
               <span class="text-base font-black text-brand-black">R$ ${formatMoney(p.price)}</span>
             </div>
-            <button 
-              onclick="openProductModal(${p.id})" 
-              class="bg-brand-black hover:bg-brand-yellow hover:text-brand-black text-white text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-sm active:scale-95 cursor-pointer">
+            <button onclick="openProductModal(${p.id})" class="bg-brand-black hover:bg-brand-yellow hover:text-brand-black text-white text-xs font-black px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-sm active:scale-95 cursor-pointer">
               <i class="fa-solid fa-plus"></i>
               <span>ADICIONAR</span>
             </button>
@@ -2543,27 +2386,18 @@
       const delivery = orderType === "delivery" ? Number(storeConfig.currentAutoFee) : 0;
       const grandTotal = subtotal + delivery;
 
-      if (document.getElementById("chkSubtotalText")) {
-        document.getElementById("chkSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
-      }
+      if (document.getElementById("chkSubtotalText")) document.getElementById("chkSubtotalText").innerText = `R$ ${formatMoney(subtotal)}`;
       if (document.getElementById("chkSummaryFeeText")) {
         document.getElementById("chkSummaryFeeText").innerText = orderType === "delivery" 
-          ? `R$ ${formatMoney(delivery)}` 
-          : orderType === "dine_in" 
-            ? "Grátis (Mesa)" 
-            : "Grátis (Retirada)";
+          ? `R$ ${formatMoney(delivery)}` : orderType === "dine_in" ? "Grátis (Mesa)" : "Grátis (Retirada)";
       }
-      if (document.getElementById("chkFinalTotalText")) {
-        document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
-      }
+      if (document.getElementById("chkFinalTotalText")) document.getElementById("chkFinalTotalText").innerText = `R$ ${formatMoney(grandTotal)}`;
 
       const btnText = document.getElementById("btnSubmitText");
       if (btnText) {
-        if (orderType === "dine_in") {
-          btnText.innerText = `ENVIAR PEDIDO PARA A COZINHA • R$ ${formatMoney(grandTotal)}`;
-        } else {
-          btnText.innerText = `CONFIRMAR E ENVIAR NO WHATSAPP • R$ ${formatMoney(grandTotal)}`;
-        }
+        btnText.innerText = orderType === "dine_in" 
+          ? `ENVIAR PEDIDO PARA A COZINHA • R$ ${formatMoney(grandTotal)}` 
+          : `CONFIRMAR E ENVIAR NO WHATSAPP • R$ ${formatMoney(grandTotal)}`;
       }
     }
 
@@ -2626,7 +2460,6 @@
         destinationType = "Retirada no Balcão";
         deliveryAddressText = "Balcão da Loja";
         deliveryDetailHeader = `🏪 *RETIRADA:* No Balcão do Restaurante\n*Taxa:* Grátis`;
-
         const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
         paymentDetails = paymentMethodRadio ? paymentMethodRadio.value : 'Pagar na Retirada';
       } else if (orderType === "dine_in") {
@@ -2711,7 +2544,6 @@ Obrigado pelo pedido!`;
         return;
       }
 
-      // Salva para a Barra de Rastreamento ao Vivo
       localStorage.setItem('phsublime_active_order_id', orderNumber.toString());
       currentActiveOrder = newOrderPayload;
       renderTrackingStatus(newOrderPayload);
