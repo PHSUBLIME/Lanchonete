@@ -5,24 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Painel do Lojista | PHSUBLIME FOOD</title>
 
-  <!-- FAVICON E META -->
   <link rel="icon" type="image/jpeg" href="https://lanchonete.phsublime.com.br/capa.jpg" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lanchonete.phsublime.com.br/admin" />
   <meta property="og:title" content="Painel de Gestão | PHSUBLIME FOOD" />
   <meta property="og:image" content="https://lanchonete.phsublime.com.br/capa.jpg" />
 
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- GERADOR DE QR CODE LOCAL (OFFLINE) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <!-- CONEXÃO SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -32,12 +26,8 @@
           fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
           colors: {
             brand: {
-              black: '#171717',
-              dark: '#212121',
-              card: '#2A2A2A',
-              yellow: '#FFB800',
-              yellowHover: '#E0A200',
-              red: '#E53935'
+              black: '#171717', dark: '#212121', card: '#2A2A2A',
+              yellow: '#FFB800', yellowHover: '#E0A200', red: '#E53935'
             }
           }
         }
@@ -46,10 +36,7 @@
   </script>
 
   <style>
-    .qrcode-box img, .qrcode-box canvas {
-      margin: 0 auto;
-      border-radius: 8px;
-    }
+    .qrcode-box img, .qrcode-box canvas { margin: 0 auto; border-radius: 8px; }
     @media print {
       body * { visibility: hidden; }
       #printableReceipt, #printableReceipt * { visibility: visible; }
@@ -95,7 +82,6 @@
           <label class="block font-bold text-gray-300 mb-1">Sua Senha</label>
           <input type="password" id="loginPass" placeholder="••••••••" class="w-full p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow font-medium" required />
         </div>
-
         <button type="submit" id="btnLoginSubmit" class="w-full bg-brand-yellow hover:bg-brand-yellowHover text-brand-black font-extrabold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-lg active:scale-95">
           <span>ENTRAR NO PAINEL</span>
           <i class="fa-solid fa-arrow-right"></i>
@@ -127,6 +113,7 @@
 
         <!-- CONTROLES RÁPIDOS -->
         <div class="p-4 border-b border-neutral-800 space-y-2">
+          <!-- LOJA ABERTA / PAUSADA -->
           <div class="bg-neutral-900 p-3 rounded-2xl border border-neutral-800 flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span id="storeStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -134,6 +121,17 @@
             </div>
             <button onclick="toggleStoreOpen()" id="btnToggleStore" class="text-[11px] px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold rounded-lg transition cursor-pointer">
               Pausar
+            </button>
+          </div>
+
+          <!-- BOTÃO NOVO: IMPRESSÃO AUTOMÁTICA -->
+          <div class="bg-neutral-900 p-2.5 rounded-2xl border border-neutral-800 flex items-center justify-between text-xs">
+            <span class="text-[11px] text-gray-400 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-print text-brand-yellow"></i>
+              <span>Imprimir Auto:</span>
+            </span>
+            <button onclick="toggleAutoPrint()" id="btnToggleAutoPrint" class="text-[11px] px-2.5 py-1 bg-neutral-800 text-gray-400 font-bold rounded-lg transition cursor-pointer">
+              DESLIGADA
             </button>
           </div>
 
@@ -258,7 +256,7 @@
         <div id="ordersContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ABA 2: FINANCEIRO / CAIXA CONSOLIDADO -->
+      <!-- ABA 2: FINANCEIRO / CAIXA -->
       <section id="tab-dashboard" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -380,7 +378,7 @@
         </div>
       </section>
 
-      <!-- ABA 3: MODERAÇÃO DE AVALIAÇÕES -->
+      <!-- ABA 3: AVALIAÇÕES -->
       <section id="tab-reviews" class="tab-content hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -447,7 +445,7 @@
         <div id="adminProductTable" class="space-y-3"></div>
       </section>
 
-      <!-- ABA 5: PLACAS DE MESA COM QR CODE -->
+      <!-- ABA 5: PLACAS DE MESA -->
       <section id="tab-tables" class="tab-content hidden max-w-4xl">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -481,17 +479,14 @@
         </div>
 
         <form onsubmit="saveStoreSettings(event)" class="space-y-5 bg-brand-dark p-6 rounded-2xl border border-neutral-800 text-xs">
-          
           <div class="space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-store"></i> Identidade & Endereço Completo
             </h3>
-
             <div>
               <label class="block font-bold text-gray-300 mb-1">Nome Fantasia do Restaurante *</label>
               <input type="text" id="cfgName" placeholder="Ex: Café da Vovó" class="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white focus:outline-none focus:border-brand-yellow" required />
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block font-bold text-gray-300 mb-1">WhatsApp para Pedidos (com DDI 55) *</label>
@@ -505,13 +500,11 @@
             </div>
           </div>
 
-          <!-- REDES SOCIAIS & LINKS DO RODAPÉ -->
+          <!-- REDES SOCIAIS & LINKS -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-share-nodes"></i> Redes Sociais & Links do Rodapé
             </h3>
-            <p class="text-[11px] text-gray-400">Marque as redes que deseja exibir no rodapé da loja e informe o link de cada uma:</p>
-
             <div class="space-y-3">
               <div class="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
                 <div class="flex items-center justify-between">
@@ -559,7 +552,7 @@
             </div>
           </div>
 
-          <!-- FORMAS DE PAGAMENTO ACEITAS -->
+          <!-- PAGAMENTOS -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-credit-card"></i> Formas de Pagamento Aceitas no Cardápio
@@ -569,17 +562,14 @@
                 <input type="checkbox" id="cfgPayPix" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
                 <span class="font-bold text-gray-200 text-xs">PIX</span>
               </label>
-
               <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
                 <input type="checkbox" id="cfgPayMoney" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
                 <span class="font-bold text-gray-200 text-xs">Dinheiro</span>
               </label>
-
               <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
                 <input type="checkbox" id="cfgPayCredit" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
                 <span class="font-bold text-gray-200 text-xs">Crédito</span>
               </label>
-
               <label class="flex items-center space-x-2 bg-neutral-900 p-3 rounded-xl border border-neutral-800 cursor-pointer hover:border-neutral-700 transition">
                 <input type="checkbox" id="cfgPayDebit" checked class="w-4 h-4 rounded accent-brand-yellow cursor-pointer" />
                 <span class="font-bold text-gray-200 text-xs">Débito</span>
@@ -587,7 +577,7 @@
             </div>
           </div>
 
-          <!-- HORÁRIOS DE ATENDIMENTO -->
+          <!-- HORÁRIOS -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-clock"></i> Horário de Atendimento no Rodapé
@@ -603,7 +593,6 @@
                   <input type="text" id="cfgHours1" value="18:00 às 23:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
                 </div>
               </div>
-
               <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 2)</label>
@@ -614,7 +603,6 @@
                   <input type="text" id="cfgHours2" value="18:00 às 00:00" class="w-full p-2 rounded-lg bg-neutral-950 border border-neutral-700 text-brand-yellow font-black" required />
                 </div>
               </div>
-
               <div class="p-3 bg-neutral-900/90 rounded-xl border border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="text-[10px] text-gray-400 block mb-0.5 font-bold">Dias (Linha 3)</label>
@@ -628,7 +616,7 @@
             </div>
           </div>
 
-          <!-- TABELA DE FRETE POR KM -->
+          <!-- FRETE -->
           <div class="pt-4 border-t border-neutral-800 space-y-3">
             <h3 class="text-xs font-black uppercase text-brand-yellow tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-motorcycle"></i> Tabela de Frete por Distância (KM)
@@ -647,7 +635,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 2</span>
                 <div class="grid grid-cols-2 gap-2">
@@ -661,7 +648,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 3</span>
                 <div class="grid grid-cols-2 gap-2">
@@ -675,7 +661,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="p-3.5 bg-neutral-900/90 rounded-xl border border-neutral-800 space-y-2">
                 <span class="font-extrabold text-white text-xs block">🛵 Faixa 4</span>
                 <div class="grid grid-cols-2 gap-2">
@@ -711,9 +696,7 @@
         <i class="fa-solid fa-ban"></i>
       </div>
       <h3 class="text-base font-black text-white mb-1" id="cancelOrderModalTitle">Cancelar Pedido?</h3>
-      <p class="text-gray-300 text-[11px] mb-4">
-        O pedido sairá da fila de abertos e será movido com segurança para a aba de <strong>Cancelados</strong>.
-      </p>
+      <p class="text-gray-300 text-[11px] mb-4">O pedido sairá da fila de abertos e será movido para a aba de <strong>Cancelados</strong>.</p>
       <div class="flex gap-2">
         <button type="button" onclick="closeCancelOrderModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
         <button type="button" id="btnConfirmCancelAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Cancelar</button>
@@ -721,14 +704,14 @@
     </div>
   </div>
 
-  <!-- MODAL: EXCLUIR AVALIAÇÃO DEFINITIVAMENTE -->
+  <!-- MODAL: EXCLUIR AVALIAÇÃO -->
   <div id="deleteReviewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-xl mb-3">
         <i class="fa-solid fa-trash"></i>
       </div>
       <h3 class="text-base font-black text-white mb-1">Excluir Avaliação?</h3>
-      <p class="text-gray-400 text-[11px] mb-4">Esse comentário e sua foto serão removidos permanentemente do banco.</p>
+      <p class="text-gray-400 text-[11px] mb-4">Esse comentário e sua foto serão removidos permanentemente.</p>
       <div class="flex gap-2">
         <button type="button" onclick="closeDeleteReviewModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
         <button type="button" id="btnConfirmDeleteReview" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Excluir</button>
@@ -736,14 +719,14 @@
     </div>
   </div>
 
-  <!-- MODAL: EXCLUIR FECHAMENTO ANTIGO -->
+  <!-- MODAL: EXCLUIR FECHAMENTO -->
   <div id="deleteClosureModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-rose-500/50 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-xl mb-3">
         <i class="fa-solid fa-trash"></i>
       </div>
       <h3 class="text-base font-black text-white mb-1">Excluir Registro de Fechamento?</h3>
-      <p class="text-gray-400 text-[11px] mb-4">Essa linha será removida permanentemente do histórico do caixa.</p>
+      <p class="text-gray-400 text-[11px] mb-4">Essa linha será removida do histórico do caixa.</p>
       <div class="flex gap-2">
         <button type="button" onclick="closeDeleteClosureModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 font-bold py-2.5 rounded-xl transition cursor-pointer">Voltar</button>
         <button type="button" id="btnConfirmDeleteClosure" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-2.5 rounded-xl transition shadow-lg cursor-pointer">Sim, Excluir</button>
@@ -751,7 +734,7 @@
     </div>
   </div>
 
-  <!-- MODAL: BAIXAR COM FORMA DE PAGAMENTO REAL -->
+  <!-- MODAL: BAIXAR PEDIDO -->
   <div id="paymentSettlementModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border-2 border-brand-yellow shadow-2xl text-xs">
       <div class="flex justify-between items-center mb-3">
@@ -795,7 +778,7 @@
     </div>
   </div>
 
-  <!-- MODAL: FECHAR O DIA / CAIXA -->
+  <!-- MODAL: FECHAMENTO DE CAIXA -->
   <div id="closeShiftModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border-2 border-rose-500 shadow-2xl text-xs">
       <div class="flex justify-between items-center mb-3">
@@ -857,7 +840,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CADASTRAR / EDITAR PRODUTO -->
+  <!-- MODAL: PRODUTO -->
   <div id="productEditModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 sm:p-7 rounded-3xl max-w-xl w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[92vh]">
       <div class="flex justify-between items-center mb-4">
@@ -950,7 +933,7 @@
     </div>
   </div>
 
-  <!-- MODAL: GERENCIAR CATEGORIAS -->
+  <!-- MODAL: CATEGORIAS -->
   <div id="categoryManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-md w-full border border-neutral-800 shadow-2xl text-xs overflow-y-auto max-h-[90vh]">
       <div class="flex justify-between items-center mb-4">
@@ -985,7 +968,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TEMPO DE ESPERA DELIVERY -->
+  <!-- MODAL: TEMPO DELIVERY -->
   <div id="deliveryTimeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-brand-dark p-6 rounded-3xl max-w-sm w-full border border-neutral-700 shadow-2xl text-xs text-center">
       <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-brand-yellow flex items-center justify-center mx-auto text-xl mb-3">
@@ -1017,7 +1000,7 @@
   <div id="printableReceipt" class="hidden"></div>
   <div id="printAreaTables" class="hidden"></div>
 
-  <!-- JAVASCRIPT DO PAINEL COM BLINDAGEM DUPLA (TEMPO REAL + POLLING) -->
+  <!-- JAVASCRIPT DO PAINEL COM IMPRESSÃO AUTOMÁTICA -->
   <script>
     const SUPABASE_URL = "https://wigbqncohvchvemnishe.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZ2JxbmNvaHZjaHZlbW5pc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzAwMTYsImV4cCI6MjEwNTAwNjAxNn0.azY4mBS5pF27rq-XGNX8thxeXt3t3wKkO90OzyNwbck";
@@ -1043,6 +1026,42 @@
     let audioContextInstance = null;
     let isInitialOrdersLoad = true;
     let lastChimeTriggerTimestamp = 0;
+    let lastAutoPrintedOrderId = null;
+
+    // IMPRESSÃO AUTOMÁTICA (Salva no dispositivo)
+    window.isAutoPrintEnabled = localStorage.getItem('admin_autoprint_enabled') === 'true';
+
+    function updateAutoPrintUI() {
+      const btn = document.getElementById('btnToggleAutoPrint');
+      if (!btn) return;
+      if (window.isAutoPrintEnabled) {
+        btn.className = "text-[11px] px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 font-black rounded-lg transition cursor-pointer";
+        btn.innerText = "LIGADA";
+      } else {
+        btn.className = "text-[11px] px-2.5 py-1 bg-neutral-800 text-gray-400 font-bold rounded-lg transition cursor-pointer";
+        btn.innerText = "DESLIGADA";
+      }
+    }
+
+    function toggleAutoPrint() {
+      window.isAutoPrintEnabled = !window.isAutoPrintEnabled;
+      localStorage.setItem('admin_autoprint_enabled', window.isAutoPrintEnabled ? 'true' : 'false');
+      updateAutoPrintUI();
+      showToast(
+        "Impressão Automática",
+        window.isAutoPrintEnabled ? "LIGADA! As comandas serão impressas ao receber o pedido." : "DESLIGADA."
+      );
+    }
+
+    function checkAndAutoPrint(order) {
+      if (!window.isAutoPrintEnabled || !order) return;
+      if (String(lastAutoPrintedOrderId) === String(order.id)) return;
+      lastAutoPrintedOrderId = String(order.id);
+
+      setTimeout(() => {
+        printReceipt(order);
+      }, 500);
+    }
 
     const PRESET_CATEGORY_ICONS = [
       { icon: 'fa-solid fa-mug-hot', label: 'Café' },
@@ -1062,12 +1081,8 @@
     function initUserAudio() {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!audioContextInstance) {
-          audioContextInstance = new AudioContext();
-        }
-        if (audioContextInstance.state === 'suspended') {
-          audioContextInstance.resume();
-        }
+        if (!audioContextInstance) audioContextInstance = new AudioContext();
+        if (audioContextInstance.state === 'suspended') audioContextInstance.resume();
       } catch (e) {}
     }
     window.addEventListener('click', initUserAudio);
@@ -1076,7 +1091,6 @@
 
     function playOrderChime() {
       const nowMs = Date.now();
-      // Evita repetição duplicada se o evento Realtime e o Polling chegarem juntos
       if (nowMs - lastChimeTriggerTimestamp < 2000) return;
       lastChimeTriggerTimestamp = nowMs;
 
@@ -1098,17 +1112,13 @@
         alarmPattern.forEach(t => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(t.freq, now + t.start);
-
           gain.gain.setValueAtTime(0.001, now + t.start);
           gain.gain.exponentialRampToValueAtTime(0.85, now + t.start + 0.02);
           gain.gain.exponentialRampToValueAtTime(0.001, now + t.start + t.dur);
-
           osc.connect(gain);
           gain.connect(ctx.destination);
-
           osc.start(now + t.start);
           osc.stop(now + t.start + t.dur + 0.05);
         });
@@ -1143,6 +1153,7 @@
     }
 
     async function loadAllData() {
+      updateAutoPrintUI();
       await Promise.all([
         fetchCategories(),
         fetchProducts(),
@@ -1172,7 +1183,6 @@
       }
     }
 
-    // BUSCA DE PEDIDOS COM BLINDAGEM DE ALARME AUTOMÁTICA
     async function fetchOrders() {
       const { data } = await db.from('orders').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -1187,6 +1197,7 @@
           if (incomingNewOrders.length > 0) {
             playOrderChime();
             showToast(`Novo Pedido #${incomingNewOrders[0].id}!`, `${incomingNewOrders[0].client} enviou um pedido.`);
+            checkAndAutoPrint(incomingNewOrders[0]);
           }
         }
 
@@ -1266,10 +1277,8 @@
         const tiers = Array.isArray(data.delivery_tiers) && data.delivery_tiers.length === 4
           ? data.delivery_tiers
           : [
-              { km: 3, price: 5.00 },
-              { km: 6, price: 8.00 },
-              { km: 10, price: 12.00 },
-              { km: 15, price: 15.00 }
+              { km: 3, price: 5.00 }, { km: 6, price: 8.00 },
+              { km: 10, price: 12.00 }, { km: 15, price: 15.00 }
             ];
 
         document.getElementById('cfgKm1').value = tiers[0].km;
@@ -1747,7 +1756,7 @@
         showToast("Erro ao Salvar", res.error.message, true);
         return;
       } else {
-        showToast("Produto Salvo com Sucesso!", `${name} cadastrado com adicionais.`);
+        showToast("Produto Salvo com Sucesso!", `${name} cadastrado.`);
       }
 
       window.adminSelectedCategory = 'all';
@@ -1930,16 +1939,23 @@
       showToast("Status Atualizado", `Pedido #${id} marcado como ${newStatus}.`);
     }
 
-    function printReceipt(orderId) {
-      const ord = window.storeOrders.find(o => o.id === orderId);
+    // IMPRESSÃO DE COMANDA (ACEITA ID OU OBJETO DO PEDIDO)
+    function printReceipt(orderOrId) {
+      let ord = null;
+      if (typeof orderOrId === 'object' && orderOrId !== null) {
+        ord = orderOrId;
+      } else {
+        ord = window.storeOrders.find(o => String(o.id) === String(orderOrId));
+      }
       if (!ord) return;
+
       const receiptArea = document.getElementById("printableReceipt");
       const isMesa = isTableOrder(ord);
 
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
-          <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress').value || ''}</p>
+          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${document.getElementById('cfgName')?.value || 'PHSUBLIME FOOD'}</h2>
+          <p style="margin: 2px 0; font-size: 11px;">${document.getElementById('cfgAddress')?.value || ''}</p>
           <div style="margin: 8px 0; padding: 6px; background: #000; color: #fff; border-radius: 4px;">
             <span style="font-size: 15px; font-weight: 900;">
               ${isMesa ? `🍽️ ${formatTableNumber(ord)}` : '🛵 ENTREGA DELIVERY'}
@@ -1949,7 +1965,7 @@
 
         <div style="margin-bottom: 8px; font-size: 11px;">
           <p style="margin: 2px 0;"><strong>PEDIDO:</strong> #${ord.id}</p>
-          <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time}</p>
+          <p style="margin: 2px 0;"><strong>HORÁRIO:</strong> ${ord.time || ''}</p>
           <p style="margin: 2px 0;"><strong>CLIENTE:</strong> ${ord.client}</p>
           ${ord.phone ? `<p style="margin: 2px 0;"><strong>TELEFONE:</strong> ${ord.phone}</p>` : ''}
           ${!isMesa ? `<p style="margin: 2px 0;"><strong>ENDEREÇO:</strong> ${ord.address}</p>` : ''}
@@ -2162,7 +2178,6 @@
 
     function calculateShiftMetrics() {
       const currentShiftOrders = window.storeOrders.filter(o => !isOrderFromPastShift(o));
-
       const validOrders = currentShiftOrders.filter(o => o.status !== "Cancelado");
       const cancelledOrders = currentShiftOrders.filter(o => o.status === "Cancelado");
 
@@ -2242,11 +2257,8 @@
       });
 
       const noticeArea = document.getElementById('existingClosureNotice');
-      if (existingToday) {
-        noticeArea.classList.remove('hidden');
-      } else {
-        noticeArea.classList.add('hidden');
-      }
+      if (existingToday) noticeArea.classList.remove('hidden');
+      else noticeArea.classList.add('hidden');
 
       document.getElementById('closeShiftModal').classList.remove('hidden');
     }
@@ -2440,7 +2452,6 @@
     async function executeDeleteClosure() {
       if (!window.closureIdToDelete) return;
       const cid = window.closureIdToDelete;
-
       closeDeleteClosureModal();
 
       const { error } = await db.from('daily_closures').delete().eq('id', cid);
@@ -2475,7 +2486,7 @@
       const receiptArea = document.getElementById("printableReceipt");
       receiptArea.innerHTML = `
         <div style="text-align:center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${document.getElementById('cfgName').value || 'PHSUBLIME FOOD'}</h2>
+          <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${document.getElementById('cfgName')?.value || 'PHSUBLIME FOOD'}</h2>
           <p style="margin: 2px 0; font-size: 13px; font-weight: bold;">FECHAMENTO DE CAIXA</p>
           <p style="margin: 2px 0; font-size: 11px;">Data: ${data.date}</p>
         </div>
@@ -2644,13 +2655,14 @@
       document.getElementById(`nav-${tabId}`).className = "nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-yellow text-brand-black transition cursor-pointer";
     }
 
-    // SINCRONIZAÇÃO EM TEMPO REAL COM DISPARO INSTANTÂNEO
+    // TEMPO REAL COM DISPARO DA IMPRESSÃO AUTOMÁTICA
     function setupRealtimeListeners() {
       db.channel('admin_live')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
           playOrderChime();
           showToast(`Novo Pedido #${payload.new.id}!`, `${payload.new.client} enviou um pedido.`);
           fetchOrders();
+          checkAndAutoPrint(payload.new);
         })
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
           const idx = window.storeOrders.findIndex(o => String(o.id) === String(payload.new.id));
@@ -2669,13 +2681,8 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, () => fetchSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_closures' }, () => fetchClosures())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => fetchAdminReviews())
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            console.log("Supabase Realtime conectado com sucesso!");
-          }
-        });
+        .subscribe();
 
-      // Polling contínuo a cada 5 segundos (garante disparo do som mesmo se o WebSocket dormir)
       setInterval(fetchOrders, 5000);
     }
 
