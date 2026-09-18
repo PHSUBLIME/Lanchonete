@@ -45,6 +45,22 @@
 </head>
 <body class="bg-[#F8F9FA] text-brand-black antialiased selection:bg-brand-yellow selection:text-brand-black pb-28 md:pb-12 max-w-full overflow-x-hidden">
 
+  <!-- AVISO LEVE E MODERNO: PEDIDO CANCELADO (ESTILO TOAST) -->
+  <div id="orderCancelledToast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-white/95 backdrop-blur-md border border-gray-200 shadow-2xl rounded-2xl p-3.5 transition-all duration-300 transform -translate-y-12 opacity-0 pointer-events-none flex items-center justify-between gap-3">
+    <div class="flex items-center space-x-3 truncate">
+      <div class="w-8 h-8 rounded-xl bg-amber-50 text-brand-yellow flex items-center justify-center shrink-0 text-sm">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+      <div class="truncate text-left">
+        <h4 class="font-extrabold text-xs text-brand-black" id="cancelledToastTitle">Pedido Cancelado</h4>
+        <p class="text-[11px] text-gray-500 font-medium truncate">Seu pedido foi cancelado. Qualquer dúvida, chama no WhatsApp!</p>
+      </div>
+    </div>
+    <button type="button" onclick="dismissCancelledNotice()" class="text-gray-400 hover:text-brand-black transition w-7 h-7 rounded-full flex items-center justify-center shrink-0 cursor-pointer">
+      <i class="fa-solid fa-xmark text-xs"></i>
+    </button>
+  </div>
+
   <!-- BARRA FIXA DE RASTREAMENTO FLUTUANTE -->
   <div id="liveTrackingBar" class="hidden fixed top-2 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-2xl z-40 bg-neutral-900/95 border border-brand-yellow/60 text-white rounded-2xl shadow-2xl p-2.5 sm:p-3 backdrop-blur-md transition-all duration-300">
     <div class="flex items-center justify-between gap-2">
@@ -945,6 +961,7 @@
     let currentReviewPhotoBase64 = '';
     let currentActiveOrder = null;
     let trackingRealtimeChannel = null;
+    let cancelledToastTimer = null;
 
     let appState = {
       cart: [],
@@ -987,7 +1004,34 @@
       input.value = v;
     }
 
-    // RASTREAMENTO COM SUMIÇO IMEDIATO E LIMPEZA QUANDO CANCELADO
+    // AVISO LEVE DE CANCELAMENTO (TOAST)
+    function showOrderCancelledNotice(orderId) {
+      clearActiveTracking();
+
+      const toast = document.getElementById('orderCancelledToast');
+      const title = document.getElementById('cancelledToastTitle');
+      if (title && orderId) title.innerText = `Pedido #${orderId} Cancelado`;
+
+      if (toast) {
+        toast.classList.remove('pointer-events-none', '-translate-y-12', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        clearTimeout(cancelledToastTimer);
+        cancelledToastTimer = setTimeout(() => {
+          dismissCancelledNotice();
+        }, 6000);
+      }
+    }
+
+    function dismissCancelledNotice() {
+      const toast = document.getElementById('orderCancelledToast');
+      if (toast) {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-12', 'opacity-0', 'pointer-events-none');
+      }
+    }
+
+    // RASTREAMENTO COM LIMPEZA IMEDIATA
     function checkActiveOrderOnLoad() {
       const savedOrderId = localStorage.getItem('phsublime_active_order_id');
       if (savedOrderId) fetchAndTrackOrder(savedOrderId);
@@ -997,7 +1041,6 @@
       const { data } = await db.from('orders').select('*').eq('id', orderId.toString()).maybeSingle();
       if (data) {
         const st = (data.status || 'Novo').trim();
-        // Se foi Entregue, Finalizado ou Cancelado no admin, limpa o rastreamento imediatamente
         if (st === 'Entregue' || st === 'Finalizado' || st === 'Cancelado') {
           clearActiveTracking();
           return;
@@ -1027,10 +1070,9 @@
             return;
           }
 
-          // SE FOI CANCELADO NO ADMIN: NOTIFICA O CLIENTE E REMOVE A TARJA DA TELA
+          // SE FOI CANCELADO NO ADMIN: SOME A TARJA E EXIBE AVISO LEVE E LIMPO
           if (newStatus === 'Cancelado') {
-            alert(`Atenção: Seu pedido #${orderId} foi cancelado pelo restaurante.`);
-            clearActiveTracking();
+            showOrderCancelledNotice(orderId);
             return;
           }
 
@@ -1136,7 +1178,7 @@
       }
     }
 
-    // BAIXA PELO CLIENTE (BOTÃO "JÁ RECEBI!")
+    // BAIXA PELO CLIENTE (BOTAO "JÁ RECEBI!")
     async function confirmCustomerDelivered() {
       if (!currentActiveOrder) return;
       const orderRef = currentActiveOrder;
