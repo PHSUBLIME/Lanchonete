@@ -987,7 +987,7 @@
       input.value = v;
     }
 
-    // RASTREAMENTO COM SUMIÇO IMEDIATO E POPUP UBER
+    // RASTREAMENTO COM SUMIÇO IMEDIATO E LIMPEZA QUANDO CANCELADO
     function checkActiveOrderOnLoad() {
       const savedOrderId = localStorage.getItem('phsublime_active_order_id');
       if (savedOrderId) fetchAndTrackOrder(savedOrderId);
@@ -997,7 +997,8 @@
       const { data } = await db.from('orders').select('*').eq('id', orderId.toString()).maybeSingle();
       if (data) {
         const st = (data.status || 'Novo').trim();
-        if (st === 'Entregue' || st === 'Finalizado') {
+        // Se foi Entregue, Finalizado ou Cancelado no admin, limpa o rastreamento imediatamente
+        if (st === 'Entregue' || st === 'Finalizado' || st === 'Cancelado') {
           clearActiveTracking();
           return;
         }
@@ -1023,6 +1024,13 @@
             const orderRef = payload.new;
             clearActiveTracking();
             triggerUberReviewPrompt(orderRef);
+            return;
+          }
+
+          // SE FOI CANCELADO NO ADMIN: NOTIFICA O CLIENTE E REMOVE A TARJA DA TELA
+          if (newStatus === 'Cancelado') {
+            alert(`Atenção: Seu pedido #${orderId} foi cancelado pelo restaurante.`);
+            clearActiveTracking();
             return;
           }
 
@@ -1055,16 +1063,7 @@
       const status = (order.status || 'Novo').trim();
 
       if (status === 'Cancelado') {
-        bar.classList.remove('hidden');
-        dot.className = "w-3 h-3 rounded-full bg-rose-500 shrink-0";
-        orderNum.innerText = `Pedido #${order.id}`;
-        statusText.innerText = "Pedido Cancelado";
-        btnReceived.classList.add('hidden');
-
-        modalBanner.className = "p-4 rounded-2xl border text-center transition-all bg-rose-50 border-rose-200 text-rose-700";
-        modalBadge.innerText = "PEDIDO CANCELADO";
-        modalSub.innerText = "Este pedido foi cancelado no painel do restaurante.";
-        btnModalReceived.classList.add('hidden');
+        clearActiveTracking();
         return;
       }
 
@@ -1137,14 +1136,14 @@
       }
     }
 
-    // BAIXA PELO CLIENTE (BOTAO "JÁ RECEBI!") - SEM CAIXA FEIA
-async function confirmCustomerDelivered() {
-  if (!currentActiveOrder) return;
-  const orderRef = currentActiveOrder;
-  await db.from('orders').update({ status: 'Entregue' }).eq('id', orderRef.id.toString());
-  clearActiveTracking();
-  triggerUberReviewPrompt(orderRef);
-}
+    // BAIXA PELO CLIENTE (BOTÃO "JÁ RECEBI!")
+    async function confirmCustomerDelivered() {
+      if (!currentActiveOrder) return;
+      const orderRef = currentActiveOrder;
+      await db.from('orders').update({ status: 'Entregue' }).eq('id', orderRef.id.toString());
+      clearActiveTracking();
+      triggerUberReviewPrompt(orderRef);
+    }
 
     // DISPARA O POPUP ESTILO UBER E SOME A TARJA
     function triggerUberReviewPrompt(orderRef) {
@@ -1169,6 +1168,9 @@ async function confirmCustomerDelivered() {
 
     function closeTrackingModal() {
       document.getElementById('trackingModal').classList.add('hidden');
+      if (currentActiveOrder && (currentActiveOrder.status || '').trim() === 'Cancelado') {
+        clearActiveTracking();
+      }
     }
 
     function openTrackingModalFromSuccess() {
@@ -1181,7 +1183,8 @@ async function confirmCustomerDelivered() {
       currentActiveOrder = null;
       const bar = document.getElementById('liveTrackingBar');
       if (bar) bar.classList.add('hidden');
-      closeTrackingModal();
+      const modal = document.getElementById('trackingModal');
+      if (modal) modal.classList.add('hidden');
       if (trackingRealtimeChannel) {
         trackingRealtimeChannel.unsubscribe();
         trackingRealtimeChannel = null;
